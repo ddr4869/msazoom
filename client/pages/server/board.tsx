@@ -29,7 +29,7 @@ export const getBoardsAxios = (token:string) => {
 export const createBoardAxios = (token:string, board_name:string, board_password:string) => {
     try {
       return new Promise<any>((resolve, reject) => {
-        const reqUrl = '/board/create';
+        const reqUrl = '/board';
         axios.post(reqUrl, {
             board_name: board_name,
             board_password: board_password

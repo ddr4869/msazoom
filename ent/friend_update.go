@@ -70,6 +70,20 @@ func (fu *FriendUpdate) SetNillableCreatedAt(t *time.Time) *FriendUpdate {
 	return fu
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (fu *FriendUpdate) SetUpdatedAt(t time.Time) *FriendUpdate {
+	fu.mutation.SetUpdatedAt(t)
+	return fu
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (fu *FriendUpdate) SetNillableUpdatedAt(t *time.Time) *FriendUpdate {
+	if t != nil {
+		fu.SetUpdatedAt(*t)
+	}
+	return fu
+}
+
 // Mutation returns the FriendMutation object of the builder.
 func (fu *FriendUpdate) Mutation() *FriendMutation {
 	return fu.mutation
@@ -119,6 +133,9 @@ func (fu *FriendUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := fu.mutation.CreatedAt(); ok {
 		_spec.SetField(friend.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := fu.mutation.UpdatedAt(); ok {
+		_spec.SetField(friend.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, fu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -178,6 +195,20 @@ func (fuo *FriendUpdateOne) SetCreatedAt(t time.Time) *FriendUpdateOne {
 func (fuo *FriendUpdateOne) SetNillableCreatedAt(t *time.Time) *FriendUpdateOne {
 	if t != nil {
 		fuo.SetCreatedAt(*t)
+	}
+	return fuo
+}
+
+// SetUpdatedAt sets the "updatedAt" field.
+func (fuo *FriendUpdateOne) SetUpdatedAt(t time.Time) *FriendUpdateOne {
+	fuo.mutation.SetUpdatedAt(t)
+	return fuo
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (fuo *FriendUpdateOne) SetNillableUpdatedAt(t *time.Time) *FriendUpdateOne {
+	if t != nil {
+		fuo.SetUpdatedAt(*t)
 	}
 	return fuo
 }
@@ -261,6 +292,9 @@ func (fuo *FriendUpdateOne) sqlSave(ctx context.Context) (_node *Friend, err err
 	}
 	if value, ok := fuo.mutation.CreatedAt(); ok {
 		_spec.SetField(friend.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := fuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(friend.FieldUpdatedAt, field.TypeTime, value)
 	}
 	_node = &Friend{config: fuo.config}
 	_spec.Assign = _node.assignValues

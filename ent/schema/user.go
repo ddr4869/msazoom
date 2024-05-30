@@ -22,6 +22,8 @@ func (User) Fields() []ent.Field {
 			Default(0),
 		field.Time("createdAt").
 			Default(time.Now),
+		field.Time("updatedAt").
+			Default(time.Now),
 	}
 }
 

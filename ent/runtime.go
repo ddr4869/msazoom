@@ -38,18 +38,30 @@ func init() {
 	boardDescCreatedAt := boardFields[4].Descriptor()
 	// board.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	board.DefaultCreatedAt = boardDescCreatedAt.Default.(func() time.Time)
+	// boardDescUpdatedAt is the schema descriptor for updatedAt field.
+	boardDescUpdatedAt := boardFields[5].Descriptor()
+	// board.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	board.DefaultUpdatedAt = boardDescUpdatedAt.Default.(func() time.Time)
 	friendFields := schema.Friend{}.Fields()
 	_ = friendFields
 	// friendDescCreatedAt is the schema descriptor for createdAt field.
 	friendDescCreatedAt := friendFields[2].Descriptor()
 	// friend.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	friend.DefaultCreatedAt = friendDescCreatedAt.Default.(func() time.Time)
+	// friendDescUpdatedAt is the schema descriptor for updatedAt field.
+	friendDescUpdatedAt := friendFields[3].Descriptor()
+	// friend.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	friend.DefaultUpdatedAt = friendDescUpdatedAt.Default.(func() time.Time)
 	messageFields := schema.Message{}.Fields()
 	_ = messageFields
 	// messageDescCreatedAt is the schema descriptor for createdAt field.
 	messageDescCreatedAt := messageFields[3].Descriptor()
 	// message.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	message.DefaultCreatedAt = messageDescCreatedAt.Default.(func() time.Time)
+	// messageDescUpdatedAt is the schema descriptor for updatedAt field.
+	messageDescUpdatedAt := messageFields[4].Descriptor()
+	// message.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	message.DefaultUpdatedAt = messageDescUpdatedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescRole is the schema descriptor for role field.
@@ -60,4 +72,8 @@ func init() {
 	userDescCreatedAt := userFields[3].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// userDescUpdatedAt is the schema descriptor for updatedAt field.
+	userDescUpdatedAt := userFields[4].Descriptor()
+	// user.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 }

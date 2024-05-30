@@ -90,6 +90,20 @@ func (bc *BoardCreate) SetNillableCreatedAt(t *time.Time) *BoardCreate {
 	return bc
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (bc *BoardCreate) SetUpdatedAt(t time.Time) *BoardCreate {
+	bc.mutation.SetUpdatedAt(t)
+	return bc
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (bc *BoardCreate) SetNillableUpdatedAt(t *time.Time) *BoardCreate {
+	if t != nil {
+		bc.SetUpdatedAt(*t)
+	}
+	return bc
+}
+
 // Mutation returns the BoardMutation object of the builder.
 func (bc *BoardCreate) Mutation() *BoardMutation {
 	return bc.mutation
@@ -145,6 +159,10 @@ func (bc *BoardCreate) defaults() {
 		v := board.DefaultCreatedAt()
 		bc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := bc.mutation.UpdatedAt(); !ok {
+		v := board.DefaultUpdatedAt()
+		bc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -160,6 +178,9 @@ func (bc *BoardCreate) check() error {
 	}
 	if _, ok := bc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Board.createdAt"`)}
+	}
+	if _, ok := bc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "Board.updatedAt"`)}
 	}
 	return nil
 }
@@ -206,6 +227,10 @@ func (bc *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.CreatedAt(); ok {
 		_spec.SetField(board.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if value, ok := bc.mutation.UpdatedAt(); ok {
+		_spec.SetField(board.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	return _node, _spec
 }

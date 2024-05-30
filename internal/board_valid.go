@@ -26,3 +26,13 @@ func (s *Server) GetBoardWithIDValid(c *gin.Context) {
 	c.Set("reqUri", reqUri)
 	c.Next()
 }
+
+func (s *Server) RecommendBoardValid(c *gin.Context) {
+	var req dto.RecommendBoardRequest
+	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
+		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get block number")
+		return
+	}
+	c.Set("req", req)
+	c.Next()
+}

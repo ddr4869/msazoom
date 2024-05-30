@@ -84,6 +84,20 @@ func (mu *MessageUpdate) SetNillableCreatedAt(t *time.Time) *MessageUpdate {
 	return mu
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (mu *MessageUpdate) SetUpdatedAt(t time.Time) *MessageUpdate {
+	mu.mutation.SetUpdatedAt(t)
+	return mu
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (mu *MessageUpdate) SetNillableUpdatedAt(t *time.Time) *MessageUpdate {
+	if t != nil {
+		mu.SetUpdatedAt(*t)
+	}
+	return mu
+}
+
 // Mutation returns the MessageMutation object of the builder.
 func (mu *MessageUpdate) Mutation() *MessageMutation {
 	return mu.mutation
@@ -136,6 +150,9 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := mu.mutation.CreatedAt(); ok {
 		_spec.SetField(message.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := mu.mutation.UpdatedAt(); ok {
+		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -209,6 +226,20 @@ func (muo *MessageUpdateOne) SetCreatedAt(t time.Time) *MessageUpdateOne {
 func (muo *MessageUpdateOne) SetNillableCreatedAt(t *time.Time) *MessageUpdateOne {
 	if t != nil {
 		muo.SetCreatedAt(*t)
+	}
+	return muo
+}
+
+// SetUpdatedAt sets the "updatedAt" field.
+func (muo *MessageUpdateOne) SetUpdatedAt(t time.Time) *MessageUpdateOne {
+	muo.mutation.SetUpdatedAt(t)
+	return muo
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (muo *MessageUpdateOne) SetNillableUpdatedAt(t *time.Time) *MessageUpdateOne {
+	if t != nil {
+		muo.SetUpdatedAt(*t)
 	}
 	return muo
 }
@@ -295,6 +326,9 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 	}
 	if value, ok := muo.mutation.CreatedAt(); ok {
 		_spec.SetField(message.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := muo.mutation.UpdatedAt(); ok {
+		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
 	}
 	_node = &Message{config: muo.config}
 	_spec.Assign = _node.assignValues

@@ -26,7 +26,9 @@ type Board struct {
 	// BoardStar holds the value of the "board_star" field.
 	BoardStar int `json:"board_star,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt    time.Time `json:"createdAt,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	// UpdatedAt holds the value of the "updatedAt" field.
+	UpdatedAt    time.Time `json:"updatedAt,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -39,7 +41,7 @@ func (*Board) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case board.FieldBoardName, board.FieldBoardAdmin, board.FieldBoardPassword:
 			values[i] = new(sql.NullString)
-		case board.FieldCreatedAt:
+		case board.FieldCreatedAt, board.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -92,6 +94,12 @@ func (b *Board) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				b.CreatedAt = value.Time
 			}
+		case board.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
+			} else if value.Valid {
+				b.UpdatedAt = value.Time
+			}
 		default:
 			b.selectValues.Set(columns[i], values[i])
 		}
@@ -142,6 +150,9 @@ func (b *Board) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("createdAt=")
 	builder.WriteString(b.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updatedAt=")
+	builder.WriteString(b.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

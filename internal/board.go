@@ -1,21 +1,30 @@
 package internal
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ddr4869/msazoom/internal/dto"
+	"github.com/ddr4869/msazoom/internal/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
+
+type CustomClaimsExample struct {
+	Name string `json:"name"`
+	Role string `json:"role"`
+	jwt.RegisteredClaims
+}
 
 func (s *Server) CreateBoard(c *gin.Context) {
 	req := c.MustGet("req").(dto.CreateBoardRequest)
-	board, err := s.repository.CreateBoard(c, req.BoardName, req.BoardAdmin, req.BoardPassword)
+	claims := c.MustGet("claims").(*utils.UserClaims)
+
+	board, err := s.repository.CreateBoard(c, req.BoardName, claims.Name, req.BoardPassword)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	dto.NewSuccessResponse(c, board)
+	dto.NewSuccessResponse(c, dto.BoardEntToResponse(board))
 }
 
 func (s *Server) GetBoardList(c *gin.Context) {
@@ -24,16 +33,31 @@ func (s *Server) GetBoardList(c *gin.Context) {
 		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to get board list")
 		return
 	}
-	dto.NewSuccessResponse(c, boardList)
+
+	var boardResponse []dto.BoardResponse
+	for _, board := range boardList {
+		boardResponse = append(boardResponse, dto.BoardEntToResponse(board))
+	}
+	dto.NewSuccessResponse(c, boardResponse)
 }
 
 func (s *Server) GetBoardWithID(c *gin.Context) {
 	reqUri := c.MustGet("reqUri").(dto.GetBoardWithIDRequest)
-	fmt.Println(reqUri.BoardID)
 	board, err := s.repository.GetBoardWithID(c, reqUri.BoardID)
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get board")
 		return
 	}
-	dto.NewSuccessResponse(c, board)
+	dto.NewSuccessResponse(c, dto.BoardEntToResponse(board))
+}
+
+func (s *Server) RecommendBoard(c *gin.Context) {
+	req := c.MustGet("req").(dto.RecommendBoardRequest)
+
+	board, err := s.repository.RecommendBoard(c, req.BoardID)
+	if err != nil {
+		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to recommend board")
+		return
+	}
+	dto.NewSuccessResponse(c, dto.BoardEntToResponse(board))
 }

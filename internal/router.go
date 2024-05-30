@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/ddr4869/msazoom/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +19,9 @@ func SetUp(s *Server) {
 
 	api.GET("/board", s.GetBoardList)
 	api.GET("/board/:board_id", s.GetBoardWithIDValid, s.GetBoardWithID)
-	api.POST("/board", s.CreateBoardValid, s.CreateBoard)
+
+	api.POST("/board", utils.ParseJWT(), s.CreateBoardValid, s.CreateBoard)
+	api.POST("/board/recommend", s.RecommendBoardValid, s.RecommendBoard)
 }
 
 func (s *Server) Ping(c *gin.Context) {

@@ -111,6 +111,20 @@ func (bu *BoardUpdate) SetNillableCreatedAt(t *time.Time) *BoardUpdate {
 	return bu
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (bu *BoardUpdate) SetUpdatedAt(t time.Time) *BoardUpdate {
+	bu.mutation.SetUpdatedAt(t)
+	return bu
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (bu *BoardUpdate) SetNillableUpdatedAt(t *time.Time) *BoardUpdate {
+	if t != nil {
+		bu.SetUpdatedAt(*t)
+	}
+	return bu
+}
+
 // Mutation returns the BoardMutation object of the builder.
 func (bu *BoardUpdate) Mutation() *BoardMutation {
 	return bu.mutation
@@ -172,6 +186,9 @@ func (bu *BoardUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := bu.mutation.CreatedAt(); ok {
 		_spec.SetField(board.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := bu.mutation.UpdatedAt(); ok {
+		_spec.SetField(board.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, bu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -276,6 +293,20 @@ func (buo *BoardUpdateOne) SetNillableCreatedAt(t *time.Time) *BoardUpdateOne {
 	return buo
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (buo *BoardUpdateOne) SetUpdatedAt(t time.Time) *BoardUpdateOne {
+	buo.mutation.SetUpdatedAt(t)
+	return buo
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (buo *BoardUpdateOne) SetNillableUpdatedAt(t *time.Time) *BoardUpdateOne {
+	if t != nil {
+		buo.SetUpdatedAt(*t)
+	}
+	return buo
+}
+
 // Mutation returns the BoardMutation object of the builder.
 func (buo *BoardUpdateOne) Mutation() *BoardMutation {
 	return buo.mutation
@@ -367,6 +398,9 @@ func (buo *BoardUpdateOne) sqlSave(ctx context.Context) (_node *Board, err error
 	}
 	if value, ok := buo.mutation.CreatedAt(); ok {
 		_spec.SetField(board.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := buo.mutation.UpdatedAt(); ok {
+		_spec.SetField(board.FieldUpdatedAt, field.TypeTime, value)
 	}
 	_node = &Board{config: buo.config}
 	_spec.Assign = _node.assignValues

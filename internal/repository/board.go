@@ -22,7 +22,7 @@ func (r Repository) CreateBoard(ctx context.Context, board_name, board_admin, bo
 }
 
 func (r Repository) GetBoardList(ctx context.Context) ([]*ent.Board, error) {
-	boardList, err := r.entClient.Board.Query().All(ctx)
+	boardList, err := r.entClient.Board.Query().Order(ent.Desc(board.FieldCreatedAt)).All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get board list: %w", err)
 	}
@@ -35,6 +35,14 @@ func (r Repository) GetBoardWithID(ctx context.Context, id int) (*ent.Board, err
 	).First(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get board: %w", err)
+	}
+	return board, nil
+}
+
+func (r Repository) RecommendBoard(ctx context.Context, id int) (*ent.Board, error) {
+	board, err := r.entClient.Board.UpdateOneID(id).AddBoardStar(1).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to recommend board: %w", err)
 	}
 	return board, nil
 }

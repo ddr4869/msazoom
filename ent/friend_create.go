@@ -46,6 +46,20 @@ func (fc *FriendCreate) SetNillableCreatedAt(t *time.Time) *FriendCreate {
 	return fc
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (fc *FriendCreate) SetUpdatedAt(t time.Time) *FriendCreate {
+	fc.mutation.SetUpdatedAt(t)
+	return fc
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (fc *FriendCreate) SetNillableUpdatedAt(t *time.Time) *FriendCreate {
+	if t != nil {
+		fc.SetUpdatedAt(*t)
+	}
+	return fc
+}
+
 // Mutation returns the FriendMutation object of the builder.
 func (fc *FriendCreate) Mutation() *FriendMutation {
 	return fc.mutation
@@ -85,6 +99,10 @@ func (fc *FriendCreate) defaults() {
 		v := friend.DefaultCreatedAt()
 		fc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := fc.mutation.UpdatedAt(); !ok {
+		v := friend.DefaultUpdatedAt()
+		fc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -97,6 +115,9 @@ func (fc *FriendCreate) check() error {
 	}
 	if _, ok := fc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Friend.createdAt"`)}
+	}
+	if _, ok := fc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "Friend.updatedAt"`)}
 	}
 	return nil
 }
@@ -135,6 +156,10 @@ func (fc *FriendCreate) createSpec() (*Friend, *sqlgraph.CreateSpec) {
 	if value, ok := fc.mutation.CreatedAt(); ok {
 		_spec.SetField(friend.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if value, ok := fc.mutation.UpdatedAt(); ok {
+		_spec.SetField(friend.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	return _node, _spec
 }

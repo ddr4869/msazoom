@@ -52,6 +52,20 @@ func (mc *MessageCreate) SetNillableCreatedAt(t *time.Time) *MessageCreate {
 	return mc
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (mc *MessageCreate) SetUpdatedAt(t time.Time) *MessageCreate {
+	mc.mutation.SetUpdatedAt(t)
+	return mc
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (mc *MessageCreate) SetNillableUpdatedAt(t *time.Time) *MessageCreate {
+	if t != nil {
+		mc.SetUpdatedAt(*t)
+	}
+	return mc
+}
+
 // Mutation returns the MessageMutation object of the builder.
 func (mc *MessageCreate) Mutation() *MessageMutation {
 	return mc.mutation
@@ -91,6 +105,10 @@ func (mc *MessageCreate) defaults() {
 		v := message.DefaultCreatedAt()
 		mc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := mc.mutation.UpdatedAt(); !ok {
+		v := message.DefaultUpdatedAt()
+		mc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -106,6 +124,9 @@ func (mc *MessageCreate) check() error {
 	}
 	if _, ok := mc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Message.createdAt"`)}
+	}
+	if _, ok := mc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "Message.updatedAt"`)}
 	}
 	return nil
 }
@@ -148,6 +169,10 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.CreatedAt(); ok {
 		_spec.SetField(message.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if value, ok := mc.mutation.UpdatedAt(); ok {
+		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	return _node, _spec
 }

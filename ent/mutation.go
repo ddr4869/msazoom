@@ -46,6 +46,7 @@ type BoardMutation struct {
 	board_star     *int
 	addboard_star  *int
 	createdAt      *time.Time
+	updatedAt      *time.Time
 	clearedFields  map[string]struct{}
 	done           bool
 	oldValue       func(context.Context) (*Board, error)
@@ -364,6 +365,42 @@ func (m *BoardMutation) ResetCreatedAt() {
 	m.createdAt = nil
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (m *BoardMutation) SetUpdatedAt(t time.Time) {
+	m.updatedAt = &t
+}
+
+// UpdatedAt returns the value of the "updatedAt" field in the mutation.
+func (m *BoardMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updatedAt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updatedAt" field's value of the Board entity.
+// If the Board object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BoardMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updatedAt" field.
+func (m *BoardMutation) ResetUpdatedAt() {
+	m.updatedAt = nil
+}
+
 // Where appends a list predicates to the BoardMutation builder.
 func (m *BoardMutation) Where(ps ...predicate.Board) {
 	m.predicates = append(m.predicates, ps...)
@@ -398,7 +435,7 @@ func (m *BoardMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BoardMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.board_name != nil {
 		fields = append(fields, board.FieldBoardName)
 	}
@@ -413,6 +450,9 @@ func (m *BoardMutation) Fields() []string {
 	}
 	if m.createdAt != nil {
 		fields = append(fields, board.FieldCreatedAt)
+	}
+	if m.updatedAt != nil {
+		fields = append(fields, board.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -432,6 +472,8 @@ func (m *BoardMutation) Field(name string) (ent.Value, bool) {
 		return m.BoardStar()
 	case board.FieldCreatedAt:
 		return m.CreatedAt()
+	case board.FieldUpdatedAt:
+		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -451,6 +493,8 @@ func (m *BoardMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldBoardStar(ctx)
 	case board.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case board.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Board field %s", name)
 }
@@ -494,6 +538,13 @@ func (m *BoardMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case board.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Board field %s", name)
@@ -583,6 +634,9 @@ func (m *BoardMutation) ResetField(name string) error {
 	case board.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
+	case board.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
 	}
 	return fmt.Errorf("unknown Board field %s", name)
 }
@@ -644,6 +698,7 @@ type FriendMutation struct {
 	username      *string
 	friend        *string
 	createdAt     *time.Time
+	updatedAt     *time.Time
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Friend, error)
@@ -856,6 +911,42 @@ func (m *FriendMutation) ResetCreatedAt() {
 	m.createdAt = nil
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (m *FriendMutation) SetUpdatedAt(t time.Time) {
+	m.updatedAt = &t
+}
+
+// UpdatedAt returns the value of the "updatedAt" field in the mutation.
+func (m *FriendMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updatedAt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updatedAt" field's value of the Friend entity.
+// If the Friend object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FriendMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updatedAt" field.
+func (m *FriendMutation) ResetUpdatedAt() {
+	m.updatedAt = nil
+}
+
 // Where appends a list predicates to the FriendMutation builder.
 func (m *FriendMutation) Where(ps ...predicate.Friend) {
 	m.predicates = append(m.predicates, ps...)
@@ -890,7 +981,7 @@ func (m *FriendMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *FriendMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.username != nil {
 		fields = append(fields, friend.FieldUsername)
 	}
@@ -899,6 +990,9 @@ func (m *FriendMutation) Fields() []string {
 	}
 	if m.createdAt != nil {
 		fields = append(fields, friend.FieldCreatedAt)
+	}
+	if m.updatedAt != nil {
+		fields = append(fields, friend.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -914,6 +1008,8 @@ func (m *FriendMutation) Field(name string) (ent.Value, bool) {
 		return m.Friend()
 	case friend.FieldCreatedAt:
 		return m.CreatedAt()
+	case friend.FieldUpdatedAt:
+		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -929,6 +1025,8 @@ func (m *FriendMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldFriend(ctx)
 	case friend.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case friend.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Friend field %s", name)
 }
@@ -958,6 +1056,13 @@ func (m *FriendMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case friend.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Friend field %s", name)
@@ -1016,6 +1121,9 @@ func (m *FriendMutation) ResetField(name string) error {
 		return nil
 	case friend.FieldCreatedAt:
 		m.ResetCreatedAt()
+		return nil
+	case friend.FieldUpdatedAt:
+		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Friend field %s", name)
@@ -1343,6 +1451,7 @@ type MessageMutation struct {
 	message       *string
 	writer        *string
 	createdAt     *time.Time
+	updatedAt     *time.Time
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Message, error)
@@ -1591,6 +1700,42 @@ func (m *MessageMutation) ResetCreatedAt() {
 	m.createdAt = nil
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (m *MessageMutation) SetUpdatedAt(t time.Time) {
+	m.updatedAt = &t
+}
+
+// UpdatedAt returns the value of the "updatedAt" field in the mutation.
+func (m *MessageMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updatedAt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updatedAt" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updatedAt" field.
+func (m *MessageMutation) ResetUpdatedAt() {
+	m.updatedAt = nil
+}
+
 // Where appends a list predicates to the MessageMutation builder.
 func (m *MessageMutation) Where(ps ...predicate.Message) {
 	m.predicates = append(m.predicates, ps...)
@@ -1625,7 +1770,7 @@ func (m *MessageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MessageMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.board_id != nil {
 		fields = append(fields, message.FieldBoardID)
 	}
@@ -1637,6 +1782,9 @@ func (m *MessageMutation) Fields() []string {
 	}
 	if m.createdAt != nil {
 		fields = append(fields, message.FieldCreatedAt)
+	}
+	if m.updatedAt != nil {
+		fields = append(fields, message.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -1654,6 +1802,8 @@ func (m *MessageMutation) Field(name string) (ent.Value, bool) {
 		return m.Writer()
 	case message.FieldCreatedAt:
 		return m.CreatedAt()
+	case message.FieldUpdatedAt:
+		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -1671,6 +1821,8 @@ func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldWriter(ctx)
 	case message.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case message.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Message field %s", name)
 }
@@ -1707,6 +1859,13 @@ func (m *MessageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case message.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Message field %s", name)
@@ -1768,6 +1927,9 @@ func (m *MessageMutation) ResetField(name string) error {
 		return nil
 	case message.FieldCreatedAt:
 		m.ResetCreatedAt()
+		return nil
+	case message.FieldUpdatedAt:
+		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Message field %s", name)
@@ -1832,6 +1994,7 @@ type UserMutation struct {
 	role          *int
 	addrole       *int
 	createdAt     *time.Time
+	updatedAt     *time.Time
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*User, error)
@@ -2100,6 +2263,42 @@ func (m *UserMutation) ResetCreatedAt() {
 	m.createdAt = nil
 }
 
+// SetUpdatedAt sets the "updatedAt" field.
+func (m *UserMutation) SetUpdatedAt(t time.Time) {
+	m.updatedAt = &t
+}
+
+// UpdatedAt returns the value of the "updatedAt" field in the mutation.
+func (m *UserMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updatedAt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updatedAt" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updatedAt" field.
+func (m *UserMutation) ResetUpdatedAt() {
+	m.updatedAt = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -2134,7 +2333,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.username != nil {
 		fields = append(fields, user.FieldUsername)
 	}
@@ -2146,6 +2345,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.createdAt != nil {
 		fields = append(fields, user.FieldCreatedAt)
+	}
+	if m.updatedAt != nil {
+		fields = append(fields, user.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -2163,6 +2365,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Role()
 	case user.FieldCreatedAt:
 		return m.CreatedAt()
+	case user.FieldUpdatedAt:
+		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -2180,6 +2384,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldRole(ctx)
 	case user.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case user.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -2216,6 +2422,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case user.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -2292,6 +2505,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldCreatedAt:
 		m.ResetCreatedAt()
+		return nil
+	case user.FieldUpdatedAt:
+		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

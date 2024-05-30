@@ -16,6 +16,7 @@ var (
 		{Name: "board_password", Type: field.TypeString, Default: "unknown"},
 		{Name: "board_star", Type: field.TypeInt, Nullable: true, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
 	// BoardsTable holds the schema information for the "boards" table.
 	BoardsTable = &schema.Table{
@@ -29,6 +30,7 @@ var (
 		{Name: "username", Type: field.TypeString},
 		{Name: "friend", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
 	// FriendsTable holds the schema information for the "friends" table.
 	FriendsTable = &schema.Table{
@@ -53,6 +55,7 @@ var (
 		{Name: "message", Type: field.TypeString},
 		{Name: "writer", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
 	// MessagesTable holds the schema information for the "messages" table.
 	MessagesTable = &schema.Table{
@@ -67,6 +70,7 @@ var (
 		{Name: "password", Type: field.TypeString},
 		{Name: "role", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

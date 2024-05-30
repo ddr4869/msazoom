@@ -19,6 +19,8 @@ func (Friend) Fields() []ent.Field {
 		field.String("friend"),
 		field.Time("createdAt").
 			Default(time.Now),
+		field.Time("updatedAt").
+			Default(time.Now),
 	}
 }
 

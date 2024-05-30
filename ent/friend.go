@@ -22,7 +22,9 @@ type Friend struct {
 	// Friend holds the value of the "friend" field.
 	Friend string `json:"friend,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt    time.Time `json:"createdAt,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	// UpdatedAt holds the value of the "updatedAt" field.
+	UpdatedAt    time.Time `json:"updatedAt,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -35,7 +37,7 @@ func (*Friend) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case friend.FieldUsername, friend.FieldFriend:
 			values[i] = new(sql.NullString)
-		case friend.FieldCreatedAt:
+		case friend.FieldCreatedAt, friend.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -75,6 +77,12 @@ func (f *Friend) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
 				f.CreatedAt = value.Time
+			}
+		case friend.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
+			} else if value.Valid {
+				f.UpdatedAt = value.Time
 			}
 		default:
 			f.selectValues.Set(columns[i], values[i])
@@ -120,6 +128,9 @@ func (f *Friend) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("createdAt=")
 	builder.WriteString(f.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updatedAt=")
+	builder.WriteString(f.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

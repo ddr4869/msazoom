@@ -20,6 +20,8 @@ func (Message) Fields() []ent.Field {
 		field.String("writer"),
 		field.Time("createdAt").
 			Default(time.Now),
+		field.Time("updatedAt").
+			Default(time.Now),
 	}
 }
 
