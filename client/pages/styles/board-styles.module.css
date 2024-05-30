@@ -1,0 +1,32 @@
+.boardsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 600px; /* 컨테이너의 최대 너비 설정 */
+  }
+  
+  .boardCard {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    width: calc(80%); /* 한 줄에 2개의 카드가 들어가도록 너비 조정 */
+  }
+  
+  .button {
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+    /* 스타일 파일에 아래 코드를 추가하거나, CSS 모듈을 사용할 경우 해당 스타일을 추가합니다. */
+.flexBoardContainer {
+  display: flex;
+  flex-wrap: wrap; /* 너비를 초과하면 다음 줄로 넘어감 */
+  gap: 10px; /* 아이템 간격 설정 */
+}
+
+.gridBoardContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 2fr); /* 각 열의 너비를 균등하게 설정 */
+  gap: 10px; /* 그리드 간격 설정 */
+  grid-auto-rows: minmax(100px, auto);
+}
