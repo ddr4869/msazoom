@@ -3,7 +3,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import axios from 'axios';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from "next/router";
-import { createBoardAxios, getBoardsAxios, recommendBoardAxios } from '../server/board';
+import { createBoardAxios, getBoardsAxios, recommendBoardAxios, deleteBoardAxios } from '../server/board';
 import boardStyles from '../styles/board-styles.module.css'
 import userStyles from '../styles/userProfile-styles.module.css'
 
@@ -13,7 +13,7 @@ const Home = () => {
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [boards, setBoards] = useState([]);
-  const [recommended, setRecommended] = useState(false);
+  const [boardReload, setBoardReload] = useState(false);
   const [showCreateBoardForm, setShowCreateBoardForm] = useState(false);
   const router = useRouter();
 
@@ -57,16 +57,37 @@ const Home = () => {
       }
   };
 
-  const handleRecommend = async (board_id: number) => {
+  const handleRecommendBoard = async (board_id: number) => {
     try {
         await recommendBoard(board_id); // 추천 요청 보내기
-        setRecommended(true); // 추천 상태 업데이트
+        setBoardReload(true); // 추천 상태 업데이트
     } catch (error) {
         // 추천 요청 실패 시 에러 처리
         console.error('Error recommending board:', error);
     }
   };
 
+  async function deleteBoard(board_id:number, board_password:string) {
+    try {
+      // API 요청 URL을 적절히 변경하세요.
+      console.log("board_id: ", board_id)
+      const response = await deleteBoardAxios(localStorage.getItem('accessToken'), board_id, board_password);
+      console.log("resp: ", response)
+      return response
+    } catch (error) {
+      console.error('Error fetching boards:', error);
+    }
+};
+
+  const handleDeleteBoard = async (board_id: number, board_password:string) => {
+    try {
+        await deleteBoard(board_id, board_password); // 추천 요청 보내기
+        setBoardReload(true); // 추천 상태 업데이트
+    } catch (error) {
+        // 추천 요청 실패 시 에러 처리
+        console.error('Error recommending board:', error);
+    }
+  };
 
   useEffect(() => {
     if (typeof localStorage === 'undefined') {
@@ -93,8 +114,8 @@ const Home = () => {
     } else {
       setBoards([])
     }
-    setRecommended(false);
-  }, [isLoggedIn, recommended, showCreateBoardForm]);
+    setBoardReload(false);
+  }, [isLoggedIn, boardReload, showCreateBoardForm]);
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -157,9 +178,9 @@ const Home = () => {
                 <div>Star: {board.board_star}</div>
                 <div>Admin: {board.board_admin}</div>
                 <button onClick={() => navigateToBoard(board.id, board.board_name)}>View Board</button>{" "}
-                <button onClick={() => handleRecommend(board.id)}>Recommend</button>{" "}
+                <button onClick={() => handleRecommendBoard(board.id)}>Recommend</button>{" "}
                 { board.board_admin == localStorage.getItem('username') &&
-                  <button onClick={() => handleRecommend(board.id)}>Delete</button>
+                  <button onClick={() => handleDeleteBoard(board.id, board.board_password)}>Delete</button>
                 }
               </div>
               ))}
@@ -177,6 +198,9 @@ const Home = () => {
               <input type="text" placeholder="Board Name" name="board_name" />
               <input type="text" placeholder="Board Password" name="board_password" />
               <button type="submit">Create</button>
+            <form onClick={() => setShowCreateBoardForm(false)}>
+              <button type="submit">Cancel</button>
+            </form>
             </form>
           )}
         </div>

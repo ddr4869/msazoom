@@ -8,8 +8,9 @@ type CreateBoardRequest struct {
 	BoardPassword string `json:"board_password"`
 }
 
-type GetBoardWithIDRequest struct {
-	BoardID int `uri:"board_id" binding:"required"`
+type GetBoardWithIDUriRequest struct {
+	BoardID       int    `json:"board_id" binding:"required"`
+	BoardPassword string `json:"board_password" binding:"required"`
 }
 
 type RecommendBoardRequest struct {

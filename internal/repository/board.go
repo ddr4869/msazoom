@@ -46,3 +46,11 @@ func (r Repository) RecommendBoard(ctx context.Context, id int) (*ent.Board, err
 	}
 	return board, nil
 }
+
+func (r Repository) DeleteBoard(ctx context.Context, id int) error {
+	err := r.entClient.Board.DeleteOneID(id).Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete board: %w", err)
+	}
+	return nil
+}

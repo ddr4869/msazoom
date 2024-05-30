@@ -42,7 +42,7 @@ func (s *Server) GetBoardList(c *gin.Context) {
 }
 
 func (s *Server) GetBoardWithID(c *gin.Context) {
-	reqUri := c.MustGet("reqUri").(dto.GetBoardWithIDRequest)
+	reqUri := c.MustGet("reqUri").(dto.GetBoardWithIDUriRequest)
 	board, err := s.repository.GetBoardWithID(c, reqUri.BoardID)
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get board")
@@ -60,4 +60,27 @@ func (s *Server) RecommendBoard(c *gin.Context) {
 		return
 	}
 	dto.NewSuccessResponse(c, dto.BoardEntToResponse(board))
+}
+
+func (s *Server) DeleteBoard(c *gin.Context) {
+	req := c.MustGet("req").(dto.GetBoardWithIDUriRequest)
+	board, err := s.repository.GetBoardWithID(c, req.BoardID)
+	if err != nil {
+		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get board")
+		return
+	}
+	if board.BoardAdmin != c.MustGet("claims").(*utils.UserClaims).Name {
+		dto.NewErrorResponse(c, http.StatusUnauthorized, nil, "you are not the admin of this board")
+		return
+	}
+	if board.BoardPassword != req.BoardPassword {
+		dto.NewErrorResponse(c, http.StatusUnauthorized, nil, "invalid password")
+		return
+	}
+	err = s.repository.DeleteBoard(c, req.BoardID)
+	if err != nil {
+		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to delete board")
+		return
+	}
+	dto.NewSuccessResponse(c, "success")
 }
