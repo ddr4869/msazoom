@@ -1,4 +1,3 @@
-import React from "react";
 import MsgComponent from "./msgComponent";
 import { useRef, useEffect } from "react";
 

@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useSession, SessionProvider } from "next-auth/react";
 import { socket, WebsocketProvider } from '../socket/websocketContext';
 import { Websocket } from '../socket/websocket';
-import axios from '../server/axios'
+import axios from '../../server/axios'
 
 
 export default function Page({id}:any) {

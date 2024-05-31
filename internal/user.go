@@ -16,6 +16,7 @@ func (s *Server) UserLogin(c *gin.Context) {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get user")
 		return
 	}
+
 	if !utils.CheckPasswordHash(req.Password, user.Password) {
 		dto.NewErrorResponse(c, http.StatusUnauthorized, nil, "invalid password")
 		return

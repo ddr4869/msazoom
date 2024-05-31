@@ -13,11 +13,15 @@ export default function LoginForm() {
         username,
         password
       });
-      const { data } = response.data;
-      const { access_token } = data;
-      localStorage.setItem('accessToken', access_token);
-      localStorage.setItem('username', username);
-      router.push("/");
+      console.log("resp -> ", response)
+      if (response && response.status === 200) {
+        const { data } = response.data;
+        const { access_token } = data;
+        localStorage.setItem('accessToken', access_token);
+        localStorage.setItem('username', username);
+        router.push("/");
+      }
+      console.log("test")
     } catch (error) {
       console.error('로그인 에러:', error);
       alert('로그인 실패!');

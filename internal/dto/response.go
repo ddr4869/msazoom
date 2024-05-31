@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,9 @@ type ErrorResponse struct {
 }
 
 func NewErrorResponse(c *gin.Context, code int, err error, message string) {
+	if err == nil {
+		err = errors.New(message)
+	}
 	c.AbortWithStatusJSON(code, ErrorResponse{
 		Error:   err.Error(),
 		Message: message,
