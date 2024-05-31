@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -15,7 +16,6 @@ type Message struct {
 // Fields of the Message.
 func (Message) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("board_id"),
 		field.String("message"),
 		field.String("writer"),
 		field.Time("createdAt").
@@ -27,5 +27,9 @@ func (Message) Fields() []ent.Field {
 
 // Edges of the Message.
 func (Message) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("board", Board.Type).
+			Ref("messages").
+			Unique(),
+	}
 }

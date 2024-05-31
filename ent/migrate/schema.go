@@ -51,17 +51,25 @@ var (
 	// MessagesColumns holds the columns for the "messages" table.
 	MessagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "board_id", Type: field.TypeInt},
 		{Name: "message", Type: field.TypeString},
 		{Name: "writer", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "board_messages", Type: field.TypeInt, Nullable: true},
 	}
 	// MessagesTable holds the schema information for the "messages" table.
 	MessagesTable = &schema.Table{
 		Name:       "messages",
 		Columns:    MessagesColumns,
 		PrimaryKey: []*schema.Column{MessagesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "messages_boards_messages",
+				Columns:    []*schema.Column{MessagesColumns[5]},
+				RefColumns: []*schema.Column{BoardsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -89,4 +97,5 @@ var (
 )
 
 func init() {
+	MessagesTable.ForeignKeys[0].RefTable = BoardsTable
 }

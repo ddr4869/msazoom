@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ddr4869/msazoom/ent/board"
 	"github.com/ddr4869/msazoom/ent/friend"
 	"github.com/ddr4869/msazoom/ent/hotboard"
@@ -342,6 +343,22 @@ func (c *BoardClient) GetX(ctx context.Context, id int) *Board {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryMessages queries the messages edge of a Board.
+func (c *BoardClient) QueryMessages(b *Board) *MessageQuery {
+	query := (&MessageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(message.Table, message.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, board.MessagesTable, board.MessagesColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -741,6 +758,22 @@ func (c *MessageClient) GetX(ctx context.Context, id int) *Message {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryBoard queries the board edge of a Message.
+func (c *MessageClient) QueryBoard(m *Message) *BoardQuery {
+	query := (&BoardClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(message.Table, message.FieldID, id),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, message.BoardTable, message.BoardColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

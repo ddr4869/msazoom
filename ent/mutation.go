@@ -37,20 +37,23 @@ const (
 // BoardMutation represents an operation that mutates the Board nodes in the graph.
 type BoardMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *int
-	board_name     *string
-	board_admin    *string
-	board_password *string
-	board_star     *int
-	addboard_star  *int
-	createdAt      *time.Time
-	updatedAt      *time.Time
-	clearedFields  map[string]struct{}
-	done           bool
-	oldValue       func(context.Context) (*Board, error)
-	predicates     []predicate.Board
+	op              Op
+	typ             string
+	id              *int
+	board_name      *string
+	board_admin     *string
+	board_password  *string
+	board_star      *int
+	addboard_star   *int
+	createdAt       *time.Time
+	updatedAt       *time.Time
+	clearedFields   map[string]struct{}
+	messages        map[int]struct{}
+	removedmessages map[int]struct{}
+	clearedmessages bool
+	done            bool
+	oldValue        func(context.Context) (*Board, error)
+	predicates      []predicate.Board
 }
 
 var _ ent.Mutation = (*BoardMutation)(nil)
@@ -401,6 +404,60 @@ func (m *BoardMutation) ResetUpdatedAt() {
 	m.updatedAt = nil
 }
 
+// AddMessageIDs adds the "messages" edge to the Message entity by ids.
+func (m *BoardMutation) AddMessageIDs(ids ...int) {
+	if m.messages == nil {
+		m.messages = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.messages[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMessages clears the "messages" edge to the Message entity.
+func (m *BoardMutation) ClearMessages() {
+	m.clearedmessages = true
+}
+
+// MessagesCleared reports if the "messages" edge to the Message entity was cleared.
+func (m *BoardMutation) MessagesCleared() bool {
+	return m.clearedmessages
+}
+
+// RemoveMessageIDs removes the "messages" edge to the Message entity by IDs.
+func (m *BoardMutation) RemoveMessageIDs(ids ...int) {
+	if m.removedmessages == nil {
+		m.removedmessages = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.messages, ids[i])
+		m.removedmessages[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMessages returns the removed IDs of the "messages" edge to the Message entity.
+func (m *BoardMutation) RemovedMessagesIDs() (ids []int) {
+	for id := range m.removedmessages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MessagesIDs returns the "messages" edge IDs in the mutation.
+func (m *BoardMutation) MessagesIDs() (ids []int) {
+	for id := range m.messages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMessages resets all changes to the "messages" edge.
+func (m *BoardMutation) ResetMessages() {
+	m.messages = nil
+	m.clearedmessages = false
+	m.removedmessages = nil
+}
+
 // Where appends a list predicates to the BoardMutation builder.
 func (m *BoardMutation) Where(ps ...predicate.Board) {
 	m.predicates = append(m.predicates, ps...)
@@ -643,49 +700,85 @@ func (m *BoardMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *BoardMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.messages != nil {
+		edges = append(edges, board.EdgeMessages)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *BoardMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case board.EdgeMessages:
+		ids := make([]ent.Value, 0, len(m.messages))
+		for id := range m.messages {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *BoardMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedmessages != nil {
+		edges = append(edges, board.EdgeMessages)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *BoardMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case board.EdgeMessages:
+		ids := make([]ent.Value, 0, len(m.removedmessages))
+		for id := range m.removedmessages {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *BoardMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedmessages {
+		edges = append(edges, board.EdgeMessages)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *BoardMutation) EdgeCleared(name string) bool {
+	switch name {
+	case board.EdgeMessages:
+		return m.clearedmessages
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *BoardMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Board unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *BoardMutation) ResetEdge(name string) error {
+	switch name {
+	case board.EdgeMessages:
+		m.ResetMessages()
+		return nil
+	}
 	return fmt.Errorf("unknown Board edge %s", name)
 }
 
@@ -1447,13 +1540,13 @@ type MessageMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	board_id      *int
-	addboard_id   *int
 	message       *string
 	writer        *string
 	createdAt     *time.Time
 	updatedAt     *time.Time
 	clearedFields map[string]struct{}
+	board         *int
+	clearedboard  bool
 	done          bool
 	oldValue      func(context.Context) (*Message, error)
 	predicates    []predicate.Message
@@ -1555,62 +1648,6 @@ func (m *MessageMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
-}
-
-// SetBoardID sets the "board_id" field.
-func (m *MessageMutation) SetBoardID(i int) {
-	m.board_id = &i
-	m.addboard_id = nil
-}
-
-// BoardID returns the value of the "board_id" field in the mutation.
-func (m *MessageMutation) BoardID() (r int, exists bool) {
-	v := m.board_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldBoardID returns the old "board_id" field's value of the Message entity.
-// If the Message object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MessageMutation) OldBoardID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldBoardID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldBoardID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldBoardID: %w", err)
-	}
-	return oldValue.BoardID, nil
-}
-
-// AddBoardID adds i to the "board_id" field.
-func (m *MessageMutation) AddBoardID(i int) {
-	if m.addboard_id != nil {
-		*m.addboard_id += i
-	} else {
-		m.addboard_id = &i
-	}
-}
-
-// AddedBoardID returns the value that was added to the "board_id" field in this mutation.
-func (m *MessageMutation) AddedBoardID() (r int, exists bool) {
-	v := m.addboard_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetBoardID resets all changes to the "board_id" field.
-func (m *MessageMutation) ResetBoardID() {
-	m.board_id = nil
-	m.addboard_id = nil
 }
 
 // SetMessage sets the "message" field.
@@ -1757,6 +1794,45 @@ func (m *MessageMutation) ResetUpdatedAt() {
 	m.updatedAt = nil
 }
 
+// SetBoardID sets the "board" edge to the Board entity by id.
+func (m *MessageMutation) SetBoardID(id int) {
+	m.board = &id
+}
+
+// ClearBoard clears the "board" edge to the Board entity.
+func (m *MessageMutation) ClearBoard() {
+	m.clearedboard = true
+}
+
+// BoardCleared reports if the "board" edge to the Board entity was cleared.
+func (m *MessageMutation) BoardCleared() bool {
+	return m.clearedboard
+}
+
+// BoardID returns the "board" edge ID in the mutation.
+func (m *MessageMutation) BoardID() (id int, exists bool) {
+	if m.board != nil {
+		return *m.board, true
+	}
+	return
+}
+
+// BoardIDs returns the "board" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// BoardID instead. It exists only for internal usage by the builders.
+func (m *MessageMutation) BoardIDs() (ids []int) {
+	if id := m.board; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetBoard resets all changes to the "board" edge.
+func (m *MessageMutation) ResetBoard() {
+	m.board = nil
+	m.clearedboard = false
+}
+
 // Where appends a list predicates to the MessageMutation builder.
 func (m *MessageMutation) Where(ps ...predicate.Message) {
 	m.predicates = append(m.predicates, ps...)
@@ -1791,10 +1867,7 @@ func (m *MessageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MessageMutation) Fields() []string {
-	fields := make([]string, 0, 5)
-	if m.board_id != nil {
-		fields = append(fields, message.FieldBoardID)
-	}
+	fields := make([]string, 0, 4)
 	if m.message != nil {
 		fields = append(fields, message.FieldMessage)
 	}
@@ -1815,8 +1888,6 @@ func (m *MessageMutation) Fields() []string {
 // schema.
 func (m *MessageMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case message.FieldBoardID:
-		return m.BoardID()
 	case message.FieldMessage:
 		return m.Message()
 	case message.FieldWriter:
@@ -1834,8 +1905,6 @@ func (m *MessageMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case message.FieldBoardID:
-		return m.OldBoardID(ctx)
 	case message.FieldMessage:
 		return m.OldMessage(ctx)
 	case message.FieldWriter:
@@ -1853,13 +1922,6 @@ func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *MessageMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case message.FieldBoardID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetBoardID(v)
-		return nil
 	case message.FieldMessage:
 		v, ok := value.(string)
 		if !ok {
@@ -1895,21 +1957,13 @@ func (m *MessageMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *MessageMutation) AddedFields() []string {
-	var fields []string
-	if m.addboard_id != nil {
-		fields = append(fields, message.FieldBoardID)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *MessageMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case message.FieldBoardID:
-		return m.AddedBoardID()
-	}
 	return nil, false
 }
 
@@ -1918,13 +1972,6 @@ func (m *MessageMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MessageMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case message.FieldBoardID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddBoardID(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Message numeric field %s", name)
 }
@@ -1952,9 +1999,6 @@ func (m *MessageMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MessageMutation) ResetField(name string) error {
 	switch name {
-	case message.FieldBoardID:
-		m.ResetBoardID()
-		return nil
 	case message.FieldMessage:
 		m.ResetMessage()
 		return nil
@@ -1973,19 +2017,28 @@ func (m *MessageMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MessageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.board != nil {
+		edges = append(edges, message.EdgeBoard)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *MessageMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case message.EdgeBoard:
+		if id := m.board; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MessageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -1997,25 +2050,42 @@ func (m *MessageMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MessageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedboard {
+		edges = append(edges, message.EdgeBoard)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *MessageMutation) EdgeCleared(name string) bool {
+	switch name {
+	case message.EdgeBoard:
+		return m.clearedboard
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *MessageMutation) ClearEdge(name string) error {
+	switch name {
+	case message.EdgeBoard:
+		m.ClearBoard()
+		return nil
+	}
 	return fmt.Errorf("unknown Message unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *MessageMutation) ResetEdge(name string) error {
+	switch name {
+	case message.EdgeBoard:
+		m.ResetBoard()
+		return nil
+	}
 	return fmt.Errorf("unknown Message edge %s", name)
 }
 

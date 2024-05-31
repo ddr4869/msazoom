@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ddr4869/msazoom/ent/board"
 	"github.com/ddr4869/msazoom/ent/message"
 )
 
@@ -18,12 +19,6 @@ type MessageCreate struct {
 	config
 	mutation *MessageMutation
 	hooks    []Hook
-}
-
-// SetBoardID sets the "board_id" field.
-func (mc *MessageCreate) SetBoardID(i int) *MessageCreate {
-	mc.mutation.SetBoardID(i)
-	return mc
 }
 
 // SetMessage sets the "message" field.
@@ -64,6 +59,25 @@ func (mc *MessageCreate) SetNillableUpdatedAt(t *time.Time) *MessageCreate {
 		mc.SetUpdatedAt(*t)
 	}
 	return mc
+}
+
+// SetBoardID sets the "board" edge to the Board entity by ID.
+func (mc *MessageCreate) SetBoardID(id int) *MessageCreate {
+	mc.mutation.SetBoardID(id)
+	return mc
+}
+
+// SetNillableBoardID sets the "board" edge to the Board entity by ID if the given value is not nil.
+func (mc *MessageCreate) SetNillableBoardID(id *int) *MessageCreate {
+	if id != nil {
+		mc = mc.SetBoardID(*id)
+	}
+	return mc
+}
+
+// SetBoard sets the "board" edge to the Board entity.
+func (mc *MessageCreate) SetBoard(b *Board) *MessageCreate {
+	return mc.SetBoardID(b.ID)
 }
 
 // Mutation returns the MessageMutation object of the builder.
@@ -113,9 +127,6 @@ func (mc *MessageCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (mc *MessageCreate) check() error {
-	if _, ok := mc.mutation.BoardID(); !ok {
-		return &ValidationError{Name: "board_id", err: errors.New(`ent: missing required field "Message.board_id"`)}
-	}
 	if _, ok := mc.mutation.Message(); !ok {
 		return &ValidationError{Name: "message", err: errors.New(`ent: missing required field "Message.message"`)}
 	}
@@ -154,10 +165,6 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 		_node = &Message{config: mc.config}
 		_spec = sqlgraph.NewCreateSpec(message.Table, sqlgraph.NewFieldSpec(message.FieldID, field.TypeInt))
 	)
-	if value, ok := mc.mutation.BoardID(); ok {
-		_spec.SetField(message.FieldBoardID, field.TypeInt, value)
-		_node.BoardID = value
-	}
 	if value, ok := mc.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)
 		_node.Message = value
@@ -173,6 +180,23 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.UpdatedAt(); ok {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if nodes := mc.mutation.BoardIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   message.BoardTable,
+			Columns: []string{message.BoardColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.board_messages = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

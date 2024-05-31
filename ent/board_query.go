@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,16 +12,18 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ddr4869/msazoom/ent/board"
+	"github.com/ddr4869/msazoom/ent/message"
 	"github.com/ddr4869/msazoom/ent/predicate"
 )
 
 // BoardQuery is the builder for querying Board entities.
 type BoardQuery struct {
 	config
-	ctx        *QueryContext
-	order      []board.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Board
+	ctx          *QueryContext
+	order        []board.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.Board
+	withMessages *MessageQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +58,28 @@ func (bq *BoardQuery) Unique(unique bool) *BoardQuery {
 func (bq *BoardQuery) Order(o ...board.OrderOption) *BoardQuery {
 	bq.order = append(bq.order, o...)
 	return bq
+}
+
+// QueryMessages chains the current query on the "messages" edge.
+func (bq *BoardQuery) QueryMessages() *MessageQuery {
+	query := (&MessageClient{config: bq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := bq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := bq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, selector),
+			sqlgraph.To(message.Table, message.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, board.MessagesTable, board.MessagesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Board entity from the query.
@@ -244,15 +269,27 @@ func (bq *BoardQuery) Clone() *BoardQuery {
 		return nil
 	}
 	return &BoardQuery{
-		config:     bq.config,
-		ctx:        bq.ctx.Clone(),
-		order:      append([]board.OrderOption{}, bq.order...),
-		inters:     append([]Interceptor{}, bq.inters...),
-		predicates: append([]predicate.Board{}, bq.predicates...),
+		config:       bq.config,
+		ctx:          bq.ctx.Clone(),
+		order:        append([]board.OrderOption{}, bq.order...),
+		inters:       append([]Interceptor{}, bq.inters...),
+		predicates:   append([]predicate.Board{}, bq.predicates...),
+		withMessages: bq.withMessages.Clone(),
 		// clone intermediate query.
 		sql:  bq.sql.Clone(),
 		path: bq.path,
 	}
+}
+
+// WithMessages tells the query-builder to eager-load the nodes that are connected to
+// the "messages" edge. The optional arguments are used to configure the query builder of the edge.
+func (bq *BoardQuery) WithMessages(opts ...func(*MessageQuery)) *BoardQuery {
+	query := (&MessageClient{config: bq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	bq.withMessages = query
+	return bq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -331,8 +368,11 @@ func (bq *BoardQuery) prepareQuery(ctx context.Context) error {
 
 func (bq *BoardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Board, error) {
 	var (
-		nodes = []*Board{}
-		_spec = bq.querySpec()
+		nodes       = []*Board{}
+		_spec       = bq.querySpec()
+		loadedTypes = [1]bool{
+			bq.withMessages != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Board).scanValues(nil, columns)
@@ -340,6 +380,7 @@ func (bq *BoardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Board,
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Board{config: bq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +392,46 @@ func (bq *BoardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Board,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := bq.withMessages; query != nil {
+		if err := bq.loadMessages(ctx, query, nodes,
+			func(n *Board) { n.Edges.Messages = []*Message{} },
+			func(n *Board, e *Message) { n.Edges.Messages = append(n.Edges.Messages, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (bq *BoardQuery) loadMessages(ctx context.Context, query *MessageQuery, nodes []*Board, init func(*Board), assign func(*Board, *Message)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Board)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(board.MessagesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.board_messages
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "board_messages" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "board_messages" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (bq *BoardQuery) sqlCount(ctx context.Context) (int, error) {

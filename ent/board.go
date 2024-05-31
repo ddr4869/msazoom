@@ -28,8 +28,29 @@ type Board struct {
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// UpdatedAt holds the value of the "updatedAt" field.
-	UpdatedAt    time.Time `json:"updatedAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the BoardQuery when eager-loading is set.
+	Edges        BoardEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// BoardEdges holds the relations/edges for other nodes in the graph.
+type BoardEdges struct {
+	// Messages holds the value of the messages edge.
+	Messages []*Message `json:"messages,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// MessagesOrErr returns the Messages value or an error if the edge
+// was not loaded in eager-loading.
+func (e BoardEdges) MessagesOrErr() ([]*Message, error) {
+	if e.loadedTypes[0] {
+		return e.Messages, nil
+	}
+	return nil, &NotLoadedError{edge: "messages"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -111,6 +132,11 @@ func (b *Board) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (b *Board) Value(name string) (ent.Value, error) {
 	return b.selectValues.Get(name)
+}
+
+// QueryMessages queries the "messages" edge of the Board entity.
+func (b *Board) QueryMessages() *MessageQuery {
+	return NewBoardClient(b.config).QueryMessages(b)
 }
 
 // Update returns a builder for updating this Board.

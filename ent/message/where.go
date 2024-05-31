@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ddr4869/msazoom/ent/predicate"
 )
 
@@ -54,11 +55,6 @@ func IDLTE(id int) predicate.Message {
 	return predicate.Message(sql.FieldLTE(FieldID, id))
 }
 
-// BoardID applies equality check predicate on the "board_id" field. It's identical to BoardIDEQ.
-func BoardID(v int) predicate.Message {
-	return predicate.Message(sql.FieldEQ(FieldBoardID, v))
-}
-
 // Message applies equality check predicate on the "message" field. It's identical to MessageEQ.
 func Message(v string) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldMessage, v))
@@ -77,46 +73,6 @@ func CreatedAt(v time.Time) predicate.Message {
 // UpdatedAt applies equality check predicate on the "updatedAt" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldUpdatedAt, v))
-}
-
-// BoardIDEQ applies the EQ predicate on the "board_id" field.
-func BoardIDEQ(v int) predicate.Message {
-	return predicate.Message(sql.FieldEQ(FieldBoardID, v))
-}
-
-// BoardIDNEQ applies the NEQ predicate on the "board_id" field.
-func BoardIDNEQ(v int) predicate.Message {
-	return predicate.Message(sql.FieldNEQ(FieldBoardID, v))
-}
-
-// BoardIDIn applies the In predicate on the "board_id" field.
-func BoardIDIn(vs ...int) predicate.Message {
-	return predicate.Message(sql.FieldIn(FieldBoardID, vs...))
-}
-
-// BoardIDNotIn applies the NotIn predicate on the "board_id" field.
-func BoardIDNotIn(vs ...int) predicate.Message {
-	return predicate.Message(sql.FieldNotIn(FieldBoardID, vs...))
-}
-
-// BoardIDGT applies the GT predicate on the "board_id" field.
-func BoardIDGT(v int) predicate.Message {
-	return predicate.Message(sql.FieldGT(FieldBoardID, v))
-}
-
-// BoardIDGTE applies the GTE predicate on the "board_id" field.
-func BoardIDGTE(v int) predicate.Message {
-	return predicate.Message(sql.FieldGTE(FieldBoardID, v))
-}
-
-// BoardIDLT applies the LT predicate on the "board_id" field.
-func BoardIDLT(v int) predicate.Message {
-	return predicate.Message(sql.FieldLT(FieldBoardID, v))
-}
-
-// BoardIDLTE applies the LTE predicate on the "board_id" field.
-func BoardIDLTE(v int) predicate.Message {
-	return predicate.Message(sql.FieldLTE(FieldBoardID, v))
 }
 
 // MessageEQ applies the EQ predicate on the "message" field.
@@ -327,6 +283,29 @@ func UpdatedAtLT(v time.Time) predicate.Message {
 // UpdatedAtLTE applies the LTE predicate on the "updatedAt" field.
 func UpdatedAtLTE(v time.Time) predicate.Message {
 	return predicate.Message(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// HasBoard applies the HasEdge predicate on the "board" edge.
+func HasBoard() predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, BoardTable, BoardColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBoardWith applies the HasEdge predicate on the "board" edge with a given conditions (other predicates).
+func HasBoardWith(preds ...predicate.Board) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		step := newBoardStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

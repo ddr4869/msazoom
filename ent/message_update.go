@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ddr4869/msazoom/ent/board"
 	"github.com/ddr4869/msazoom/ent/message"
 	"github.com/ddr4869/msazoom/ent/predicate"
 )
@@ -25,27 +26,6 @@ type MessageUpdate struct {
 // Where appends a list predicates to the MessageUpdate builder.
 func (mu *MessageUpdate) Where(ps ...predicate.Message) *MessageUpdate {
 	mu.mutation.Where(ps...)
-	return mu
-}
-
-// SetBoardID sets the "board_id" field.
-func (mu *MessageUpdate) SetBoardID(i int) *MessageUpdate {
-	mu.mutation.ResetBoardID()
-	mu.mutation.SetBoardID(i)
-	return mu
-}
-
-// SetNillableBoardID sets the "board_id" field if the given value is not nil.
-func (mu *MessageUpdate) SetNillableBoardID(i *int) *MessageUpdate {
-	if i != nil {
-		mu.SetBoardID(*i)
-	}
-	return mu
-}
-
-// AddBoardID adds i to the "board_id" field.
-func (mu *MessageUpdate) AddBoardID(i int) *MessageUpdate {
-	mu.mutation.AddBoardID(i)
 	return mu
 }
 
@@ -105,9 +85,34 @@ func (mu *MessageUpdate) SetNillableUpdatedAt(t *time.Time) *MessageUpdate {
 	return mu
 }
 
+// SetBoardID sets the "board" edge to the Board entity by ID.
+func (mu *MessageUpdate) SetBoardID(id int) *MessageUpdate {
+	mu.mutation.SetBoardID(id)
+	return mu
+}
+
+// SetNillableBoardID sets the "board" edge to the Board entity by ID if the given value is not nil.
+func (mu *MessageUpdate) SetNillableBoardID(id *int) *MessageUpdate {
+	if id != nil {
+		mu = mu.SetBoardID(*id)
+	}
+	return mu
+}
+
+// SetBoard sets the "board" edge to the Board entity.
+func (mu *MessageUpdate) SetBoard(b *Board) *MessageUpdate {
+	return mu.SetBoardID(b.ID)
+}
+
 // Mutation returns the MessageMutation object of the builder.
 func (mu *MessageUpdate) Mutation() *MessageMutation {
 	return mu.mutation
+}
+
+// ClearBoard clears the "board" edge to the Board entity.
+func (mu *MessageUpdate) ClearBoard() *MessageUpdate {
+	mu.mutation.ClearBoard()
+	return mu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -146,12 +151,6 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := mu.mutation.BoardID(); ok {
-		_spec.SetField(message.FieldBoardID, field.TypeInt, value)
-	}
-	if value, ok := mu.mutation.AddedBoardID(); ok {
-		_spec.AddField(message.FieldBoardID, field.TypeInt, value)
-	}
 	if value, ok := mu.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)
 	}
@@ -163,6 +162,35 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := mu.mutation.UpdatedAt(); ok {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if mu.mutation.BoardCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   message.BoardTable,
+			Columns: []string{message.BoardColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.BoardIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   message.BoardTable,
+			Columns: []string{message.BoardColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -182,27 +210,6 @@ type MessageUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *MessageMutation
-}
-
-// SetBoardID sets the "board_id" field.
-func (muo *MessageUpdateOne) SetBoardID(i int) *MessageUpdateOne {
-	muo.mutation.ResetBoardID()
-	muo.mutation.SetBoardID(i)
-	return muo
-}
-
-// SetNillableBoardID sets the "board_id" field if the given value is not nil.
-func (muo *MessageUpdateOne) SetNillableBoardID(i *int) *MessageUpdateOne {
-	if i != nil {
-		muo.SetBoardID(*i)
-	}
-	return muo
-}
-
-// AddBoardID adds i to the "board_id" field.
-func (muo *MessageUpdateOne) AddBoardID(i int) *MessageUpdateOne {
-	muo.mutation.AddBoardID(i)
-	return muo
 }
 
 // SetMessage sets the "message" field.
@@ -261,9 +268,34 @@ func (muo *MessageUpdateOne) SetNillableUpdatedAt(t *time.Time) *MessageUpdateOn
 	return muo
 }
 
+// SetBoardID sets the "board" edge to the Board entity by ID.
+func (muo *MessageUpdateOne) SetBoardID(id int) *MessageUpdateOne {
+	muo.mutation.SetBoardID(id)
+	return muo
+}
+
+// SetNillableBoardID sets the "board" edge to the Board entity by ID if the given value is not nil.
+func (muo *MessageUpdateOne) SetNillableBoardID(id *int) *MessageUpdateOne {
+	if id != nil {
+		muo = muo.SetBoardID(*id)
+	}
+	return muo
+}
+
+// SetBoard sets the "board" edge to the Board entity.
+func (muo *MessageUpdateOne) SetBoard(b *Board) *MessageUpdateOne {
+	return muo.SetBoardID(b.ID)
+}
+
 // Mutation returns the MessageMutation object of the builder.
 func (muo *MessageUpdateOne) Mutation() *MessageMutation {
 	return muo.mutation
+}
+
+// ClearBoard clears the "board" edge to the Board entity.
+func (muo *MessageUpdateOne) ClearBoard() *MessageUpdateOne {
+	muo.mutation.ClearBoard()
+	return muo
 }
 
 // Where appends a list predicates to the MessageUpdate builder.
@@ -332,12 +364,6 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 			}
 		}
 	}
-	if value, ok := muo.mutation.BoardID(); ok {
-		_spec.SetField(message.FieldBoardID, field.TypeInt, value)
-	}
-	if value, ok := muo.mutation.AddedBoardID(); ok {
-		_spec.AddField(message.FieldBoardID, field.TypeInt, value)
-	}
 	if value, ok := muo.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)
 	}
@@ -349,6 +375,35 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 	}
 	if value, ok := muo.mutation.UpdatedAt(); ok {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if muo.mutation.BoardCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   message.BoardTable,
+			Columns: []string{message.BoardColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.BoardIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   message.BoardTable,
+			Columns: []string{message.BoardColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Message{config: muo.config}
 	_spec.Assign = _node.assignValues

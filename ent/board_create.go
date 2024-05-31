@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ddr4869/msazoom/ent/board"
+	"github.com/ddr4869/msazoom/ent/message"
 )
 
 // BoardCreate is the builder for creating a Board entity.
@@ -102,6 +103,21 @@ func (bc *BoardCreate) SetNillableUpdatedAt(t *time.Time) *BoardCreate {
 		bc.SetUpdatedAt(*t)
 	}
 	return bc
+}
+
+// AddMessageIDs adds the "messages" edge to the Message entity by IDs.
+func (bc *BoardCreate) AddMessageIDs(ids ...int) *BoardCreate {
+	bc.mutation.AddMessageIDs(ids...)
+	return bc
+}
+
+// AddMessages adds the "messages" edges to the Message entity.
+func (bc *BoardCreate) AddMessages(m ...*Message) *BoardCreate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return bc.AddMessageIDs(ids...)
 }
 
 // Mutation returns the BoardMutation object of the builder.
@@ -231,6 +247,22 @@ func (bc *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.UpdatedAt(); ok {
 		_spec.SetField(board.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if nodes := bc.mutation.MessagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   board.MessagesTable,
+			Columns: []string{board.MessagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(message.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

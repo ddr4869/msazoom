@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ddr4869/msazoom/ent/board"
 	"github.com/ddr4869/msazoom/ent/message"
 )
 
@@ -17,8 +18,6 @@ type Message struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// BoardID holds the value of the "board_id" field.
-	BoardID int `json:"board_id,omitempty"`
 	// Message holds the value of the "message" field.
 	Message string `json:"message,omitempty"`
 	// Writer holds the value of the "writer" field.
@@ -26,8 +25,32 @@ type Message struct {
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// UpdatedAt holds the value of the "updatedAt" field.
-	UpdatedAt    time.Time `json:"updatedAt,omitempty"`
-	selectValues sql.SelectValues
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the MessageQuery when eager-loading is set.
+	Edges          MessageEdges `json:"edges"`
+	board_messages *int
+	selectValues   sql.SelectValues
+}
+
+// MessageEdges holds the relations/edges for other nodes in the graph.
+type MessageEdges struct {
+	// Board holds the value of the board edge.
+	Board *Board `json:"board,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// BoardOrErr returns the Board value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MessageEdges) BoardOrErr() (*Board, error) {
+	if e.Board != nil {
+		return e.Board, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: board.Label}
+	}
+	return nil, &NotLoadedError{edge: "board"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -35,12 +58,14 @@ func (*Message) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case message.FieldID, message.FieldBoardID:
+		case message.FieldID:
 			values[i] = new(sql.NullInt64)
 		case message.FieldMessage, message.FieldWriter:
 			values[i] = new(sql.NullString)
 		case message.FieldCreatedAt, message.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case message.ForeignKeys[0]: // board_messages
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -62,12 +87,6 @@ func (m *Message) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			m.ID = int(value.Int64)
-		case message.FieldBoardID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field board_id", values[i])
-			} else if value.Valid {
-				m.BoardID = int(value.Int64)
-			}
 		case message.FieldMessage:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field message", values[i])
@@ -92,6 +111,13 @@ func (m *Message) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.UpdatedAt = value.Time
 			}
+		case message.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field board_messages", value)
+			} else if value.Valid {
+				m.board_messages = new(int)
+				*m.board_messages = int(value.Int64)
+			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
 		}
@@ -103,6 +129,11 @@ func (m *Message) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (m *Message) Value(name string) (ent.Value, error) {
 	return m.selectValues.Get(name)
+}
+
+// QueryBoard queries the "board" edge of the Message entity.
+func (m *Message) QueryBoard() *BoardQuery {
+	return NewMessageClient(m.config).QueryBoard(m)
 }
 
 // Update returns a builder for updating this Message.
@@ -128,9 +159,6 @@ func (m *Message) String() string {
 	var builder strings.Builder
 	builder.WriteString("Message(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
-	builder.WriteString("board_id=")
-	builder.WriteString(fmt.Sprintf("%v", m.BoardID))
-	builder.WriteString(", ")
 	builder.WriteString("message=")
 	builder.WriteString(m.Message)
 	builder.WriteString(", ")

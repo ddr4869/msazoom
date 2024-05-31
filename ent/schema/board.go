@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -33,5 +35,8 @@ func (Board) Fields() []ent.Field {
 
 // Edges of the Board.
 func (Board) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("messages", Message.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+	}
 }

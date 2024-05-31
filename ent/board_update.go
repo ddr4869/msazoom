@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ddr4869/msazoom/ent/board"
+	"github.com/ddr4869/msazoom/ent/message"
 	"github.com/ddr4869/msazoom/ent/predicate"
 )
 
@@ -125,9 +126,45 @@ func (bu *BoardUpdate) SetNillableUpdatedAt(t *time.Time) *BoardUpdate {
 	return bu
 }
 
+// AddMessageIDs adds the "messages" edge to the Message entity by IDs.
+func (bu *BoardUpdate) AddMessageIDs(ids ...int) *BoardUpdate {
+	bu.mutation.AddMessageIDs(ids...)
+	return bu
+}
+
+// AddMessages adds the "messages" edges to the Message entity.
+func (bu *BoardUpdate) AddMessages(m ...*Message) *BoardUpdate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return bu.AddMessageIDs(ids...)
+}
+
 // Mutation returns the BoardMutation object of the builder.
 func (bu *BoardUpdate) Mutation() *BoardMutation {
 	return bu.mutation
+}
+
+// ClearMessages clears all "messages" edges to the Message entity.
+func (bu *BoardUpdate) ClearMessages() *BoardUpdate {
+	bu.mutation.ClearMessages()
+	return bu
+}
+
+// RemoveMessageIDs removes the "messages" edge to Message entities by IDs.
+func (bu *BoardUpdate) RemoveMessageIDs(ids ...int) *BoardUpdate {
+	bu.mutation.RemoveMessageIDs(ids...)
+	return bu
+}
+
+// RemoveMessages removes "messages" edges to Message entities.
+func (bu *BoardUpdate) RemoveMessages(m ...*Message) *BoardUpdate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return bu.RemoveMessageIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -189,6 +226,51 @@ func (bu *BoardUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := bu.mutation.UpdatedAt(); ok {
 		_spec.SetField(board.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if bu.mutation.MessagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   board.MessagesTable,
+			Columns: []string{board.MessagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(message.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := bu.mutation.RemovedMessagesIDs(); len(nodes) > 0 && !bu.mutation.MessagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   board.MessagesTable,
+			Columns: []string{board.MessagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(message.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := bu.mutation.MessagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   board.MessagesTable,
+			Columns: []string{board.MessagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(message.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, bu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -307,9 +389,45 @@ func (buo *BoardUpdateOne) SetNillableUpdatedAt(t *time.Time) *BoardUpdateOne {
 	return buo
 }
 
+// AddMessageIDs adds the "messages" edge to the Message entity by IDs.
+func (buo *BoardUpdateOne) AddMessageIDs(ids ...int) *BoardUpdateOne {
+	buo.mutation.AddMessageIDs(ids...)
+	return buo
+}
+
+// AddMessages adds the "messages" edges to the Message entity.
+func (buo *BoardUpdateOne) AddMessages(m ...*Message) *BoardUpdateOne {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return buo.AddMessageIDs(ids...)
+}
+
 // Mutation returns the BoardMutation object of the builder.
 func (buo *BoardUpdateOne) Mutation() *BoardMutation {
 	return buo.mutation
+}
+
+// ClearMessages clears all "messages" edges to the Message entity.
+func (buo *BoardUpdateOne) ClearMessages() *BoardUpdateOne {
+	buo.mutation.ClearMessages()
+	return buo
+}
+
+// RemoveMessageIDs removes the "messages" edge to Message entities by IDs.
+func (buo *BoardUpdateOne) RemoveMessageIDs(ids ...int) *BoardUpdateOne {
+	buo.mutation.RemoveMessageIDs(ids...)
+	return buo
+}
+
+// RemoveMessages removes "messages" edges to Message entities.
+func (buo *BoardUpdateOne) RemoveMessages(m ...*Message) *BoardUpdateOne {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return buo.RemoveMessageIDs(ids...)
 }
 
 // Where appends a list predicates to the BoardUpdate builder.
@@ -401,6 +519,51 @@ func (buo *BoardUpdateOne) sqlSave(ctx context.Context) (_node *Board, err error
 	}
 	if value, ok := buo.mutation.UpdatedAt(); ok {
 		_spec.SetField(board.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if buo.mutation.MessagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   board.MessagesTable,
+			Columns: []string{board.MessagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(message.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := buo.mutation.RemovedMessagesIDs(); len(nodes) > 0 && !buo.mutation.MessagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   board.MessagesTable,
+			Columns: []string{board.MessagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(message.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := buo.mutation.MessagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   board.MessagesTable,
+			Columns: []string{board.MessagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(message.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Board{config: buo.config}
 	_spec.Assign = _node.assignValues

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -13,8 +14,6 @@ const (
 	Label = "message"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldBoardID holds the string denoting the board_id field in the database.
-	FieldBoardID = "board_id"
 	// FieldMessage holds the string denoting the message field in the database.
 	FieldMessage = "message"
 	// FieldWriter holds the string denoting the writer field in the database.
@@ -23,24 +22,43 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
 	FieldUpdatedAt = "updated_at"
+	// EdgeBoard holds the string denoting the board edge name in mutations.
+	EdgeBoard = "board"
 	// Table holds the table name of the message in the database.
 	Table = "messages"
+	// BoardTable is the table that holds the board relation/edge.
+	BoardTable = "messages"
+	// BoardInverseTable is the table name for the Board entity.
+	// It exists in this package in order to avoid circular dependency with the "board" package.
+	BoardInverseTable = "boards"
+	// BoardColumn is the table column denoting the board relation/edge.
+	BoardColumn = "board_messages"
 )
 
 // Columns holds all SQL columns for message fields.
 var Columns = []string{
 	FieldID,
-	FieldBoardID,
 	FieldMessage,
 	FieldWriter,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "messages"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"board_messages",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -62,11 +80,6 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByBoardID orders the results by the board_id field.
-func ByBoardID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldBoardID, opts...).ToFunc()
-}
-
 // ByMessage orders the results by the message field.
 func ByMessage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMessage, opts...).ToFunc()
@@ -85,4 +98,18 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updatedAt field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByBoardField orders the results by board field.
+func ByBoardField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBoardStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newBoardStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(BoardInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, BoardTable, BoardColumn),
+	)
 }

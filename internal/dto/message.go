@@ -21,8 +21,8 @@ type MessageResponse struct {
 func MessageEntToResponse(message *ent.Message) MessageResponse {
 	return MessageResponse{
 		MessageID: message.ID,
-		BoardID:   message.BoardID,
-		Message:   message.Message,
-		Writer:    message.Writer,
+		//BoardID:   message.BoardID,
+		Message: message.Message,
+		Writer:  message.Writer,
 	}
 }
