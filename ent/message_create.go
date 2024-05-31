@@ -21,8 +21,8 @@ type MessageCreate struct {
 }
 
 // SetBoardID sets the "board_id" field.
-func (mc *MessageCreate) SetBoardID(s string) *MessageCreate {
-	mc.mutation.SetBoardID(s)
+func (mc *MessageCreate) SetBoardID(i int) *MessageCreate {
+	mc.mutation.SetBoardID(i)
 	return mc
 }
 
@@ -155,7 +155,7 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 		_spec = sqlgraph.NewCreateSpec(message.Table, sqlgraph.NewFieldSpec(message.FieldID, field.TypeInt))
 	)
 	if value, ok := mc.mutation.BoardID(); ok {
-		_spec.SetField(message.FieldBoardID, field.TypeString, value)
+		_spec.SetField(message.FieldBoardID, field.TypeInt, value)
 		_node.BoardID = value
 	}
 	if value, ok := mc.mutation.Message(); ok {

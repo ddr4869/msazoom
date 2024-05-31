@@ -28,7 +28,7 @@ func (s *Server) GetBoardWithIDValid(c *gin.Context) {
 }
 
 func (s *Server) DeleteBoardValid(c *gin.Context) {
-	var req dto.GetBoardWithIDUriRequest
+	var req dto.DeleteBoardWithIDUriRequest
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get block number")
 		return

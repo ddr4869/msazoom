@@ -261,7 +261,7 @@ func (mq *MessageQuery) Clone() *MessageQuery {
 // Example:
 //
 //	var v []struct {
-//		BoardID string `json:"board_id,omitempty"`
+//		BoardID int `json:"board_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -284,7 +284,7 @@ func (mq *MessageQuery) GroupBy(field string, fields ...string) *MessageGroupBy 
 // Example:
 //
 //	var v []struct {
-//		BoardID string `json:"board_id,omitempty"`
+//		BoardID int `json:"board_id,omitempty"`
 //	}
 //
 //	client.Message.Query().

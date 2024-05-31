@@ -18,7 +18,7 @@ type Message struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// BoardID holds the value of the "board_id" field.
-	BoardID string `json:"board_id,omitempty"`
+	BoardID int `json:"board_id,omitempty"`
 	// Message holds the value of the "message" field.
 	Message string `json:"message,omitempty"`
 	// Writer holds the value of the "writer" field.
@@ -35,9 +35,9 @@ func (*Message) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case message.FieldID:
+		case message.FieldID, message.FieldBoardID:
 			values[i] = new(sql.NullInt64)
-		case message.FieldBoardID, message.FieldMessage, message.FieldWriter:
+		case message.FieldMessage, message.FieldWriter:
 			values[i] = new(sql.NullString)
 		case message.FieldCreatedAt, message.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -63,10 +63,10 @@ func (m *Message) assignValues(columns []string, values []any) error {
 			}
 			m.ID = int(value.Int64)
 		case message.FieldBoardID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field board_id", values[i])
 			} else if value.Valid {
-				m.BoardID = value.String
+				m.BoardID = int(value.Int64)
 			}
 		case message.FieldMessage:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -129,7 +129,7 @@ func (m *Message) String() string {
 	builder.WriteString("Message(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
 	builder.WriteString("board_id=")
-	builder.WriteString(m.BoardID)
+	builder.WriteString(fmt.Sprintf("%v", m.BoardID))
 	builder.WriteString(", ")
 	builder.WriteString("message=")
 	builder.WriteString(m.Message)

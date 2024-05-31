@@ -63,7 +63,7 @@ func (s *Server) RecommendBoard(c *gin.Context) {
 }
 
 func (s *Server) DeleteBoard(c *gin.Context) {
-	req := c.MustGet("req").(dto.GetBoardWithIDUriRequest)
+	req := c.MustGet("req").(dto.DeleteBoardWithIDUriRequest)
 	board, err := s.repository.GetBoardWithID(c, req.BoardID)
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get board")

@@ -55,7 +55,7 @@ func IDLTE(id int) predicate.Message {
 }
 
 // BoardID applies equality check predicate on the "board_id" field. It's identical to BoardIDEQ.
-func BoardID(v string) predicate.Message {
+func BoardID(v int) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldBoardID, v))
 }
 
@@ -80,68 +80,43 @@ func UpdatedAt(v time.Time) predicate.Message {
 }
 
 // BoardIDEQ applies the EQ predicate on the "board_id" field.
-func BoardIDEQ(v string) predicate.Message {
+func BoardIDEQ(v int) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldBoardID, v))
 }
 
 // BoardIDNEQ applies the NEQ predicate on the "board_id" field.
-func BoardIDNEQ(v string) predicate.Message {
+func BoardIDNEQ(v int) predicate.Message {
 	return predicate.Message(sql.FieldNEQ(FieldBoardID, v))
 }
 
 // BoardIDIn applies the In predicate on the "board_id" field.
-func BoardIDIn(vs ...string) predicate.Message {
+func BoardIDIn(vs ...int) predicate.Message {
 	return predicate.Message(sql.FieldIn(FieldBoardID, vs...))
 }
 
 // BoardIDNotIn applies the NotIn predicate on the "board_id" field.
-func BoardIDNotIn(vs ...string) predicate.Message {
+func BoardIDNotIn(vs ...int) predicate.Message {
 	return predicate.Message(sql.FieldNotIn(FieldBoardID, vs...))
 }
 
 // BoardIDGT applies the GT predicate on the "board_id" field.
-func BoardIDGT(v string) predicate.Message {
+func BoardIDGT(v int) predicate.Message {
 	return predicate.Message(sql.FieldGT(FieldBoardID, v))
 }
 
 // BoardIDGTE applies the GTE predicate on the "board_id" field.
-func BoardIDGTE(v string) predicate.Message {
+func BoardIDGTE(v int) predicate.Message {
 	return predicate.Message(sql.FieldGTE(FieldBoardID, v))
 }
 
 // BoardIDLT applies the LT predicate on the "board_id" field.
-func BoardIDLT(v string) predicate.Message {
+func BoardIDLT(v int) predicate.Message {
 	return predicate.Message(sql.FieldLT(FieldBoardID, v))
 }
 
 // BoardIDLTE applies the LTE predicate on the "board_id" field.
-func BoardIDLTE(v string) predicate.Message {
+func BoardIDLTE(v int) predicate.Message {
 	return predicate.Message(sql.FieldLTE(FieldBoardID, v))
-}
-
-// BoardIDContains applies the Contains predicate on the "board_id" field.
-func BoardIDContains(v string) predicate.Message {
-	return predicate.Message(sql.FieldContains(FieldBoardID, v))
-}
-
-// BoardIDHasPrefix applies the HasPrefix predicate on the "board_id" field.
-func BoardIDHasPrefix(v string) predicate.Message {
-	return predicate.Message(sql.FieldHasPrefix(FieldBoardID, v))
-}
-
-// BoardIDHasSuffix applies the HasSuffix predicate on the "board_id" field.
-func BoardIDHasSuffix(v string) predicate.Message {
-	return predicate.Message(sql.FieldHasSuffix(FieldBoardID, v))
-}
-
-// BoardIDEqualFold applies the EqualFold predicate on the "board_id" field.
-func BoardIDEqualFold(v string) predicate.Message {
-	return predicate.Message(sql.FieldEqualFold(FieldBoardID, v))
-}
-
-// BoardIDContainsFold applies the ContainsFold predicate on the "board_id" field.
-func BoardIDContainsFold(v string) predicate.Message {
-	return predicate.Message(sql.FieldContainsFold(FieldBoardID, v))
 }
 
 // MessageEQ applies the EQ predicate on the "message" field.

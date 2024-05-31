@@ -3,7 +3,7 @@ import { w3cwebsocket as W3CWebSocket } from 'websocket';
 
 const client = new W3CWebSocket('ws://localhost:8080/ws');
 
-export default function WebSocketPage() {
+const WebSocketComponent = () => {
   const [message, setMessage] = useState('');
   const [response, setResponse] = useState('');
 
@@ -39,3 +39,5 @@ export default function WebSocketPage() {
     </div>
   );
 }
+
+export default WebSocketComponent;

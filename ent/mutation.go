@@ -1447,7 +1447,8 @@ type MessageMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	board_id      *string
+	board_id      *int
+	addboard_id   *int
 	message       *string
 	writer        *string
 	createdAt     *time.Time
@@ -1557,12 +1558,13 @@ func (m *MessageMutation) IDs(ctx context.Context) ([]int, error) {
 }
 
 // SetBoardID sets the "board_id" field.
-func (m *MessageMutation) SetBoardID(s string) {
-	m.board_id = &s
+func (m *MessageMutation) SetBoardID(i int) {
+	m.board_id = &i
+	m.addboard_id = nil
 }
 
 // BoardID returns the value of the "board_id" field in the mutation.
-func (m *MessageMutation) BoardID() (r string, exists bool) {
+func (m *MessageMutation) BoardID() (r int, exists bool) {
 	v := m.board_id
 	if v == nil {
 		return
@@ -1573,7 +1575,7 @@ func (m *MessageMutation) BoardID() (r string, exists bool) {
 // OldBoardID returns the old "board_id" field's value of the Message entity.
 // If the Message object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MessageMutation) OldBoardID(ctx context.Context) (v string, err error) {
+func (m *MessageMutation) OldBoardID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldBoardID is only allowed on UpdateOne operations")
 	}
@@ -1587,9 +1589,28 @@ func (m *MessageMutation) OldBoardID(ctx context.Context) (v string, err error) 
 	return oldValue.BoardID, nil
 }
 
+// AddBoardID adds i to the "board_id" field.
+func (m *MessageMutation) AddBoardID(i int) {
+	if m.addboard_id != nil {
+		*m.addboard_id += i
+	} else {
+		m.addboard_id = &i
+	}
+}
+
+// AddedBoardID returns the value that was added to the "board_id" field in this mutation.
+func (m *MessageMutation) AddedBoardID() (r int, exists bool) {
+	v := m.addboard_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetBoardID resets all changes to the "board_id" field.
 func (m *MessageMutation) ResetBoardID() {
 	m.board_id = nil
+	m.addboard_id = nil
 }
 
 // SetMessage sets the "message" field.
@@ -1833,7 +1854,7 @@ func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value,
 func (m *MessageMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case message.FieldBoardID:
-		v, ok := value.(string)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1874,13 +1895,21 @@ func (m *MessageMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *MessageMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addboard_id != nil {
+		fields = append(fields, message.FieldBoardID)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *MessageMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case message.FieldBoardID:
+		return m.AddedBoardID()
+	}
 	return nil, false
 }
 
@@ -1889,6 +1918,13 @@ func (m *MessageMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MessageMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case message.FieldBoardID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddBoardID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Message numeric field %s", name)
 }

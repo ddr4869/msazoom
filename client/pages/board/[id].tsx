@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useSession, SessionProvider } from "next-auth/react";
-import { socket, WebsocketProvider } from '../socket/websocketContext';
+import { socket, WebSocketComponent } from '../socket/websocket';
 import { Websocket } from '../socket/websocket';
 import axios from '../../server/axios'
 
@@ -16,9 +16,12 @@ export default function Page({id}:any) {
   return (
       <SessionProvider>
         <button onClick={navigateToDashboard}>뒤로가기</button>
-      <WebsocketProvider value={socket}>
+      {/* <WebSocketComponent value={socket}>
         <Websocket board_id={id} board_name={router.query.board_name}/>
-      </WebsocketProvider>
+      </WebSocketComponent> */}
+      <WebSocketComponent>
+        <Websocket board_id={id} board_name={router.query.board_name}/>
+      </WebSocketComponent>
     </SessionProvider>
   )
 }

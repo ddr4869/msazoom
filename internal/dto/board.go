@@ -9,6 +9,10 @@ type CreateBoardRequest struct {
 }
 
 type GetBoardWithIDUriRequest struct {
+	BoardID int `uri:"board_id"`
+}
+
+type DeleteBoardWithIDUriRequest struct {
 	BoardID       int    `json:"board_id" binding:"required"`
 	BoardPassword string `json:"board_password" binding:"required"`
 }

@@ -29,16 +29,23 @@ func (mu *MessageUpdate) Where(ps ...predicate.Message) *MessageUpdate {
 }
 
 // SetBoardID sets the "board_id" field.
-func (mu *MessageUpdate) SetBoardID(s string) *MessageUpdate {
-	mu.mutation.SetBoardID(s)
+func (mu *MessageUpdate) SetBoardID(i int) *MessageUpdate {
+	mu.mutation.ResetBoardID()
+	mu.mutation.SetBoardID(i)
 	return mu
 }
 
 // SetNillableBoardID sets the "board_id" field if the given value is not nil.
-func (mu *MessageUpdate) SetNillableBoardID(s *string) *MessageUpdate {
-	if s != nil {
-		mu.SetBoardID(*s)
+func (mu *MessageUpdate) SetNillableBoardID(i *int) *MessageUpdate {
+	if i != nil {
+		mu.SetBoardID(*i)
 	}
+	return mu
+}
+
+// AddBoardID adds i to the "board_id" field.
+func (mu *MessageUpdate) AddBoardID(i int) *MessageUpdate {
+	mu.mutation.AddBoardID(i)
 	return mu
 }
 
@@ -140,7 +147,10 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := mu.mutation.BoardID(); ok {
-		_spec.SetField(message.FieldBoardID, field.TypeString, value)
+		_spec.SetField(message.FieldBoardID, field.TypeInt, value)
+	}
+	if value, ok := mu.mutation.AddedBoardID(); ok {
+		_spec.AddField(message.FieldBoardID, field.TypeInt, value)
 	}
 	if value, ok := mu.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)
@@ -175,16 +185,23 @@ type MessageUpdateOne struct {
 }
 
 // SetBoardID sets the "board_id" field.
-func (muo *MessageUpdateOne) SetBoardID(s string) *MessageUpdateOne {
-	muo.mutation.SetBoardID(s)
+func (muo *MessageUpdateOne) SetBoardID(i int) *MessageUpdateOne {
+	muo.mutation.ResetBoardID()
+	muo.mutation.SetBoardID(i)
 	return muo
 }
 
 // SetNillableBoardID sets the "board_id" field if the given value is not nil.
-func (muo *MessageUpdateOne) SetNillableBoardID(s *string) *MessageUpdateOne {
-	if s != nil {
-		muo.SetBoardID(*s)
+func (muo *MessageUpdateOne) SetNillableBoardID(i *int) *MessageUpdateOne {
+	if i != nil {
+		muo.SetBoardID(*i)
 	}
+	return muo
+}
+
+// AddBoardID adds i to the "board_id" field.
+func (muo *MessageUpdateOne) AddBoardID(i int) *MessageUpdateOne {
+	muo.mutation.AddBoardID(i)
 	return muo
 }
 
@@ -316,7 +333,10 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 		}
 	}
 	if value, ok := muo.mutation.BoardID(); ok {
-		_spec.SetField(message.FieldBoardID, field.TypeString, value)
+		_spec.SetField(message.FieldBoardID, field.TypeInt, value)
+	}
+	if value, ok := muo.mutation.AddedBoardID(); ok {
+		_spec.AddField(message.FieldBoardID, field.TypeInt, value)
 	}
 	if value, ok := muo.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)

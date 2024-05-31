@@ -51,7 +51,7 @@ var (
 	// MessagesColumns holds the columns for the "messages" table.
 	MessagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "board_id", Type: field.TypeString},
+		{Name: "board_id", Type: field.TypeInt},
 		{Name: "message", Type: field.TypeString},
 		{Name: "writer", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},

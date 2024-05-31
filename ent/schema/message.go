@@ -15,7 +15,7 @@ type Message struct {
 // Fields of the Message.
 func (Message) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("board_id"),
+		field.Int("board_id"),
 		field.String("message"),
 		field.String("writer"),
 		field.Time("createdAt").

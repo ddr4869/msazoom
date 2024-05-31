@@ -23,6 +23,9 @@ func SetUp(s *Server) {
 	api.POST("/board", utils.ParseJWT(), s.CreateBoardValid, s.CreateBoard)
 	api.POST("/board/recommend", s.RecommendBoardValid, s.RecommendBoard)
 	api.POST("/board/remove", utils.ParseJWT(), s.DeleteBoardValid, s.DeleteBoard)
+
+	api.GET("/message/:board_id", s.GetBoardMessageValid, s.GetBoardMessage)
+	api.POST("/message/", utils.ParseJWT(), s.WriteBoardMessageValid, s.WriteBoardMessage)
 }
 
 func (s *Server) Ping(c *gin.Context) {
