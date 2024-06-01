@@ -26,17 +26,3 @@ func (s *Server) GetBoardMessageValid(c *gin.Context) {
 	c.Set("reqUri", reqUri)
 	c.Next()
 }
-
-type RoomID struct {
-	RoomID string `form:"room_id" json:"room_id"`
-}
-
-func (s *Server) JoinRoomTestValid(c *gin.Context) {
-	var req RoomID
-	if err := c.ShouldBind(&req); err != nil {
-		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get block number")
-		return
-	}
-	c.Set("req", req)
-	c.Next()
-}

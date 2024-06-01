@@ -9,7 +9,6 @@ import Room from '@/components/rtc/Room';
 const RoomPage = () => {
     const router = useRouter();
     const { id } = router.query;
-  
     return (
       <div>
         <h1>Golang & React</h1>

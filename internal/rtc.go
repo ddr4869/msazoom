@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 
@@ -13,15 +12,10 @@ import (
 var broadcast = rtc.Broadcast
 
 func (s *Server) CreateChat(c *gin.Context) {
+	req := c.MustGet("req").(dto.CreateChatRequest)
+	rtc.AllRooms.CreateRoom(req.Board_id)
 
-	roomID := rtc.AllRooms.CreateRoom()
-
-	type resp struct {
-		RoomID string `json:"room_id"`
-	}
-
-	log.Println("AllRooms.Map -> ", rtc.AllRooms.Map)
-	json.NewEncoder(c.Writer).Encode(resp{RoomID: roomID})
+	dto.NewSuccessResponse(c, req.Board_id)
 }
 
 func (s *Server) RoomListTest(c *gin.Context) {
@@ -30,21 +24,13 @@ func (s *Server) RoomListTest(c *gin.Context) {
 
 func (s *Server) JoinRoomTest(c *gin.Context) {
 	// get roomID from query
-	req := c.MustGet("req").(RoomID)
+	req := c.MustGet("req").(dto.CreateChatRequest)
 	fmt.Println("req->", req)
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Fatal("Web Socket Upgrade Error", err)
 	}
-	// get first key of AllRooms.Map
-	var roomId string
-	for k := range rtc.AllRooms.Map {
-		roomId = k
-		rtc.AllRooms.InsertIntoRoom(roomId, false, ws)
-		break
-	}
-	//AllRooms.InsertIntoRoom("test", false, ws)
-
+	rtc.AllRooms.InsertIntoRoom(req.Board_id, false, ws)
 	go rtc.Broadcaster()
 	for {
 		var msg rtc.BroadcastMsg
@@ -53,11 +39,9 @@ func (s *Server) JoinRoomTest(c *gin.Context) {
 			log.Println("Quit")
 			break
 		}
-		fmt.Println("roomId -> ", roomId)
 		msg.Client = ws
-		msg.RoomID = roomId
+		msg.BoardId = req.Board_id
 		log.Println("message -> ", msg.Message)
 		broadcast <- msg
-
 	}
 }

@@ -2,9 +2,11 @@
 import { useRouter } from 'next/router';
 import { useSession, SessionProvider } from 'next-auth/react';
 import { useWebSocket } from '../socket/websocket';
+import Room from '@/components/rtc/Room';
 
 export default function Page({ id }) {
   const router = useRouter();
+  const boardId = router.query.id;
   const { data: session } = useSession();
   const { messages, sendMessage } = useWebSocket(); // WebSocket 서버 URL
 
@@ -24,12 +26,7 @@ export default function Page({ id }) {
       <button onClick={navigateToDashboard}>뒤로가기</button>
       <button onClick={handleSendMessage}>Send WebSocket Message</button>
       <div>
-        <h2>Received Messages:</h2>
-        <ul>
-          {messages.map((msg, index) => (
-            <li key={index}>{msg.content}</li>
-          ))}
-        </ul>
+        <Room roomId={id} />
       </div>
     </SessionProvider>
   );

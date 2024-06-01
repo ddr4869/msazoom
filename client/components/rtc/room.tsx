@@ -8,6 +8,7 @@ const Room = ({ roomId }) => {
   const webSocketRef = useRef();
 
   const openCamera = async () => {
+    console.log('Opening Camera');
     const constraints = {
       video: true,
       audio: true,
@@ -20,13 +21,15 @@ const Room = ({ roomId }) => {
   useEffect(() => {
     const start = async () => {
       await openCamera();
-      webSocketRef.current = new WebSocket(`ws://localhost:8080/api/rtc/join?room_iD=${roomId}`);
+      webSocketRef.current = new WebSocket(`ws://localhost:8080/api/rtc/join?board_id=${roomId}`);
 
       webSocketRef.current.addEventListener('open', () => {
+        console.log('!! addEventListner open !!');
         webSocketRef.current.send(JSON.stringify({ join: true }));
       });
 
       webSocketRef.current.addEventListener('message', async (e) => {
+        console.log('!! addEventListner message !!');
         console.log('Received data -> ', e.data);
         // if message is empty, return
         if (!e.data) return;    
@@ -50,11 +53,16 @@ const Room = ({ roomId }) => {
           );
         }
 
-        if (message.iceCandidate) {
+        if (message.iceCandidate && peerRef.current) {
           console.log('Receiving and Adding ICE Candidate -> ', message.iceCandidate);
           peerRef.current.addIceCandidate(message.iceCandidate).catch(
               (err) => console.log("Error adding ICE Candidate"));
             console.log('*** ICE Candidate Added Success ***');
+        }
+
+        if (message.disconnect) {
+          console.log('Peer disconnected');
+          handlePeerDisconnect();
         }
       });
     };
@@ -135,7 +143,42 @@ const Room = ({ roomId }) => {
 
   const handleTrackEvent = (e) => {
     console.log('Received Tracks, e.stream[0]->', e.streams[0]);
-    partnerVideo.current.srcObject = e.streams[0];
+    partnerVideo.current.srcObject = e.streams[0]; 
+  };
+
+  const handlePeerDisconnect = () => {
+    console.log('Handling peer disconnection');
+    // Close the partner video stream
+    if (partnerVideo.current && partnerVideo.current.srcObject) {
+      partnerVideo.current.srcObject.getTracks().forEach((track) => track.stop());
+      partnerVideo.current.srcObject = null;
+    }
+  
+    // Close the peer connection
+    if (peerRef.current) {
+      peerRef.current.close();
+      peerRef.current = null;
+    }
+  };
+  
+  // disconnect webRTC
+  const disconnect = () => {
+    console.log('Disconnecting');
+    if (webSocketRef.current) {
+      webSocketRef.current.send(JSON.stringify({ disconnect: true }));
+    }
+
+    userStream.current.getTracks().forEach((track) => {
+      track.stop();
+    });
+
+    if (peerRef.current) {
+      peerRef.current.close();
+    }
+
+    if (webSocketRef.current) {
+      webSocketRef.current.close();
+    }
   };
 
   return (
@@ -153,6 +196,10 @@ const Room = ({ roomId }) => {
       >
         <video playsInline autoPlay muted controls ref={userVideo} />
         <video playsInline autoPlay controls ref={partnerVideo} />
+      </div>
+      <div>
+        <button onClick={disconnect}>Disconnect</button>
+
       </div>
     </div>
   );
