@@ -2,7 +2,7 @@
 import { useRouter } from 'next/router';
 import { useSession, SessionProvider } from 'next-auth/react';
 import { useWebSocket } from '../socket/websocket';
-import Room from '@/components/rtc/Room';
+import WebRTCComponent from '@/components/rtc/webRTC';
 
 export default function Page({ id }) {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function Page({ id }) {
       <button onClick={navigateToDashboard}>뒤로가기</button>
       <button onClick={handleSendMessage}>Send WebSocket Message</button>
       <div>
-        <Room roomId={id} />
+        <WebRTCComponent roomId={id} />
       </div>
     </SessionProvider>
   );

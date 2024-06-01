@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-const Room = ({ roomId }) => {
+const WebRTCComponent = ({ roomId }) => {
   const userVideo = useRef();
   const userStream = useRef();
   const partnerVideo = useRef();
@@ -205,4 +205,4 @@ const Room = ({ roomId }) => {
   );
 };
 
-export default Room;
+export default WebRTCComponent;
