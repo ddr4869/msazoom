@@ -13,6 +13,7 @@ type SuccessResponse struct {
 }
 
 func NewSuccessResponse(c *gin.Context, data interface{}) {
+
 	c.JSON(http.StatusOK, SuccessResponse{
 		Data: data,
 		Code: http.StatusOK,

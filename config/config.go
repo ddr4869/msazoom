@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/ddr4869/msazoom/internal/domain/rtc"
 	"github.com/joho/godotenv"
 )
 
@@ -46,6 +47,9 @@ func Init() *Config {
 		Name:     os.Getenv("DB_NAME"),
 		Password: os.Getenv("DB_PASSWORD"),
 	}
+
+	// Initialize RoomMap
+	rtc.AllRooms.Init()
 
 	JwtSecretPassword = os.Getenv("JWT_SECRET_PASSWORD")
 

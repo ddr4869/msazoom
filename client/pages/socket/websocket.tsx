@@ -1,43 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
+import { useEffect, useState } from 'react';
 
-const client = new W3CWebSocket('ws://localhost:8080/ws');
-
-const WebSocketComponent = () => {
-  const [message, setMessage] = useState('');
-  const [response, setResponse] = useState('');
+export const useWebSocket  = () => {
+  const [socket, setSocket] = useState(null);
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    client.onopen = () => {
-      console.log('WebSocket Client Connected');
+    const username = localStorage.getItem('username')
+    console.log("username -> "  + username)
+    const ws = new WebSocket("ws://localhost:8080/api/ws");
+    setSocket(ws);
+
+    ws.onopen = () => {
+      console.log('Connected to WebSocket server');
     };
-    client.onmessage = (message) => {
-      console.log('Received message:', message.data);
-      setResponse(message.data);
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      //const message = event.data;
+      console.log('Received message:', message);
+      setMessages((prevMessages) => [...prevMessages, message]);
     };
-    client.onclose = () => {
-      console.log('WebSocket Client Closed');
+
+    ws.onclose = () => {
+      console.log('Disconnected from WebSocket server');
     };
-    client.onerror = (error) => {
-      console.error('WebSocket Client Error:', error);
+
+    return () => {
+      ws.close();
     };
   }, []);
 
-  const sendMessage = () => {
-    if (client.readyState === client.OPEN) {
-      console.log('Sending message:', message);
-      client.send(message);
+  const sendMessage = (message) => {
+    if (socket) {
+      socket.send(JSON.stringify(message));
     }
   };
 
-  return (
-    <div>
-      <h1>WebSocket Example</h1>
-      <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} />
-      <button onClick={sendMessage}>Send Message</button>
-      <p>Response from server: {response}</p>
-    </div>
-  );
-}
-
-export default WebSocketComponent;
+  return { messages, sendMessage };
+};

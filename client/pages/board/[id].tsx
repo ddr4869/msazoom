@@ -1,32 +1,40 @@
-import { useRouter } from 'next/router'
-import { useSession, SessionProvider } from "next-auth/react";
-import { socket, WebSocketComponent } from '../socket/websocket';
-import { Websocket } from '../socket/websocket';
-import axios from '../../server/axios'
+// /pages/[id].js
+import { useRouter } from 'next/router';
+import { useSession, SessionProvider } from 'next-auth/react';
+import { useWebSocket } from '../socket/websocket';
 
+export default function Page({ id }) {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const { messages, sendMessage } = useWebSocket(); // WebSocket 서버 URL
 
-export default function Page({id}:any) {
-  const router = useRouter()  
   const navigateToDashboard = () => {
     router.push({
-      pathname: `/dashboard`,
+      pathname: '/dashboard',
     });
   };
 
+  const handleSendMessage = () => {
+    const message = { id, content: 'Hello from Next.js!' };
+    sendMessage(message);
+  };
+
   return (
-      <SessionProvider>
-        <button onClick={navigateToDashboard}>뒤로가기</button>
-      {/* <WebSocketComponent value={socket}>
-        <Websocket board_id={id} board_name={router.query.board_name}/>
-      </WebSocketComponent> */}
-      <WebSocketComponent>
-        <Websocket board_id={id} board_name={router.query.board_name}/>
-      </WebSocketComponent>
+    <SessionProvider session={session}>
+      <button onClick={navigateToDashboard}>뒤로가기</button>
+      <button onClick={handleSendMessage}>Send WebSocket Message</button>
+      <div>
+        <h2>Received Messages:</h2>
+        <ul>
+          {messages.map((msg, index) => (
+            <li key={index}>{msg.content}</li>
+          ))}
+        </ul>
+      </div>
     </SessionProvider>
-  )
+  );
 }
 
-export async function getServerSideProps(context:any) {
+export async function getServerSideProps(context) {
   return { props: { id: context.params.id } };
 }
-
