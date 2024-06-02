@@ -3,13 +3,14 @@ import { useRouter } from 'next/router';
 import { useSession, SessionProvider } from 'next-auth/react';
 import { useWebSocket } from '../socket/websocket';
 import WebRTCComponent from '@/components/rtc/webRTC';
+import { useEffect } from 'react';
 
 export default function Page({ id }) {
   const router = useRouter();
-  const boardId = router.query.id;
+  const username = localStorage.getItem('accessToken')
   const { data: session } = useSession();
-  const { messages, sendMessage } = useWebSocket(); // WebSocket 서버 URL
-
+  //const { messages, sendMessage } = useWebSocket(); // WebSocket 서버 URL
+  
   const navigateToDashboard = () => {
     router.push({
       pathname: '/dashboard',
@@ -26,7 +27,7 @@ export default function Page({ id }) {
       <button onClick={navigateToDashboard}>뒤로가기</button>
       <button onClick={handleSendMessage}>Send WebSocket Message</button>
       <div>
-        <WebRTCComponent roomId={id} />
+        <WebRTCComponent roomId={id} userId={username} />
       </div>
     </SessionProvider>
   );

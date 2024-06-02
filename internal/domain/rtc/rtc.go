@@ -9,13 +9,23 @@ import (
 )
 
 type Participant struct {
-	Host bool
-	Conn *websocket.Conn
+	UserName string
+	Host     bool
+	Conn     *websocket.Conn
 }
 
 type RoomMap struct {
 	Mutex sync.RWMutex
 	Map   map[int][]Participant
+}
+
+// #### Signaling ####
+var AllRooms RoomMap
+
+type BroadcastMsg struct {
+	Message map[string]interface{}
+	BoardId int
+	Client  *websocket.Conn
 }
 
 var Broadcast = make(chan BroadcastMsg)
@@ -31,32 +41,26 @@ func (r *RoomMap) Get(board_id int) []Participant {
 	return r.Map[board_id]
 }
 
-// #### Signaling ####
-var AllRooms RoomMap
-
-type BroadcastMsg struct {
-	Message map[string]interface{}
-	BoardId int
-	Client  *websocket.Conn
-}
-
-func (r *RoomMap) CreateRoom(board_id int) {
+func (r *RoomMap) InsertIntoRoom(board_id int, username string, host bool, conn *websocket.Conn) {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
-	r.Map[board_id] = []Participant{}
-}
-
-func (r *RoomMap) InsertIntoRoom(board_id int, host bool, conn *websocket.Conn) {
-	r.Mutex.Lock()
-	defer r.Mutex.Unlock()
-
-	p := Participant{host, conn}
-
+	p := Participant{
+		UserName: username,
+		Host:     host,
+		Conn:     conn,
+	}
 	log.Println("Inserting into Room with RoomID: ", board_id)
 	r.Map[board_id] = append(r.Map[board_id], p)
 }
 
-func (r *RoomMap) DeleteRoom(board_id int) {
+func (r *RoomMap) DeleteRoom(board_id int, username string) {
+	r.Mutex.Lock()
+	defer r.Mutex.Unlock()
+
+	delete(r.Map, board_id)
+}
+
+func (r *RoomMap) QuitRoom(board_id int) {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
 
@@ -86,7 +90,10 @@ func Broadcaster() {
 				err := client.Conn.WriteJSON(msg.Message)
 				if err != nil {
 					fmt.Println("broadcast close !!")
+					// print error
+					log.Println("Error broadcasting message: ", err)
 					client.Conn.Close()
+					AllRooms.Mutex.Unlock()
 					return
 				}
 				AllRooms.Mutex.Unlock()

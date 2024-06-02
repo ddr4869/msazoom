@@ -5,7 +5,7 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from "next/router";
 import { createBoardAxios, getBoardsAxios, recommendBoardAxios, deleteBoardAxios } from '@/server/board';
 
-import Room from '@/components/rtc/Room';
+import Room from '@/components/rtc/webRTC';
 const RoomPage = () => {
     const router = useRouter();
     const { id } = router.query;

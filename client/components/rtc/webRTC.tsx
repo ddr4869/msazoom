@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-const WebRTCComponent = ({ roomId }) => {
+const WebRTCComponent = ({ roomId, userId }) => {
   const userVideo = useRef();
   const userStream = useRef();
   const partnerVideo = useRef();
@@ -21,8 +21,8 @@ const WebRTCComponent = ({ roomId }) => {
   useEffect(() => {
     const start = async () => {
       await openCamera();
-      webSocketRef.current = new WebSocket(`ws://localhost:8080/api/rtc/join?board_id=${roomId}`);
-
+      
+      webSocketRef.current = new WebSocket(`ws://localhost:8080/api/rtc/join?board_id=${roomId}&username=${userId}`);
       webSocketRef.current.addEventListener('open', () => {
         console.log('!! addEventListner open !!');
         webSocketRef.current.send(JSON.stringify({ join: true }));
@@ -161,6 +161,18 @@ const WebRTCComponent = ({ roomId }) => {
     }
   };
   
+    // 뒤로가기 감지 
+    useEffect(() => {
+      const handlePopState = () => {
+        disconnect();
+      };  
+      window.addEventListener('popstate', handlePopState);
+      // Cleanup the event listener on component unmount
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }, []);
+
   // disconnect webRTC
   const disconnect = () => {
     console.log('Disconnecting');
