@@ -12,15 +12,7 @@ import (
 
 var broadcast = rtc.Broadcast
 
-func (s *Server) CreateMochChat(c *gin.Context) {
-	_, _ = s.repository.CreateChat(c, "test1", "tom")
-	_, _ = s.repository.CreateChat(c, "test2", "tom")
-	_, _ = s.repository.CreateChat(c, "test3", "tom")
-	chat, _ := s.repository.CreateChat(c, "test4", "tom")
-	dto.NewSuccessResponse(c, chat)
-}
-
-func (s *Server) RoomConditionTest(c *gin.Context) {
+func (s *Server) RoomConditionCheck(c *gin.Context) {
 	dto.NewSuccessResponse(c, &rtc.AllRooms)
 }
 
@@ -37,8 +29,6 @@ func (s *Server) CreateChat(c *gin.Context) {
 func (s *Server) JoinChat(c *gin.Context) {
 	// get roomID from query
 	req := c.MustGet("req").(dto.JoinChatRequest)
-	fmt.Println("req.ChatID: ", req.ChatID)
-	fmt.Println("req.Username: ", req.Username)
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Fatal("Web Socket Upgrade Error", err)

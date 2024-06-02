@@ -53,7 +53,6 @@ func (r *RoomMap) InsertIntoRoom(chat_id int, username string, host bool, ws *we
 		Conn: ws,
 	}
 	log.Println("Inserting into Room with RoomID: ", chat_id)
-	//r.Map[chat_id][username] = p
 	if host {
 		r.Map[chat_id] = Participants{username: p}
 	} else {

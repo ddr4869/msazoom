@@ -14,6 +14,10 @@ export default function Page({ id }) {
       <div>
         <WebRTCComponent chatId={id} userId={username} />
       </div>
+      <div>
+        <h1>Chat Room</h1>
+        <p>Chat Room ID: {id}</p>
+      </div>
     </SessionProvider>
   );
 }

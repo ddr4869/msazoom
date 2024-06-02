@@ -5,7 +5,6 @@ import CreateChatForm from '@/ui/chat/CreateChatForm';
 import { handleLogin, handleLogout } from '@/utils/auth';
 import ChatList from '@/components/chat/chatList';
 import LoginComponent from '@/components/user/LoginComponent';
-import WebRTCComponent from '@/components/rtc/webRTC';
 
 const Home = () => {
   const [username, setUsername] = useState('');
@@ -25,7 +24,6 @@ const Home = () => {
 
 
     try {
-      //<WebRTCComponent chatId={id} userId={username} />
       const formData = new FormData(event.currentTarget);
       const chat_title = formData.get('title') as string;
       const response = await createChatAxios(localStorage.getItem('username'), chat_title);

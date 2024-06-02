@@ -205,11 +205,11 @@ const WebRTCComponent = ({ chatId, userId }) => {
 
   return (
     <div>
-      <button onClick={navigateToHome}>뒤로가기</button>
+      <button onClick={navigateToHome}>Disconnect</button>
       <div
         style={{
           display: 'flex',
-          justifyContent: 'center',
+          justifyContent: 'space-around',
           alignItems: 'center',
           top: '100px',
           right: '100px',
@@ -217,13 +217,31 @@ const WebRTCComponent = ({ chatId, userId }) => {
           overflow: 'hidden',
         }}
       >
-        <video playsInline autoPlay muted controls ref={userVideo} />
-        <video playsInline autoPlay controls ref={partnerVideo} />
+        <div style={{ textAlign: 'center' }}>
+          <h2>Partner Video</h2>
+          <video
+            playsInline
+            autoPlay
+            controls
+            ref={partnerVideo}
+            style={{ width: '600px', height: '450px' }} // 고정 크기
+          />
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <h2>Your Video</h2>
+          <video
+            playsInline
+            autoPlay
+            muted
+            controls
+            ref={userVideo}
+            style={{ width: '600px', height: '450px' }} // 고정 크기
+          />
+        </div>
       </div>
-      <div>
+      {/* <div>
         <button onClick={disconnect}>Disconnect</button>
-
-      </div>
+      </div> */}
     </div>
   );
 };
