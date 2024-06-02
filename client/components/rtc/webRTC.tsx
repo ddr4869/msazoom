@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
 
-const WebRTCComponent = ({ roomId, userId }) => {
+const WebRTCComponent = ({ chatId, userId }) => {
+  const router = useRouter();
   const userVideo = useRef();
   const userStream = useRef();
   const partnerVideo = useRef();
@@ -22,7 +24,7 @@ const WebRTCComponent = ({ roomId, userId }) => {
     const start = async () => {
       await openCamera();
       
-      webSocketRef.current = new WebSocket(`ws://localhost:8080/api/rtc/join?board_id=${roomId}&username=${userId}`);
+      webSocketRef.current = new WebSocket(`ws://localhost:8080/api/chat/join?chat_id=${chatId}&username=${userId}`);
       webSocketRef.current.addEventListener('open', () => {
         console.log('!! addEventListner open !!');
         webSocketRef.current.send(JSON.stringify({ join: true }));
@@ -67,10 +69,10 @@ const WebRTCComponent = ({ roomId, userId }) => {
       });
     };
 
-    if (roomId) {
+    if (chatId) {
       start();
     }
-  }, [roomId]);
+  }, [chatId]);
 
   const handleOffer = async (offer) => {
     console.log('Received Offer, Creating Answer');
@@ -161,7 +163,15 @@ const WebRTCComponent = ({ roomId, userId }) => {
     }
   };
   
-    // 뒤로가기 감지 
+    // 뒤로가기
+    const navigateToHome = () => {
+      disconnect();
+      router.push({
+        pathname: '/',
+      });
+    };
+
+    // disconnect 감지 
     useEffect(() => {
       const handlePopState = () => {
         disconnect();
@@ -195,6 +205,7 @@ const WebRTCComponent = ({ roomId, userId }) => {
 
   return (
     <div>
+      <button onClick={navigateToHome}>뒤로가기</button>
       <div
         style={{
           display: 'flex',

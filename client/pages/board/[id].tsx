@@ -7,9 +7,8 @@ import { useEffect } from 'react';
 
 export default function Page({ id }) {
   const router = useRouter();
-  const username = localStorage.getItem('accessToken')
+  const username = localStorage.getItem('username')
   const { data: session } = useSession();
-  //const { messages, sendMessage } = useWebSocket(); // WebSocket 서버 URL
   
   const navigateToDashboard = () => {
     router.push({
@@ -17,17 +16,11 @@ export default function Page({ id }) {
     });
   };
 
-  const handleSendMessage = () => {
-    const message = { id, content: 'Hello from Next.js!' };
-    sendMessage(message);
-  };
-
   return (
     <SessionProvider session={session}>
       <button onClick={navigateToDashboard}>뒤로가기</button>
-      <button onClick={handleSendMessage}>Send WebSocket Message</button>
       <div>
-        <WebRTCComponent roomId={id} userId={username} />
+        <WebRTCComponent chatId={id} userId={username} />
       </div>
     </SessionProvider>
   );

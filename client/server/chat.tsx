@@ -4,7 +4,6 @@ import axios from './axios'
 export const createChatAxios = (username:string, chat_title:string) => {
   try {
     return new Promise<any>((resolve, reject) => {
-      // /chat?title=chat_title&username=username
       const reqUrl = `/chat/create?title=${chat_title}&username=${username}`;
       axios.get(reqUrl,  {})
       .then(res => {

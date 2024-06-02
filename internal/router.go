@@ -30,9 +30,12 @@ func SetUp(s *Server) {
 	api.GET("/message/ws/:board_id", s.GetBoardMessageValid, s.SocketWriteBoardMessage)
 
 	// webRTC Test
+	//api.GET("/chat/create", s.CreateMochChat)
 	api.GET("/chat/create", s.CreateChatValid, s.CreateChat)
 	api.GET("/chat", s.GetChatList)
 	api.GET("/chat/join", s.JoinChatValid, s.JoinChat)
+
+	api.GET("/chat/room_condition", s.RoomConditionTest)
 }
 
 func (s *Server) Ping(c *gin.Context) {

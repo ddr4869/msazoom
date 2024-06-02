@@ -16,6 +16,14 @@ func (r Repository) CreateChat(ctx context.Context, title, username string) (*en
 	return c, nil
 }
 
+func (r Repository) GetChat(ctx context.Context, chat_id int) (*ent.Chat, error) {
+	chat, err := r.entClient.Chat.Query().Where(chat.ID(chat_id)).First(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get chat list: %w", err)
+	}
+	return chat, nil
+}
+
 func (r Repository) GetChatList(ctx context.Context) ([]*ent.Chat, error) {
 	chatList, err := r.entClient.Chat.Query().Order(ent.Desc(chat.FieldCreatedAt)).All(ctx)
 	if err != nil {

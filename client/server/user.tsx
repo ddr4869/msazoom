@@ -10,7 +10,7 @@ export const LoginAxios = (username, password) => {
             password: password
         })
         .then(res => {
-          resolve(res.data);
+          resolve(res.data.data);
           const { data } = res.data;
           const { access_token } = data;
           localStorage.setItem('accessToken', access_token);

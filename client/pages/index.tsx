@@ -1,61 +1,50 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from "next/router";
-import { createBoardAxios, getBoardsAxios, recommendBoardAxios, deleteBoardAxios } from '../server/board';
-import BoardList from '@/components/Board/BoardList';
-import CreateBoardForm from '@/ui/Board/CreateBoardForm';
+import { createChatAxios, getChatsAxios } from '@/server/chat';
+import CreateChatForm from '@/ui/chat/CreateChatForm';
 import { handleLogin, handleLogout } from '@/utils/auth';
+import ChatList from '@/components/chat/chatList';
 import LoginComponent from '@/components/user/LoginComponent';
+import WebRTCComponent from '@/components/rtc/webRTC';
 
 const Home = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [boards, setBoards] = useState([]);
-  const [boardReload, setBoardReload] = useState(false);
-  const [showCreateBoardForm, setShowCreateBoardForm] = useState(false);
+  const [chats, setChats] = useState([]);
+  const [chatReload, setChatReload] = useState(false);
+  const [showCreateChatForm, setShowCreateChatForm] = useState(false);
   const router = useRouter();
 
-  const handleCreateBoardClick = () => {
-    setShowCreateBoardForm(true);
+  const handleCreateChatClick = () => {
+    setShowCreateChatForm(true);
   };
 
-  const handleSubmitBoardForm = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmitChatForm = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+
     try {
+      //<WebRTCComponent chatId={id} userId={username} />
       const formData = new FormData(event.currentTarget);
-      const boardName = formData.get('board_name') as string;
-      const boardPassword = formData.get('board_password') as string;
-      await createBoardAxios(localStorage.getItem('accessToken'), boardName, boardPassword);
-      setShowCreateBoardForm(false);
-      setBoardReload(true);
+      const chat_title = formData.get('title') as string;
+      const response = await createChatAxios(localStorage.getItem('username'), chat_title);
+      console.log("response -> ", response)
+      setShowCreateChatForm(false);
+      setChatReload(true);
+      navigateToChat(response.id);
     } catch (error) {
-      console.error('Error creating board:', error);
+      console.error('Error creating chat:', error);
     }
   };
 
-  const navigateToBoard = (boardId: any, boardName: any) => {
+  // TODO !!
+  const navigateToChat = (chatId: any) => {
+    console.log("chatod -> ", chatId)
     router.push({
-      pathname: `/board/${boardId}`,
-      query: { board_name: boardName }
+      pathname: `/chat/${chatId}`,
+      //query: { board_name: boardName }
     });
-  };
-
-  const handleRecommendBoard = async (board_id: number) => {
-    try {
-      await recommendBoardAxios(board_id);
-      setBoardReload(true);
-    } catch (error) {
-      console.error('Error recommending board:', error);
-    }
-  };
-
-  const handleDeleteBoard = async (board_id: number, board_password: string) => {
-    try {
-      await deleteBoardAxios(localStorage.getItem('accessToken'), board_id, board_password);
-      setBoardReload(true);
-    } catch (error) {
-      console.error('Error deleting board:', error);
-    }
   };
 
   useEffect(() => {
@@ -66,8 +55,8 @@ const Home = () => {
   useEffect(() => {
     const fetchBoards = async (token: string) => {
       try {
-        const response = await getBoardsAxios(token);
-        setBoards(response);
+        const response = await getChatsAxios(token);
+        setChats(response);
       } catch (error) {
         console.error('Error fetching boards:', error);
       }
@@ -77,10 +66,10 @@ const Home = () => {
     if (isLoggedIn && accessToken) {
       fetchBoards(accessToken);
     } else {
-      setBoards([]);
+      setChats([]);
     }
-    setBoardReload(false);
-  }, [isLoggedIn, boardReload, showCreateBoardForm]);
+    setChatReload(false);
+  }, [isLoggedIn, chatReload, showCreateChatForm]);
 
   return (
     <div className="chat-board">
@@ -99,19 +88,17 @@ const Home = () => {
         <h2> 
           {isLoggedIn ? "Container List" : "Please Login" } 
         </h2>
-        <BoardList
-          boards={boards}
-          navigateToBoard={navigateToBoard}
-          handleRecommendBoard={handleRecommendBoard}
-          handleDeleteBoard={handleDeleteBoard}
+        <ChatList
+          chats={chats}
+          navigateToChat={navigateToChat}
         />
-        {isLoggedIn && !showCreateBoardForm && (
-          <button onClick={handleCreateBoardClick}>Create Board</button>
+        {isLoggedIn && !showCreateChatForm && (
+          <button onClick={handleCreateChatClick}>Create Chat</button>
         )}
-        {isLoggedIn && showCreateBoardForm && (
-          <CreateBoardForm
-            handleSubmitBoardForm={handleSubmitBoardForm}
-            setShowCreateBoardForm={setShowCreateBoardForm}
+        {isLoggedIn && showCreateChatForm && (
+          <CreateChatForm
+            handleSubmitChatForm={handleSubmitChatForm}
+            setShowCreateChatForm={setShowCreateChatForm}
           />
         )}
       </main>
