@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ddr4869/msazoom/ent/board"
+	"github.com/ddr4869/msazoom/ent/chat"
 	"github.com/ddr4869/msazoom/ent/friend"
 	"github.com/ddr4869/msazoom/ent/hotboard"
 	"github.com/ddr4869/msazoom/ent/message"
@@ -78,6 +79,7 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			board.Table:    board.ValidColumn,
+			chat.Table:     chat.ValidColumn,
 			friend.Table:   friend.ValidColumn,
 			hotboard.Table: hotboard.ValidColumn,
 			message.Table:  message.ValidColumn,

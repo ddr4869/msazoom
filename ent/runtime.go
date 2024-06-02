@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ddr4869/msazoom/ent/board"
+	"github.com/ddr4869/msazoom/ent/chat"
 	"github.com/ddr4869/msazoom/ent/friend"
 	"github.com/ddr4869/msazoom/ent/message"
 	"github.com/ddr4869/msazoom/ent/schema"
@@ -42,6 +43,24 @@ func init() {
 	boardDescUpdatedAt := boardFields[5].Descriptor()
 	// board.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
 	board.DefaultUpdatedAt = boardDescUpdatedAt.Default.(func() time.Time)
+	chatFields := schema.Chat{}.Fields()
+	_ = chatFields
+	// chatDescChatName is the schema descriptor for chat_name field.
+	chatDescChatName := chatFields[0].Descriptor()
+	// chat.DefaultChatName holds the default value on creation for the chat_name field.
+	chat.DefaultChatName = chatDescChatName.Default.(string)
+	// chatDescChatUser is the schema descriptor for chat_user field.
+	chatDescChatUser := chatFields[1].Descriptor()
+	// chat.DefaultChatUser holds the default value on creation for the chat_user field.
+	chat.DefaultChatUser = chatDescChatUser.Default.(string)
+	// chatDescCreatedAt is the schema descriptor for createdAt field.
+	chatDescCreatedAt := chatFields[2].Descriptor()
+	// chat.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	chat.DefaultCreatedAt = chatDescCreatedAt.Default.(func() time.Time)
+	// chatDescUpdatedAt is the schema descriptor for updatedAt field.
+	chatDescUpdatedAt := chatFields[3].Descriptor()
+	// chat.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	chat.DefaultUpdatedAt = chatDescUpdatedAt.Default.(func() time.Time)
 	friendFields := schema.Friend{}.Fields()
 	_ = friendFields
 	// friendDescCreatedAt is the schema descriptor for createdAt field.

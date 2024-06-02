@@ -8,15 +8,17 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Participant struct {
-	UserName string
-	Host     bool
-	Conn     *websocket.Conn
-}
-
 type RoomMap struct {
 	Mutex sync.RWMutex
-	Map   map[int][]Participant
+	Map   map[int]Participants
+}
+
+// define map[string]Participant type
+type Participants map[string]Participant
+
+type Participant struct {
+	Host bool
+	Conn *websocket.Conn
 }
 
 // #### Signaling ####
@@ -31,53 +33,42 @@ type BroadcastMsg struct {
 var Broadcast = make(chan BroadcastMsg)
 
 func (r *RoomMap) Init() {
-	r.Map = make(map[int][]Participant)
+	r.Map = make(map[int]Participants)
 }
 
-func (r *RoomMap) Get(board_id int) []Participant {
+func (r *RoomMap) Get(board_id int) Participants {
 	r.Mutex.RLock()
 	defer r.Mutex.RUnlock()
 
 	return r.Map[board_id]
 }
 
-func (r *RoomMap) InsertIntoRoom(board_id int, username string, host bool, conn *websocket.Conn) {
+// If the room does not exist, create a new room
+// If the room already exists, insert the user into the room
+func (r *RoomMap) InsertIntoRoom(chat_id int, username string, host bool, ws *websocket.Conn) {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
 	p := Participant{
-		UserName: username,
-		Host:     host,
-		Conn:     conn,
+		Host: host,
+		Conn: ws,
 	}
-	log.Println("Inserting into Room with RoomID: ", board_id)
-	r.Map[board_id] = append(r.Map[board_id], p)
+	log.Println("Inserting into Room with RoomID: ", chat_id)
+	r.Map[chat_id][username] = p
+	//r.Map[board_id] = append(r.Map[board_id], p)
 }
 
-func (r *RoomMap) DeleteRoom(board_id int, username string) {
+// If the user is the host, delete the room
+func (r *RoomMap) QuitRoom(board_id int, username string) bool {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
-
-	delete(r.Map, board_id)
-}
-
-func (r *RoomMap) QuitRoom(board_id int) {
-	r.Mutex.Lock()
-	defer r.Mutex.Unlock()
-
-	delete(r.Map, board_id)
-}
-
-func (r *RoomMap) DeleteRoomClient(board_id int, conn *websocket.Conn) {
-	r.Mutex.Lock()
-	defer r.Mutex.Unlock()
-
-	var newParticipants []Participant
-	for _, p := range r.Map[board_id] {
-		if p.Conn != conn {
-			newParticipants = append(newParticipants, p)
-		}
+	p := r.Map[board_id][username]
+	if p.Host {
+		delete(r.Map, board_id)
+		return true
+	} else {
+		delete(r.Map[board_id], username)
+		return false
 	}
-	r.Map[board_id] = newParticipants
 }
 
 func Broadcaster() {

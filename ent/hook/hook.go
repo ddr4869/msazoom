@@ -21,6 +21,18 @@ func (f BoardFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BoardMutation", m)
 }
 
+// The ChatFunc type is an adapter to allow the use of ordinary
+// function as Chat mutator.
+type ChatFunc func(context.Context, *ent.ChatMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChatFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ChatMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChatMutation", m)
+}
+
 // The FriendFunc type is an adapter to allow the use of ordinary
 // function as Friend mutator.
 type FriendFunc func(context.Context, *ent.FriendMutation) (ent.Value, error)

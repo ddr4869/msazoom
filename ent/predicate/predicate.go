@@ -9,6 +9,9 @@ import (
 // Board is the predicate function for board builders.
 type Board func(*sql.Selector)
 
+// Chat is the predicate function for chat builders.
+type Chat func(*sql.Selector)
+
 // Friend is the predicate function for friend builders.
 type Friend func(*sql.Selector)
 

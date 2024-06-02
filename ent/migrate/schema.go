@@ -24,6 +24,20 @@ var (
 		Columns:    BoardsColumns,
 		PrimaryKey: []*schema.Column{BoardsColumns[0]},
 	}
+	// ChatsColumns holds the columns for the "chats" table.
+	ChatsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "chat_name", Type: field.TypeString, Default: "unknown"},
+		{Name: "chat_user", Type: field.TypeString, Default: "unknown"},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ChatsTable holds the schema information for the "chats" table.
+	ChatsTable = &schema.Table{
+		Name:       "chats",
+		Columns:    ChatsColumns,
+		PrimaryKey: []*schema.Column{ChatsColumns[0]},
+	}
 	// FriendsColumns holds the columns for the "friends" table.
 	FriendsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -89,6 +103,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BoardsTable,
+		ChatsTable,
 		FriendsTable,
 		HotBoardsTable,
 		MessagesTable,

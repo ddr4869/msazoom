@@ -1,10 +1,11 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from "next/router";
-import { createBoardAxios, getBoardsAxios, recommendBoardAxios, deleteBoardAxios } from '../server/board';
+import { createBoardAxios, getBoardsAxios, recommendBoardAxios, deleteBoardAxios } from '@/server/board';
 import BoardList from '@/components/Board/BoardList';
 import CreateBoardForm from '@/ui/Board/CreateBoardForm';
+import LoginForm from '@/components/User/LoginForm';
+import UserProfile from '@/components/User/UserProfile';
 import { handleLogin, handleLogout } from '@/utils/auth';
-import LoginComponent from '@/components/user/LoginComponent';
 
 const Home = () => {
   const [username, setUsername] = useState('');
@@ -85,15 +86,20 @@ const Home = () => {
   return (
     <div className="chat-board">
       <header>
-        <LoginComponent 
-          username={username} 
-          setUsername={setUsername} 
-          password={password} 
-          setPassword={setPassword} 
-          handleLogin={(event) => handleLogin(username, password, setIsLoggedIn, event)}
-          handleLogout={() => handleLogout(setIsLoggedIn)}
-          isLoggedIn={isLoggedIn} 
-        />
+        <h1>Chat Board</h1>
+        <div id="login-section">
+          {!isLoggedIn ? (
+            <LoginForm
+              username={username}
+              setUsername={setUsername}
+              password={password}
+              setPassword={setPassword}
+              handleLogin={(event) => handleLogin(username, password, setIsLoggedIn, event)}
+            />
+          ) : (
+            <UserProfile handleLogout={() => handleLogout(setIsLoggedIn)} />
+          )}
+        </div>
       </header>
       <main>
         <h2> 
