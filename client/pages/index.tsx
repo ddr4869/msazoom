@@ -1,10 +1,11 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from "next/router";
 import { createChatAxios, getChatsAxios } from '@/server/chat';
-import CreateChatForm from '@/ui/chat/CreateChatForm';
+import CreateChatForm from '@/ui/chat/createChatForm';
 import { handleLogin, handleLogout } from '@/utils/auth';
 import ChatList from '@/components/chat/chatList';
 import LoginComponent from '@/components/user/loginComponent';
+import SignUpComponent from '@/components/user/singupComponent';
 
 const Home = () => {
   const [username, setUsername] = useState('');
@@ -83,8 +84,11 @@ const Home = () => {
         />
       </header>
       <main>
+        <br></br>
         <h2> 
-          {isLoggedIn ? "Container List" : "Please Login" } 
+          {isLoggedIn ? "Container List" : "Sign up for an account if you don't have one." } 
+        <br></br><br></br>
+        {!isLoggedIn && ( <SignUpComponent/> )}
         </h2>
         <ChatList
           chats={chats}
@@ -102,7 +106,7 @@ const Home = () => {
           />
         )}
         <br></br><br></br>
-        <button onClick={() => setChatReload(true) }>Reload Chat List</button>
+        { isLoggedIn && <button onClick={() => setChatReload(true) }>Reload Chat List</button> }
       </main>
     </div>
   );

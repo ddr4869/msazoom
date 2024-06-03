@@ -121,12 +121,14 @@ const WebRTCComponent = ({ chatId, userId }) => {
   };
 
   useEffect(() => {
-    const handlePopState = () => {
+    const handleDisconnectState = () => {
       disconnect();
     };
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handleDisconnectState);
+    window.addEventListener('beforeunload', handleDisconnectState);
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('popstate', handleDisconnectState);
+      window.removeEventListener('beforeunload', handleDisconnectState);
     };
   }, []);
 

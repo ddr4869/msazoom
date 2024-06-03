@@ -1,5 +1,5 @@
 import LoginForm from '@/ui/user/LoginForm';
-import userStyles from '@/styles/userProfile-styles.module.css';
+import userStyles from '@/styles/user-styles.module.css';
 
 const LoginComponent = ({ username, setUsername, password, setPassword, handleLogin, handleLogout, isLoggedIn }) => {
   return (

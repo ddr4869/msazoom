@@ -26,3 +26,27 @@ export const LoginAxios = (username, password) => {
       throw new Error('Failed to connect server.');
     }
 }
+
+// signupAxios
+export const SignupAxios = (username, password) => {
+    //noStore()
+    try {
+      return new Promise<any>((resolve, reject) => {
+        const reqUrl = '/user';
+        axios.post(reqUrl,  {
+            username: username,
+            password: password
+        })
+        .then(res => {
+          resolve(res.data.data);
+        })
+        .catch(err => {
+            console.log(err)
+          reject(err.message);
+        })
+      })
+    } catch (error) {
+      console.error('Server Error:', error);
+      throw new Error('Failed to connect server.');
+    }
+}

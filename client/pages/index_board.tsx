@@ -2,7 +2,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from "next/router";
 import { createBoardAxios, getBoardsAxios, recommendBoardAxios, deleteBoardAxios } from '../server/board';
 import BoardList from '@/components/Board/BoardList';
-import CreateBoardForm from '@/ui/Board/CreateBoardForm';
+import CreateBoardForm from '@/ui/board/createBoardForm';
 import { handleLogin, handleLogout } from '@/utils/auth';
 import LoginComponent from '@/components/user/loginComponent';
 
