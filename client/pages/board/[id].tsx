@@ -2,7 +2,7 @@
 import { useRouter } from 'next/router';
 import { useSession, SessionProvider } from 'next-auth/react';
 import { useWebSocket } from '../socket/websocket';
-import WebRTCComponent from '@/components/rtc/webRTC';
+import WebRTCComponent from '@/components/rtc/webRTC_backup';
 import { useEffect } from 'react';
 
 export default function Page({ id }) {

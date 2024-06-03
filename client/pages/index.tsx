@@ -4,7 +4,7 @@ import { createChatAxios, getChatsAxios } from '@/server/chat';
 import CreateChatForm from '@/ui/chat/CreateChatForm';
 import { handleLogin, handleLogout } from '@/utils/auth';
 import ChatList from '@/components/chat/chatList';
-import LoginComponent from '@/components/user/LoginComponent';
+import LoginComponent from '@/components/user/loginComponent';
 
 const Home = () => {
   const [username, setUsername] = useState('');
@@ -38,7 +38,7 @@ const Home = () => {
 
   // TODO !!
   const navigateToChat = (chatId: any) => {
-    console.log("chatod -> ", chatId)
+    console.log("chatId -> ", chatId)
     router.push({
       pathname: `/chat/${chatId}`,
       //query: { board_name: boardName }

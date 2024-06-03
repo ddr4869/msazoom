@@ -4,7 +4,7 @@ import { createBoardAxios, getBoardsAxios, recommendBoardAxios, deleteBoardAxios
 import BoardList from '@/components/Board/BoardList';
 import CreateBoardForm from '@/ui/Board/CreateBoardForm';
 import { handleLogin, handleLogout } from '@/utils/auth';
-import LoginComponent from '@/components/user/LoginComponent';
+import LoginComponent from '@/components/user/loginComponent';
 
 const Home = () => {
   const [username, setUsername] = useState('');
