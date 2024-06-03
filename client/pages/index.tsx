@@ -90,6 +90,8 @@ const Home = () => {
           chats={chats}
           navigateToChat={navigateToChat}
         />
+        <br></br>
+        
         {isLoggedIn && !showCreateChatForm && (
           <button onClick={handleCreateChatClick}>Create Chat</button>
         )}
@@ -99,6 +101,8 @@ const Home = () => {
             setShowCreateChatForm={setShowCreateChatForm}
           />
         )}
+        <br></br><br></br>
+        <button onClick={() => setChatReload(true) }>Reload Chat List</button>
       </main>
     </div>
   );

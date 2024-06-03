@@ -1,5 +1,6 @@
 // rtcPeerConnection.js
 export const createPeerConnection = (handleNegotiationNeeded, handleIceCandidateEvent, handleTrackEvent) => {
+  console.log('Creating Peer Connection');
     const peer = new RTCPeerConnection({
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
     });
@@ -33,6 +34,8 @@ export const createPeerConnection = (handleNegotiationNeeded, handleIceCandidate
   
   export const closePeerConnection = (peer) => {
     if (peer) {
+      console.log('Closing Peer Connection');
+      //peer.getSenders().forEach(sender => peer.removeTrack(sender));
       peer.close();
     }
   };
