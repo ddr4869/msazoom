@@ -8,4 +8,5 @@ const ChatCard = ({ chat, navigateToChat }) => (
   </div>
 );
 
+
 export default ChatCard;

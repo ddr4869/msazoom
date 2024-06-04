@@ -6,7 +6,7 @@ import { handleLogin, handleLogout } from '@/utils/auth';
 import ChatList from '@/components/chat/chatList';
 import LoginComponent from '@/components/user/loginComponent';
 import SignUpComponent from '@/components/user/singupComponent';
-import { GetFriendsAxios } from '@/server/user';
+import { GetFriendsAxios, RemoveFriendAxios } from '@/server/user';
 import FriendsList from '@/components/user/friendList';
 
 const Home = () => {
@@ -18,7 +18,7 @@ const Home = () => {
   const [chatReload, setChatReload] = useState(false);
   const [showCreateChatForm, setShowCreateChatForm] = useState(false);
   const router = useRouter();
-
+  
   const handleCreateChatClick = () => {
     setShowCreateChatForm(true);
   };
@@ -40,14 +40,32 @@ const Home = () => {
     }
   };
 
-  // TODO !!
+
   const navigateToChat = (chatId: any) => {
     console.log("chatId -> ", chatId)
     router.push({
       pathname: `/chat/${chatId}`,
-      //query: { board_name: boardName }
     });
   };
+
+  const navigateToFriendChat = (friendId: any) => {
+    console.log("friendId -> ", friendId)
+    router.push({
+      pathname: `/friend`,
+      query: { friend: friendId }
+    });
+  }
+
+  const removeFriend = (friendId: any) => {
+    if (confirm('친구목록에서 삭제하겠습니까?')) {
+      RemoveFriendAxios(localStorage.getItem('accessToken'), friendId).then(() => {
+        console.log("remove friend success")
+        setChatReload(true);
+    }).catch((error) => {
+      console.error('Error removing friend:', error);
+      })
+    }
+  }
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -82,7 +100,7 @@ const Home = () => {
       setFriends([]);
     }
     setChatReload(false);
-  }, [isLoggedIn, chatReload, showCreateChatForm]);
+  }, [isLoggedIn, chatReload]);
 
   return (
     <div className="chat-board">
@@ -124,10 +142,15 @@ const Home = () => {
           />
         )}
         <br></br><br></br>
-        
+        <hr></hr>
+
         {isLoggedIn && <h1>Friends List</h1>}
         {isLoggedIn && (          
-            <FriendsList friends={friends} />
+            <FriendsList 
+              friends={friends} 
+              navigateToFriendChat={navigateToFriendChat} 
+              removeFriend={removeFriend}
+            />
           )
         }
       </main>

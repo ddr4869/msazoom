@@ -55,7 +55,7 @@ const WebRTCComponent = ({ chatId, userId }) => {
     }
 
     if (message.disconnect) {
-      setMessages((prevMessages) => [...prevMessages, { from: 'System', text: partnerUsername+' disconnected' }]);
+      setMessages((prevMessages) => [...prevMessages, { from: 'System', text: 'The chat is over' }]);
       handlePeerDisconnect();
       setPartnerUsername(null);
     }
@@ -196,7 +196,7 @@ const WebRTCComponent = ({ chatId, userId }) => {
         <h1>Chatting</h1>
         <div style={{ border: '1px solid black', height: '200px', overflowY: 'scroll', padding: '10px' }}>
           {messages.map((msg, index) => (
-            <div key={index} style={{ textAlign: msg.from === 'Me' ? 'right' : 'left', marginBottom: '5px' }}>
+            <div key={index} style={{ textAlign: msg.from === 'System' ? 'center' : msg.from === 'Me' ? 'right' : 'left', marginBottom: '5px' }}>
               <strong>{msg.from}:</strong> {msg.text}
             </div>
           ))}
