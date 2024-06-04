@@ -24,12 +24,16 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
 	FieldUpdatedAt = "updated_at"
-	// EdgeFriends holds the string denoting the friends edge name in mutations.
-	EdgeFriends = "friends"
+	// EdgeFollwer holds the string denoting the follwer edge name in mutations.
+	EdgeFollwer = "follwer"
+	// EdgeFriend holds the string denoting the friend edge name in mutations.
+	EdgeFriend = "friend"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// FriendsTable is the table that holds the friends relation/edge. The primary key declared below.
-	FriendsTable = "user_friends"
+	// FollwerTable is the table that holds the follwer relation/edge. The primary key declared below.
+	FollwerTable = "user_friend"
+	// FriendTable is the table that holds the friend relation/edge. The primary key declared below.
+	FriendTable = "user_friend"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -43,9 +47,12 @@ var Columns = []string{
 }
 
 var (
-	// FriendsPrimaryKey and FriendsColumn2 are the table columns denoting the
-	// primary key for the friends relation (M2M).
-	FriendsPrimaryKey = []string{"user_id", "friend_id"}
+	// FollwerPrimaryKey and FollwerColumn2 are the table columns denoting the
+	// primary key for the follwer relation (M2M).
+	FollwerPrimaryKey = []string{"user_id", "follwer_id"}
+	// FriendPrimaryKey and FriendColumn2 are the table columns denoting the
+	// primary key for the friend relation (M2M).
+	FriendPrimaryKey = []string{"user_id", "follwer_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -100,23 +107,44 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByFriendsCount orders the results by friends count.
-func ByFriendsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByFollwerCount orders the results by follwer count.
+func ByFollwerCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newFriendsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newFollwerStep(), opts...)
 	}
 }
 
-// ByFriends orders the results by friends terms.
-func ByFriends(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByFollwer orders the results by follwer terms.
+func ByFollwer(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newFriendsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newFollwerStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newFriendsStep() *sqlgraph.Step {
+
+// ByFriendCount orders the results by friend count.
+func ByFriendCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFriendStep(), opts...)
+	}
+}
+
+// ByFriend orders the results by friend terms.
+func ByFriend(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFriendStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newFollwerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, FriendsTable, FriendsPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2M, true, FollwerTable, FollwerPrimaryKey...),
+	)
+}
+func newFriendStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, FriendTable, FriendPrimaryKey...),
 	)
 }

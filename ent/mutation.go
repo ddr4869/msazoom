@@ -2102,9 +2102,12 @@ type UserMutation struct {
 	createdAt      *time.Time
 	updatedAt      *time.Time
 	clearedFields  map[string]struct{}
-	friends        map[int]struct{}
-	removedfriends map[int]struct{}
-	clearedfriends bool
+	follwer        map[int]struct{}
+	removedfollwer map[int]struct{}
+	clearedfollwer bool
+	friend         map[int]struct{}
+	removedfriend  map[int]struct{}
+	clearedfriend  bool
 	done           bool
 	oldValue       func(context.Context) (*User, error)
 	predicates     []predicate.User
@@ -2408,58 +2411,112 @@ func (m *UserMutation) ResetUpdatedAt() {
 	m.updatedAt = nil
 }
 
-// AddFriendIDs adds the "friends" edge to the User entity by ids.
+// AddFollwerIDs adds the "follwer" edge to the User entity by ids.
+func (m *UserMutation) AddFollwerIDs(ids ...int) {
+	if m.follwer == nil {
+		m.follwer = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.follwer[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFollwer clears the "follwer" edge to the User entity.
+func (m *UserMutation) ClearFollwer() {
+	m.clearedfollwer = true
+}
+
+// FollwerCleared reports if the "follwer" edge to the User entity was cleared.
+func (m *UserMutation) FollwerCleared() bool {
+	return m.clearedfollwer
+}
+
+// RemoveFollwerIDs removes the "follwer" edge to the User entity by IDs.
+func (m *UserMutation) RemoveFollwerIDs(ids ...int) {
+	if m.removedfollwer == nil {
+		m.removedfollwer = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.follwer, ids[i])
+		m.removedfollwer[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFollwer returns the removed IDs of the "follwer" edge to the User entity.
+func (m *UserMutation) RemovedFollwerIDs() (ids []int) {
+	for id := range m.removedfollwer {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FollwerIDs returns the "follwer" edge IDs in the mutation.
+func (m *UserMutation) FollwerIDs() (ids []int) {
+	for id := range m.follwer {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFollwer resets all changes to the "follwer" edge.
+func (m *UserMutation) ResetFollwer() {
+	m.follwer = nil
+	m.clearedfollwer = false
+	m.removedfollwer = nil
+}
+
+// AddFriendIDs adds the "friend" edge to the User entity by ids.
 func (m *UserMutation) AddFriendIDs(ids ...int) {
-	if m.friends == nil {
-		m.friends = make(map[int]struct{})
+	if m.friend == nil {
+		m.friend = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.friends[ids[i]] = struct{}{}
+		m.friend[ids[i]] = struct{}{}
 	}
 }
 
-// ClearFriends clears the "friends" edge to the User entity.
-func (m *UserMutation) ClearFriends() {
-	m.clearedfriends = true
+// ClearFriend clears the "friend" edge to the User entity.
+func (m *UserMutation) ClearFriend() {
+	m.clearedfriend = true
 }
 
-// FriendsCleared reports if the "friends" edge to the User entity was cleared.
-func (m *UserMutation) FriendsCleared() bool {
-	return m.clearedfriends
+// FriendCleared reports if the "friend" edge to the User entity was cleared.
+func (m *UserMutation) FriendCleared() bool {
+	return m.clearedfriend
 }
 
-// RemoveFriendIDs removes the "friends" edge to the User entity by IDs.
+// RemoveFriendIDs removes the "friend" edge to the User entity by IDs.
 func (m *UserMutation) RemoveFriendIDs(ids ...int) {
-	if m.removedfriends == nil {
-		m.removedfriends = make(map[int]struct{})
+	if m.removedfriend == nil {
+		m.removedfriend = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.friends, ids[i])
-		m.removedfriends[ids[i]] = struct{}{}
+		delete(m.friend, ids[i])
+		m.removedfriend[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedFriends returns the removed IDs of the "friends" edge to the User entity.
-func (m *UserMutation) RemovedFriendsIDs() (ids []int) {
-	for id := range m.removedfriends {
+// RemovedFriend returns the removed IDs of the "friend" edge to the User entity.
+func (m *UserMutation) RemovedFriendIDs() (ids []int) {
+	for id := range m.removedfriend {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// FriendsIDs returns the "friends" edge IDs in the mutation.
-func (m *UserMutation) FriendsIDs() (ids []int) {
-	for id := range m.friends {
+// FriendIDs returns the "friend" edge IDs in the mutation.
+func (m *UserMutation) FriendIDs() (ids []int) {
+	for id := range m.friend {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetFriends resets all changes to the "friends" edge.
-func (m *UserMutation) ResetFriends() {
-	m.friends = nil
-	m.clearedfriends = false
-	m.removedfriends = nil
+// ResetFriend resets all changes to the "friend" edge.
+func (m *UserMutation) ResetFriend() {
+	m.friend = nil
+	m.clearedfriend = false
+	m.removedfriend = nil
 }
 
 // Where appends a list predicates to the UserMutation builder.
@@ -2678,9 +2735,12 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.friends != nil {
-		edges = append(edges, user.EdgeFriends)
+	edges := make([]string, 0, 2)
+	if m.follwer != nil {
+		edges = append(edges, user.EdgeFollwer)
+	}
+	if m.friend != nil {
+		edges = append(edges, user.EdgeFriend)
 	}
 	return edges
 }
@@ -2689,9 +2749,15 @@ func (m *UserMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeFriends:
-		ids := make([]ent.Value, 0, len(m.friends))
-		for id := range m.friends {
+	case user.EdgeFollwer:
+		ids := make([]ent.Value, 0, len(m.follwer))
+		for id := range m.follwer {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeFriend:
+		ids := make([]ent.Value, 0, len(m.friend))
+		for id := range m.friend {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2701,9 +2767,12 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.removedfriends != nil {
-		edges = append(edges, user.EdgeFriends)
+	edges := make([]string, 0, 2)
+	if m.removedfollwer != nil {
+		edges = append(edges, user.EdgeFollwer)
+	}
+	if m.removedfriend != nil {
+		edges = append(edges, user.EdgeFriend)
 	}
 	return edges
 }
@@ -2712,9 +2781,15 @@ func (m *UserMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeFriends:
-		ids := make([]ent.Value, 0, len(m.removedfriends))
-		for id := range m.removedfriends {
+	case user.EdgeFollwer:
+		ids := make([]ent.Value, 0, len(m.removedfollwer))
+		for id := range m.removedfollwer {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeFriend:
+		ids := make([]ent.Value, 0, len(m.removedfriend))
+		for id := range m.removedfriend {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2724,9 +2799,12 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedfriends {
-		edges = append(edges, user.EdgeFriends)
+	edges := make([]string, 0, 2)
+	if m.clearedfollwer {
+		edges = append(edges, user.EdgeFollwer)
+	}
+	if m.clearedfriend {
+		edges = append(edges, user.EdgeFriend)
 	}
 	return edges
 }
@@ -2735,8 +2813,10 @@ func (m *UserMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
-	case user.EdgeFriends:
-		return m.clearedfriends
+	case user.EdgeFollwer:
+		return m.clearedfollwer
+	case user.EdgeFriend:
+		return m.clearedfriend
 	}
 	return false
 }
@@ -2753,8 +2833,11 @@ func (m *UserMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
-	case user.EdgeFriends:
-		m.ResetFriends()
+	case user.EdgeFollwer:
+		m.ResetFollwer()
+		return nil
+	case user.EdgeFriend:
+		m.ResetFriend()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

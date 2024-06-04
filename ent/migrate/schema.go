@@ -86,26 +86,26 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
-	// UserFriendsColumns holds the columns for the "user_friends" table.
-	UserFriendsColumns = []*schema.Column{
+	// UserFriendColumns holds the columns for the "user_friend" table.
+	UserFriendColumns = []*schema.Column{
 		{Name: "user_id", Type: field.TypeInt},
-		{Name: "friend_id", Type: field.TypeInt},
+		{Name: "follwer_id", Type: field.TypeInt},
 	}
-	// UserFriendsTable holds the schema information for the "user_friends" table.
-	UserFriendsTable = &schema.Table{
-		Name:       "user_friends",
-		Columns:    UserFriendsColumns,
-		PrimaryKey: []*schema.Column{UserFriendsColumns[0], UserFriendsColumns[1]},
+	// UserFriendTable holds the schema information for the "user_friend" table.
+	UserFriendTable = &schema.Table{
+		Name:       "user_friend",
+		Columns:    UserFriendColumns,
+		PrimaryKey: []*schema.Column{UserFriendColumns[0], UserFriendColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "user_friends_user_id",
-				Columns:    []*schema.Column{UserFriendsColumns[0]},
+				Symbol:     "user_friend_user_id",
+				Columns:    []*schema.Column{UserFriendColumns[0]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "user_friends_friend_id",
-				Columns:    []*schema.Column{UserFriendsColumns[1]},
+				Symbol:     "user_friend_follwer_id",
+				Columns:    []*schema.Column{UserFriendColumns[1]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -118,12 +118,12 @@ var (
 		HotBoardsTable,
 		MessagesTable,
 		UsersTable,
-		UserFriendsTable,
+		UserFriendTable,
 	}
 )
 
 func init() {
 	MessagesTable.ForeignKeys[0].RefTable = BoardsTable
-	UserFriendsTable.ForeignKeys[0].RefTable = UsersTable
-	UserFriendsTable.ForeignKeys[1].RefTable = UsersTable
+	UserFriendTable.ForeignKeys[0].RefTable = UsersTable
+	UserFriendTable.ForeignKeys[1].RefTable = UsersTable
 }

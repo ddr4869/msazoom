@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import { initializeWebSocket, sendMessage, closeWebSocket } from './webSocket';
 import { createPeerConnection, handleOffer, addIceCandidate, closePeerConnection } from './rtcPeerConnection';
 import { openCamera, stopStreamTracks } from './video';
+import { CheckFriendAxios, AddFriendAxios } from '@/server/user';
+
 
 const WebRTCComponent = ({ chatId, userId }) => {
   const router = useRouter();
@@ -148,16 +150,24 @@ const WebRTCComponent = ({ chatId, userId }) => {
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault(); // Prevent the default behavior of the Enter key
-      console.log('Enter Pressed')
-      handleSendMessage();
-    }
-  };
-
   const  handleUsernameClick = () => {
-    console.log('Username Clicked')
+    CheckFriendAxios(localStorage.getItem('accessToken'), partnerUsername).
+      then((data) => {
+        console.log("res->", data)
+        if (data === true) {
+          alert(partnerUsername + "는 이미 친구입니다.");
+        } else {
+          if (confirm(partnerUsername + "를 친구 추가 하시겠습니까?")){
+            console.log("친구 추가")
+            AddFriendAxios(localStorage.getItem('accessToken'), partnerUsername).then((data) => {
+              alert(partnerUsername + "가 친구로 추가되었습니다.");
+              // have to send gRPC to server
+            })
+        }}
+      }).catch((err) => { 
+        console.log(err);
+      }
+    )
   }
 
   return (
@@ -166,8 +176,7 @@ const WebRTCComponent = ({ chatId, userId }) => {
       <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', top: '100px', right: '100px', borderRadius: '10px', overflow: 'hidden' }}>
         <div style={{ textAlign: 'center' }}>
             {
-                partnerUsername ? (
-                  
+                partnerUsername ? (   
                 <h2 onClick={handleUsernameClick} style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline'  }}>{partnerUsername}</h2>
                 ) : (
                     <h2>Waiting for Partner</h2>

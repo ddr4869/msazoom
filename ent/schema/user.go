@@ -31,7 +31,7 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("friends", User.Type),
+		edge.To("friend", User.Type).From("follwer"),
 		// edge.To("friend_from", Friend.Type).
 		// 	Through("friend", Friend.Type).
 		// 	Annotations(entsql.OnDelete(entsql.Cascade)),

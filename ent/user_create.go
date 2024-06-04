@@ -74,14 +74,29 @@ func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
 	return uc
 }
 
-// AddFriendIDs adds the "friends" edge to the User entity by IDs.
+// AddFollwerIDs adds the "follwer" edge to the User entity by IDs.
+func (uc *UserCreate) AddFollwerIDs(ids ...int) *UserCreate {
+	uc.mutation.AddFollwerIDs(ids...)
+	return uc
+}
+
+// AddFollwer adds the "follwer" edges to the User entity.
+func (uc *UserCreate) AddFollwer(u ...*User) *UserCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddFollwerIDs(ids...)
+}
+
+// AddFriendIDs adds the "friend" edge to the User entity by IDs.
 func (uc *UserCreate) AddFriendIDs(ids ...int) *UserCreate {
 	uc.mutation.AddFriendIDs(ids...)
 	return uc
 }
 
-// AddFriends adds the "friends" edges to the User entity.
-func (uc *UserCreate) AddFriends(u ...*User) *UserCreate {
+// AddFriend adds the "friend" edges to the User entity.
+func (uc *UserCreate) AddFriend(u ...*User) *UserCreate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
@@ -201,13 +216,29 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if nodes := uc.mutation.FriendsIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.FollwerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.FollwerTable,
+			Columns: user.FollwerPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.FriendIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.FriendsTable,
-			Columns: user.FriendsPrimaryKey,
-			Bidi:    true,
+			Table:   user.FriendTable,
+			Columns: user.FriendPrimaryKey,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},

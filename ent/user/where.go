@@ -330,21 +330,44 @@ func UpdatedAtLTE(v time.Time) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// HasFriends applies the HasEdge predicate on the "friends" edge.
-func HasFriends() predicate.User {
+// HasFollwer applies the HasEdge predicate on the "follwer" edge.
+func HasFollwer() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, FriendsTable, FriendsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, FollwerTable, FollwerPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasFriendsWith applies the HasEdge predicate on the "friends" edge with a given conditions (other predicates).
-func HasFriendsWith(preds ...predicate.User) predicate.User {
+// HasFollwerWith applies the HasEdge predicate on the "follwer" edge with a given conditions (other predicates).
+func HasFollwerWith(preds ...predicate.User) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newFriendsStep()
+		step := newFollwerStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasFriend applies the HasEdge predicate on the "friend" edge.
+func HasFriend() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, FriendTable, FriendPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasFriendWith applies the HasEdge predicate on the "friend" edge with a given conditions (other predicates).
+func HasFriendWith(preds ...predicate.User) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newFriendStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

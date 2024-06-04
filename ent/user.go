@@ -35,20 +35,31 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Friends holds the value of the friends edge.
-	Friends []*User `json:"friends,omitempty"`
+	// Follwer holds the value of the follwer edge.
+	Follwer []*User `json:"follwer,omitempty"`
+	// Friend holds the value of the friend edge.
+	Friend []*User `json:"friend,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
-// FriendsOrErr returns the Friends value or an error if the edge
+// FollwerOrErr returns the Follwer value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) FriendsOrErr() ([]*User, error) {
+func (e UserEdges) FollwerOrErr() ([]*User, error) {
 	if e.loadedTypes[0] {
-		return e.Friends, nil
+		return e.Follwer, nil
 	}
-	return nil, &NotLoadedError{edge: "friends"}
+	return nil, &NotLoadedError{edge: "follwer"}
+}
+
+// FriendOrErr returns the Friend value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) FriendOrErr() ([]*User, error) {
+	if e.loadedTypes[1] {
+		return e.Friend, nil
+	}
+	return nil, &NotLoadedError{edge: "friend"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -126,9 +137,14 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryFriends queries the "friends" edge of the User entity.
-func (u *User) QueryFriends() *UserQuery {
-	return NewUserClient(u.config).QueryFriends(u)
+// QueryFollwer queries the "follwer" edge of the User entity.
+func (u *User) QueryFollwer() *UserQuery {
+	return NewUserClient(u.config).QueryFollwer(u)
+}
+
+// QueryFriend queries the "friend" edge of the User entity.
+func (u *User) QueryFriend() *UserQuery {
+	return NewUserClient(u.config).QueryFriend(u)
 }
 
 // Update returns a builder for updating this User.

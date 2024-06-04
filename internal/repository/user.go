@@ -39,7 +39,7 @@ func (r Repository) GetFriendList(ctx context.Context, user_name string) ([]*ent
 	if err != nil {
 		return nil, fmt.Errorf("failed creating board: %w", err)
 	}
-	friends, err := u.QueryFriends().All(ctx)
+	friends, err := u.QueryFollwer().All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating board: %w", err)
 	}
@@ -54,7 +54,7 @@ func (r Repository) AddFriend(ctx context.Context, user_name, friend_name string
 	if err != nil {
 		return nil, fmt.Errorf("failed creating board: %w", err)
 	}
-	_, err = r.entClient.User.Update().Where(user.UsernameEQ(user_name)).AddFriends(f).Save(ctx)
+	_, err = r.entClient.User.Update().Where(user.UsernameEQ(user_name)).AddFollwer(f).Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating board: %w", err)
 	}
@@ -69,7 +69,7 @@ func (r Repository) RemoveFriend(ctx context.Context, user_name, friend_name str
 	if err != nil {
 		return nil, fmt.Errorf("failed creating board: %w", err)
 	}
-	_, err = r.entClient.User.Update().Where(user.UsernameEQ(user_name)).RemoveFriends(f).Save(ctx)
+	_, err = r.entClient.User.Update().Where(user.UsernameEQ(user_name)).RemoveFollwer(f).Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating board: %w", err)
 	}
@@ -95,7 +95,7 @@ func (r Repository) CheckFriend(ctx context.Context, user_name, friend_name stri
 	is_friend, err := r.entClient.User.
 		Query().
 		Where(user.UsernameEQ(user_name)).
-		Where(user.HasFriendsWith(user.Username(friend_name))).Exist(ctx)
+		Where(user.HasFollwerWith(user.Username(friend_name))).Exist(ctx)
 
 	if err != nil {
 		return false, fmt.Errorf("failed creating board: %w", err)
