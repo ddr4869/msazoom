@@ -35,7 +35,6 @@ export const createPeerConnection = (handleNegotiationNeeded, handleIceCandidate
   export const closePeerConnection = (peer) => {
     if (peer) {
       console.log('Closing Peer Connection');
-      //peer.getSenders().forEach(sender => peer.removeTrack(sender));
       peer.close();
     }
   };

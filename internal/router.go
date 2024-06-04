@@ -16,6 +16,9 @@ func SetUp(s *Server) {
 
 	api.POST("/user", s.UserCreateValid, s.UserCreate)
 	api.POST("/user/login", s.UserLoginValid, s.UserLogin)
+	api.POST("/user/friend", utils.ParseJWT(), s.AddFriendValid, s.AddFriend)
+	api.GET("/user/friend", utils.ParseJWT(), s.GetFriendList)
+	api.GET("/user/friend/check", utils.ParseJWT(), s.CheckFriendValid, s.CheckFriend)
 
 	api.GET("/board", s.GetBoardList)
 	api.GET("/board/:board_id", s.GetBoardWithIDValid, s.GetBoardWithID)
@@ -32,7 +35,6 @@ func SetUp(s *Server) {
 	api.GET("/chat/create", s.CreateChatValid, s.CreateChat)
 	api.GET("/chat", s.GetChatList)
 	api.GET("/chat/join", s.JoinChatValid, s.JoinChat)
-
 	api.GET("/chat/room_condition", s.RoomConditionCheck)
 }
 

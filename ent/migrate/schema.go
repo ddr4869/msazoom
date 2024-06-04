@@ -38,20 +38,6 @@ var (
 		Columns:    ChatsColumns,
 		PrimaryKey: []*schema.Column{ChatsColumns[0]},
 	}
-	// FriendsColumns holds the columns for the "friends" table.
-	FriendsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "username", Type: field.TypeString},
-		{Name: "friend", Type: field.TypeString},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-	}
-	// FriendsTable holds the schema information for the "friends" table.
-	FriendsTable = &schema.Table{
-		Name:       "friends",
-		Columns:    FriendsColumns,
-		PrimaryKey: []*schema.Column{FriendsColumns[0]},
-	}
 	// HotBoardsColumns holds the columns for the "hot_boards" table.
 	HotBoardsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -100,17 +86,44 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// UserFriendsColumns holds the columns for the "user_friends" table.
+	UserFriendsColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "friend_id", Type: field.TypeInt},
+	}
+	// UserFriendsTable holds the schema information for the "user_friends" table.
+	UserFriendsTable = &schema.Table{
+		Name:       "user_friends",
+		Columns:    UserFriendsColumns,
+		PrimaryKey: []*schema.Column{UserFriendsColumns[0], UserFriendsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_friends_user_id",
+				Columns:    []*schema.Column{UserFriendsColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_friends_friend_id",
+				Columns:    []*schema.Column{UserFriendsColumns[1]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BoardsTable,
 		ChatsTable,
-		FriendsTable,
 		HotBoardsTable,
 		MessagesTable,
 		UsersTable,
+		UserFriendsTable,
 	}
 )
 
 func init() {
 	MessagesTable.ForeignKeys[0].RefTable = BoardsTable
+	UserFriendsTable.ForeignKeys[0].RefTable = UsersTable
+	UserFriendsTable.ForeignKeys[1].RefTable = UsersTable
 }

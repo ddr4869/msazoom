@@ -156,6 +156,10 @@ const WebRTCComponent = ({ chatId, userId }) => {
     }
   };
 
+  const  handleUsernameClick = () => {
+    console.log('Username Clicked')
+  }
+
   return (
     <div>
       <button onClick={navigateToHome}>Disconnect</button>
@@ -163,7 +167,8 @@ const WebRTCComponent = ({ chatId, userId }) => {
         <div style={{ textAlign: 'center' }}>
             {
                 partnerUsername ? (
-                <h2>Partner Video - {partnerUsername}</h2>
+                  
+                <h2 onClick={handleUsernameClick} style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline'  }}>{partnerUsername}</h2>
                 ) : (
                     <h2>Waiting for Partner</h2>
                 )
@@ -190,12 +195,12 @@ const WebRTCComponent = ({ chatId, userId }) => {
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => {
+          onKeyPress={(e) => {
             if (e.key === 'Enter') {
               handleSendMessage()
             }
           }}
-          //onKeyDown={handleKeyDown}
+          //onKeyDown={handleKeyDown} // 한글 입력시 버그 발생
           style={{ width: '80%', marginRight: '10px' }}
         />
         <button onClick={handleSendMessage}>Send</button>

@@ -16,8 +16,6 @@ type Tx struct {
 	Board *BoardClient
 	// Chat is the client for interacting with the Chat builders.
 	Chat *ChatClient
-	// Friend is the client for interacting with the Friend builders.
-	Friend *FriendClient
 	// HotBoard is the client for interacting with the HotBoard builders.
 	HotBoard *HotBoardClient
 	// Message is the client for interacting with the Message builders.
@@ -157,7 +155,6 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Board = NewBoardClient(tx.config)
 	tx.Chat = NewChatClient(tx.config)
-	tx.Friend = NewFriendClient(tx.config)
 	tx.HotBoard = NewHotBoardClient(tx.config)
 	tx.Message = NewMessageClient(tx.config)
 	tx.User = NewUserClient(tx.config)

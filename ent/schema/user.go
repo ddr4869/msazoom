@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -29,5 +30,10 @@ func (User) Fields() []ent.Field {
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("friends", User.Type),
+		// edge.To("friend_from", Friend.Type).
+		// 	Through("friend", Friend.Type).
+		// 	Annotations(entsql.OnDelete(entsql.Cascade)),
+	}
 }
