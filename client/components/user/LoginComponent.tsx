@@ -6,6 +6,8 @@ const LoginComponent = ({ username, setUsername, password, setPassword, handleLo
     <header>
       <h1>Chat Board</h1>
       <div id="login-section">
+      
+        {!isLoggedIn && <h2>Login</h2>}
         {!isLoggedIn ? (
           <LoginForm
             username={username}
@@ -18,6 +20,8 @@ const LoginComponent = ({ username, setUsername, password, setPassword, handleLo
           <UserProfile handleLogout={handleLogout} />
         )}
       </div>
+      <br></br>
+      <hr></hr>
     </header>
   );
 };

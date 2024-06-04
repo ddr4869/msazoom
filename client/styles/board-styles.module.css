@@ -30,3 +30,8 @@
   gap: 10px; /* 그리드 간격 설정 */
   grid-auto-rows: minmax(100px, auto);
 }
+
+.friendList {
+  list-style: none; /* 목록 기호 제거 */
+  padding: 0; /* 내부 여백 제거 */
+}

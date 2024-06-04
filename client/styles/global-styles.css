@@ -36,7 +36,8 @@
   }
   
   button {
-    padding: 10px 20px;
+    padding: 12px 24px;
+    font-size: 16px;
     border: none;
     border-radius: 5px;
     background-color: #007bff;
@@ -44,5 +45,23 @@
     cursor: pointer;
   }
 
-
+  h1 {
+    font-size: 48px;
+    font-weight: bold;
+    color: #f8f1f1; /* 오렌지색 */
+    text-transform: uppercase; /* 대문자 변환 */
+    letter-spacing: 2px; /* 글자 간격 조정 */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* 그림자 효과 */
+    margin-bottom: 20px; /* 하단 마진 */
+    background-color: #007bff; /* 배경색 */
+  }
   
+  .friend-card {
+    display: flex;
+    justify-content: space-between; /* 요소들을 최대한 오른쪽과 왼쪽에 배치 */
+    align-items: center; /* 세로 가운데 정렬 */
+  }
+  
+  .friend-card h2 {
+    margin-right: auto; /* h2 요소를 왼쪽으로 밀어냄 */
+  }

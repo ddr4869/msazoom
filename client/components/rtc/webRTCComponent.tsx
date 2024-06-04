@@ -16,7 +16,6 @@ const WebRTCComponent = ({ chatId, userId }) => {
   const webSocketRef = useRef();
   const chatEndRef = useRef();
   const [partnerUsername, setPartnerUsername] = useState(null);
-  const [hostName, setHostName] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
 
@@ -26,6 +25,7 @@ const WebRTCComponent = ({ chatId, userId }) => {
     if (message.join) {
       console.log('Joining Room -> ', message.join);
       setPartnerUsername(message.partnerUsername);
+      setMessages((prevMessages) => [...prevMessages, { from: 'System', text: message.partnerUsername+' Joined' }]);
       webSocketRef.current.send(JSON.stringify({ hostUserName: userId })); 
       await createAndCallUser();
     }
@@ -33,6 +33,7 @@ const WebRTCComponent = ({ chatId, userId }) => {
     if (message.hostUserName) {
         console.log('Host -> ', message.hostUserName);
         setPartnerUsername(message.hostUserName);
+        setMessages((prevMessages) => [...prevMessages, { from: 'System', text: 'You Joined Chat' }]);
     }
 
     if (message.offer) {
@@ -54,6 +55,7 @@ const WebRTCComponent = ({ chatId, userId }) => {
     }
 
     if (message.disconnect) {
+      setMessages((prevMessages) => [...prevMessages, { from: 'System', text: partnerUsername+' disconnected' }]);
       handlePeerDisconnect();
       setPartnerUsername(null);
     }
@@ -191,7 +193,7 @@ const WebRTCComponent = ({ chatId, userId }) => {
       </div>
 
       <div style={{ marginTop: '20px' }}>
-        <h2>Chat</h2>
+        <h1>Chatting</h1>
         <div style={{ border: '1px solid black', height: '200px', overflowY: 'scroll', padding: '10px' }}>
           {messages.map((msg, index) => (
             <div key={index} style={{ textAlign: msg.from === 'Me' ? 'right' : 'left', marginBottom: '5px' }}>

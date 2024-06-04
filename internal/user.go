@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -48,7 +47,7 @@ func (s *Server) UserCreate(c *gin.Context) {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to create user")
 		return
 	}
-	resp := dto.UserLoginResponse{
+	resp := dto.UserNormalResponse{
 		Username: user.Username,
 		Role:     user.Role,
 	}
@@ -62,9 +61,11 @@ func (s *Server) GetFriendList(c *gin.Context) {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get friend list")
 		return
 	}
-	fmt.Println("claims.Name: ", claims.Name)
-	fmt.Println("friends: ", friends)
-	dto.NewSuccessResponse(c, friends)
+	resp := make([]dto.UserNormalResponse, 0)
+	for _, friend := range friends {
+		resp = append(resp, dto.UserEntToResponse(friend))
+	}
+	dto.NewSuccessResponse(c, resp)
 }
 
 func (s *Server) AddFriend(c *gin.Context) {
@@ -79,7 +80,7 @@ func (s *Server) AddFriend(c *gin.Context) {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to add friend")
 		return
 	}
-	dto.NewSuccessResponse(c, user)
+	dto.NewSuccessResponse(c, dto.UserEntToResponse(user))
 }
 
 func (s *Server) CheckFriend(c *gin.Context) {
@@ -89,10 +90,10 @@ func (s *Server) CheckFriend(c *gin.Context) {
 		dto.NewErrorResponse(c, http.StatusBadRequest, nil, "cannot add yourself as friend")
 		return
 	}
-	user, err := s.repository.CheckFriend(c, claims.Name, req.Friend)
+	is_friend, err := s.repository.CheckFriend(c, claims.Name, req.Friend)
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to check friend")
 		return
 	}
-	dto.NewSuccessResponse(c, user)
+	dto.NewSuccessResponse(c, is_friend)
 }

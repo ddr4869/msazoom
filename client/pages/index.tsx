@@ -6,12 +6,15 @@ import { handleLogin, handleLogout } from '@/utils/auth';
 import ChatList from '@/components/chat/chatList';
 import LoginComponent from '@/components/user/loginComponent';
 import SignUpComponent from '@/components/user/singupComponent';
+import { GetFriendsAxios } from '@/server/user';
+import FriendsList from '@/components/user/friendList';
 
 const Home = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [chats, setChats] = useState([]);
+  const [friends, setFriends] = useState([]);
   const [chatReload, setChatReload] = useState(false);
   const [showCreateChatForm, setShowCreateChatForm] = useState(false);
   const router = useRouter();
@@ -52,20 +55,31 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const fetchBoards = async (token: string) => {
+    const fetchChats = async (token: string) => {
       try {
         const response = await getChatsAxios(token);
         setChats(response);
       } catch (error) {
-        console.error('Error fetching boards:', error);
+        console.error('Error fetching chats:', error);
       }
     };
 
+    const fetchFriends = async (token: string) => {
+      try {
+        const response = await GetFriendsAxios(token);
+        setFriends(response);
+      } catch (error) {
+        console.error('Error fetching friends:', error);
+      }
+    }
+
     const accessToken = localStorage.getItem('accessToken');
     if (isLoggedIn && accessToken) {
-      fetchBoards(accessToken);
+      fetchChats(accessToken);
+      fetchFriends(accessToken);
     } else {
       setChats([]);
+      setFriends([]);
     }
     setChatReload(false);
   }, [isLoggedIn, chatReload, showCreateChatForm]);
@@ -85,17 +99,21 @@ const Home = () => {
       </header>
       <main>
         <br></br>
-        <h2> 
-          {isLoggedIn ? "Container List" : "Sign up for an account if you don't have one." } 
-        <br></br><br></br>
+ 
+          {isLoggedIn ? <h1>Chat List</h1> : <h2>Sign up for an account if you don't have one.</h2> } 
+        
+        {/* <br></br><br></br> */}
         {!isLoggedIn && ( <SignUpComponent/> )}
-        </h2>
-        <ChatList
+        { isLoggedIn && <button onClick={() => setChatReload(true) }>Reload Chat List</button> }
+        <br></br>
+        <br></br>
+        { isLoggedIn && (
+          <ChatList
           chats={chats}
           navigateToChat={navigateToChat}
         />
+        )}
         <br></br>
-        
         {isLoggedIn && !showCreateChatForm && (
           <button onClick={handleCreateChatClick}>Create Chat</button>
         )}
@@ -106,7 +124,12 @@ const Home = () => {
           />
         )}
         <br></br><br></br>
-        { isLoggedIn && <button onClick={() => setChatReload(true) }>Reload Chat List</button> }
+        
+        {isLoggedIn && <h1>Friends List</h1>}
+        {isLoggedIn && (          
+            <FriendsList friends={friends} />
+          )
+        }
       </main>
     </div>
   );
