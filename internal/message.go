@@ -1,29 +1,25 @@
 package internal
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/ddr4869/msazoom/internal/dto"
+	"github.com/ddr4869/msazoom/internal/socket"
 	"github.com/ddr4869/msazoom/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
-// func (s *Server) WriteFriendMessage(c *gin.Context) {
-// 	req := c.MustGet("req").(dto.JoinMessageRequest)
-
-// 	message, err := s.repository.WriteFriendMessage(c, req.UserName, req.FriendName, req.Message)
-// 	if err != nil {
-// 		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to write board message")
-// 		return
-// 	}
-// 	dto.NewSuccessResponse(c, dto.MessageEntToResponse(message))
-// }
+func (s *Server) MessageConditionCheck(c *gin.Context) {
+	dto.NewSuccessResponse(c, &socket.AllMessageRooms)
+}
 
 func (s *Server) GetFriendMessage(c *gin.Context) {
 	req := c.MustGet("req").(dto.GetFriendMessageRequest)
-	claim := c.MustGet("claim").(*utils.UserClaims)
+	claims := c.MustGet("claims").(*utils.UserClaims)
 
-	messages, err := s.repository.GetFriendMessage(c, claim.Name, req.FriendName)
+	messages, err := s.repository.GetFriendMessage(c, claims.Name, req.FriendName)
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to get board message")
 		return
@@ -36,25 +32,39 @@ func (s *Server) GetFriendMessage(c *gin.Context) {
 }
 
 func (s *Server) ConnectMessage(c *gin.Context) {
-	// ws, err := socket.Upgrader.Upgrade(c.Writer, c.Request, nil)
-	// if err != nil {
-	// 	dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to upgrade connection")
-	// 	return
-	// }
-	// defer ws.Close()
+	req := c.MustGet("req").(dto.ConnectMessageRequest)
+	ws, err := socket.Upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to upgrade connection")
+		return
+	}
+	defer ws.Close()
 
-	// for {
-	// 	var msg dto.MessageResponse
-	// 	messageType, p, err := ws.ReadJSON()
+	key := GenerateSocketKey(req.UserName, req.FriendName)
+	socket.AllMessageRooms.InsertIntoRoom(key, req.UserName, req.FriendName, ws)
 
-	// 	fmt.Println("new message -> ", string(p))
-	// 	if err != nil {
-	// 		log.Printf("conn.ReadMessage: %v", err)
-	// 		return
-	// 	}
-	// 	if err := conn.WriteMessage(messageType, p); err != nil {
-	// 		log.Printf("conn.WriteMessage: %v", err)
-	// 		return
-	// 	}
-	// }
+	go socket.AllMessageRooms.Broadcast()
+	var socketData socket.MessageSocketData
+	socketData.Client = ws
+	socketData.ID = key
+	for {
+		err := ws.ReadJSON(&socketData.Data)
+		if err != nil {
+			log.Println("Quit or Delete room")
+			ws.Close()
+			_ = socket.AllMessageRooms.QuitRoom(key, req.UserName)
+			break
+		}
+		fmt.Println("socketData.Client set, req.username", req.UserName)
+
+		socket.MessageSocketChannel <- socketData
+	}
+}
+
+func GenerateSocketKey(key1, key2 string) string {
+	if key1 > key2 {
+		return key1 + key2
+	} else {
+		return key2 + key1
+	}
 }

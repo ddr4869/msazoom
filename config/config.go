@@ -49,7 +49,8 @@ func Init() *Config {
 	}
 
 	// Initialize RoomMap
-	socket.AllRooms.Init()
+	socket.AllChatRooms.Init()
+	socket.AllMessageRooms.Init()
 
 	JwtSecretPassword = os.Getenv("JWT_SECRET_PASSWORD")
 

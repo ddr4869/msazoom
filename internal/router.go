@@ -28,8 +28,10 @@ func SetUp(s *Server) {
 	api.POST("/board/recommend", s.RecommendBoardValid, s.RecommendBoard)
 	api.POST("/board/remove", utils.ParseJWT(), s.DeleteBoardValid, s.DeleteBoard)
 
-	api.GET("/message/connect", s.ConnectMessageValid, s.ConnectMessage)
+	//api.GET("/message/connect", s.ConnectMessageValid, s.ConnectMessage)
 	api.GET("/message", utils.ParseJWT(), s.GetFriendMessageValid, s.GetFriendMessage)
+	api.GET("/message/connect", s.ConnectMessageValid, s.ConnectMessage)
+	api.GET("/message/condition", s.MessageConditionCheck)
 
 	api.GET("/chat/:chat_id", utils.ParseJWT(), s.GetChatValid, s.GetChat)
 	api.GET("/chat/create", utils.ParseJWT(), s.CreateChatValid, s.CreateChat)

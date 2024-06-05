@@ -10,15 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var broadcast = socket.SocketChannel
+//var broadcast = socket.ChatSocketChannel
 
 func (s *Server) RoomConditionCheck(c *gin.Context) {
-	dto.NewSuccessResponse(c, &socket.AllRooms)
+	dto.NewSuccessResponse(c, &socket.AllChatRooms)
 }
 
 func (s *Server) GetChat(c *gin.Context) {
 	reqUri := c.MustGet("reqUri").(dto.GetRoomRequest)
-	p := socket.AllRooms.GetRoom(reqUri.ID)
+	p := socket.AllChatRooms.GetRoom(reqUri.ID)
 	if p.Participant == nil {
 		dto.NewErrorResponse(c, http.StatusBadRequest, nil, "No room available")
 		return
@@ -57,17 +57,17 @@ func (s *Server) JoinChat(c *gin.Context) {
 		isHost = false
 	}
 
-	socket.AllRooms.InsertIntoRoom(req.ChatID, chat.ChatName, req.Username, isHost, ws)
+	socket.AllChatRooms.InsertIntoRoom(req.ChatID, chat.ChatName, req.Username, isHost, ws)
 
-	go socket.AllRooms.Broadcast()
+	go socket.AllChatRooms.Broadcast()
 
 	for {
-		var socketChannel socket.SocketData
-		err := ws.ReadJSON(&socketChannel.Data)
+		var socketData socket.ChatSocketData
+		err := ws.ReadJSON(&socketData.Data)
 		if err != nil {
 			log.Println("Quit or Delete room")
 			ws.Close()
-			isDelete := socket.AllRooms.QuitRoom(req.ChatID, req.Username)
+			isDelete := socket.AllChatRooms.QuitRoom(req.ChatID, req.Username)
 			if isDelete {
 				err = s.repository.DeleteChat(c, req.ChatID)
 				if err != nil {
@@ -76,15 +76,15 @@ func (s *Server) JoinChat(c *gin.Context) {
 			}
 			break
 		}
-		socketChannel.Client = ws
-		socketChannel.ID = req.ChatID
-		broadcast <- socketChannel
+		socketData.Client = ws
+		socketData.ID = req.ChatID
+		socket.ChatSocketChannel <- socketData
 	}
 }
 
 func (s *Server) GetChatList(c *gin.Context) {
 	ChatResponse := make([]dto.ChatResponse, 0)
-	for id, chat := range socket.AllRooms.Map {
+	for id, chat := range socket.AllChatRooms.Map {
 		ChatResponse = append(ChatResponse, dto.ChatResponse{
 			ID:         id,
 			Title:      chat.Title,
@@ -97,7 +97,7 @@ func (s *Server) GetChatList(c *gin.Context) {
 
 func (s *Server) RandomChating(c *gin.Context) {
 	// get roomID from query
-	n := socket.AllRooms.GetRandomRoomKey()
+	n := socket.AllChatRooms.GetRandomRoomKey()
 	if n == -1 {
 		dto.NewErrorResponse(c, http.StatusBadRequest, nil, "No room available")
 		return

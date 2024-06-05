@@ -11,35 +11,30 @@ import (
 
 type RoomMap struct {
 	Mutex sync.RWMutex
-	Map   map[int]Participants
+	Map   map[int]RoomChat
 }
 
 // define map[string]Participant type
-type Participants struct {
+type RoomChat struct {
 	Participant map[string]Participant
 	Title       string
 	Admin       string
 	Created_at  time.Time
 }
 
-type Participant struct {
-	Host bool
-	Conn *websocket.Conn
-}
-
 // #### Signaling ####
-var AllRooms RoomMap
+var AllChatRooms RoomMap
 
 func (r *RoomMap) Init() {
-	r.Map = make(map[int]Participants)
+	r.Map = make(map[int]RoomChat)
 }
 
-func (r *RoomMap) GetRoom(chat_id int) Participants {
+func (r *RoomMap) GetRoom(chat_id int) RoomChat {
 	r.Mutex.RLock()
 	defer r.Mutex.RUnlock()
 	// check if the room exists
 	if _, ok := r.Map[chat_id]; !ok {
-		return Participants{}
+		return RoomChat{}
 	}
 	return r.Map[chat_id]
 }
@@ -71,7 +66,7 @@ func (r *RoomMap) InsertIntoRoom(chat_id int, chat_title, username string, host 
 		Conn: ws,
 	}
 	if host {
-		r.Map[chat_id] = Participants{
+		r.Map[chat_id] = RoomChat{
 			Participant: map[string]Participant{username: p},
 			Title:       chat_title,
 			Admin:       username,
@@ -98,19 +93,18 @@ func (r *RoomMap) QuitRoom(chat_id int, username string) bool {
 
 func (r *RoomMap) Broadcast() {
 	for {
-		socketChannel := <-SocketChannel
-		fmt.Println("broadcast msg -> ", socketChannel)
+		socketChannel := <-ChatSocketChannel
 		for _, client := range r.Map[socketChannel.ID].Participant {
 			if client.Conn != socketChannel.Client {
-				AllRooms.Mutex.Lock()
+				AllChatRooms.Mutex.Lock()
 				err := client.Conn.WriteJSON(socketChannel.Data)
 				if err != nil {
 					fmt.Println("broadcast close ->", err)
 					client.Conn.Close()
-					AllRooms.Mutex.Unlock()
+					AllChatRooms.Mutex.Unlock()
 					return
 				}
-				AllRooms.Mutex.Unlock()
+				AllChatRooms.Mutex.Unlock()
 			}
 		}
 	}

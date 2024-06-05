@@ -14,13 +14,25 @@ var Upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-type SocketData struct {
+type ChatSocketData struct {
 	Data   map[string]interface{}
 	ID     int
 	Client *websocket.Conn
 }
 
-var SocketChannel = make(chan SocketData)
+type MessageSocketData struct {
+	Data   map[string]interface{}
+	ID     string
+	Client *websocket.Conn
+}
+
+type Participant struct {
+	Host bool
+	Conn *websocket.Conn
+}
+
+var ChatSocketChannel = make(chan ChatSocketData)
+var MessageSocketChannel = make(chan MessageSocketData)
 
 type BroadCaster interface {
 	Broadcast()
