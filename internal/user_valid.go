@@ -46,3 +46,13 @@ func (s *Server) CheckFriendValid(c *gin.Context) {
 	c.Set("req", req)
 	c.Next()
 }
+
+func (s *Server) RemoveFriendValid(c *gin.Context) {
+	var req dto.RemoveFriendRequest
+	if err := c.ShouldBind(&req); err != nil {
+		dto.NewErrorResponse(c, http.StatusBadRequest, err, "ID or PW is empty")
+		return
+	}
+	c.Set("req", req)
+	c.Next()
+}

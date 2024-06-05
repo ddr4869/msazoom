@@ -26,6 +26,10 @@ type CheckFriendRequest struct {
 	Friend string `form:"friend" binding:"required"`
 }
 
+type RemoveFriendRequest struct {
+	Friend string `form:"friend" binding:"required"`
+}
+
 type UserNormalResponse struct {
 	Username string `json:"username"`
 	Role     int    `json:"role"`

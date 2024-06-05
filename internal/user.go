@@ -97,3 +97,14 @@ func (s *Server) CheckFriend(c *gin.Context) {
 	}
 	dto.NewSuccessResponse(c, is_friend)
 }
+
+func (s *Server) RemoveFriend(c *gin.Context) {
+	req := c.MustGet("req").(dto.RemoveFriendRequest)
+	claims := c.MustGet("claims").(*utils.UserClaims)
+	_, err := s.repository.RemoveFriend(c, claims.Name, req.Friend)
+	if err != nil {
+		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to remove friend")
+		return
+	}
+	dto.NewSuccessResponse(c, "success")
+}

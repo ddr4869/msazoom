@@ -16,6 +16,16 @@ func (s *Server) RoomConditionCheck(c *gin.Context) {
 	dto.NewSuccessResponse(c, &rtc.AllRooms)
 }
 
+func (s *Server) GetChat(c *gin.Context) {
+	reqUri := c.MustGet("reqUri").(dto.GetRoomRequest)
+	p := rtc.AllRooms.GetRoom(reqUri.ID)
+	if p.Participant == nil {
+		dto.NewErrorResponse(c, http.StatusBadRequest, nil, "No room available")
+		return
+	}
+	dto.NewSuccessResponse(c, p)
+}
+
 func (s *Server) CreateChat(c *gin.Context) {
 	req := c.MustGet("req").(dto.CreateChatRequest)
 	chat, err := s.repository.CreateChat(c, req.Title, req.Username)
@@ -47,7 +57,7 @@ func (s *Server) JoinChat(c *gin.Context) {
 		isHost = false
 	}
 
-	rtc.AllRooms.InsertIntoRoom(req.ChatID, req.Username, isHost, ws)
+	rtc.AllRooms.InsertIntoRoom(req.ChatID, chat.ChatName, req.Username, isHost, ws)
 
 	go rtc.Broadcaster()
 
@@ -74,10 +84,24 @@ func (s *Server) JoinChat(c *gin.Context) {
 }
 
 func (s *Server) GetChatList(c *gin.Context) {
-	// show chat list from db
-	chats, err := s.repository.GetChatList(c)
-	if err != nil {
-		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to get chat list")
+	ChatResponse := make([]dto.ChatResponse, 0)
+	for id, chat := range rtc.AllRooms.Map {
+		ChatResponse = append(ChatResponse, dto.ChatResponse{
+			ID:         id,
+			Title:      chat.Title,
+			Admin:      chat.Admin,
+			Created_at: chat.Created_at.Format("2006-01-02 15:04:05"),
+		})
 	}
-	dto.NewSuccessResponse(c, chats)
+	dto.NewSuccessResponse(c, ChatResponse)
+}
+
+func (s *Server) RandomChating(c *gin.Context) {
+	// get roomID from query
+	n := rtc.AllRooms.GetRandomRoomKey()
+	if n == -1 {
+		dto.NewErrorResponse(c, http.StatusBadRequest, nil, "No room available")
+		return
+	}
+	dto.NewSuccessResponse(c, n)
 }

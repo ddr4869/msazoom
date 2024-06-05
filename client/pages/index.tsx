@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from "next/router";
-import { createChatAxios, getChatsAxios } from '@/server/chat';
+import { createChatAxios, getChatsAxios, getRandomChatIdAxios, getChatAxios } from '@/server/chat';
 import CreateChatForm from '@/ui/chat/createChatForm';
 import { handleLogin, handleLogout } from '@/utils/auth';
 import ChatList from '@/components/chat/chatList';
@@ -25,16 +25,16 @@ const Home = () => {
 
   const handleSubmitChatForm = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-
     try {
       const formData = new FormData(event.currentTarget);
       const chat_title = formData.get('title') as string;
-      const response = await createChatAxios(localStorage.getItem('username'), chat_title);
-      console.log("response -> ", response)
+      const response = await createChatAxios(localStorage.getItem('accessToken'), localStorage.getItem('username'), chat_title);
+      console.log("handleSubmitChatForm response -> ", response)
       setShowCreateChatForm(false);
       setChatReload(true);
-      navigateToChat(response.id);
+      router.push({
+        pathname: `/chat/${response.id}`,
+      });
     } catch (error) {
       console.error('Error creating chat:', error);
     }
@@ -42,11 +42,26 @@ const Home = () => {
 
 
   const navigateToChat = (chatId: any) => {
-    console.log("chatId -> ", chatId)
-    router.push({
-      pathname: `/chat/${chatId}`,
-    });
+    getChatAxios(localStorage.getItem('accessToken'), chatId).then((response) => {
+      console.log("response -> ", response)
+      router.push({
+        pathname: `/chat/${chatId}`,
+      });
+    }).catch((error) => {
+      alert('이미 종료된 채팅입니다.');
+      setChatReload(true);
+    })
   };
+
+  const navigateToRandomChat = () => {
+    getRandomChatIdAxios(localStorage.getItem('accessToken')).then((response) => {
+      console.log("response -> ", response)
+      navigateToChat(response);
+    }).catch((error) => {
+      console.error('Error fetching random chat:', error);
+      alert('No chat available');
+    });
+  }
 
   const navigateToFriendChat = (friendId: any) => {
     console.log("friendId -> ", friendId)
@@ -122,7 +137,12 @@ const Home = () => {
         
         {/* <br></br><br></br> */}
         {!isLoggedIn && ( <SignUpComponent/> )}
-        { isLoggedIn && <button onClick={() => setChatReload(true) }>Reload Chat List</button> }
+        { isLoggedIn && (
+          <div>
+            <button onClick={() => setChatReload(true) }>Reload Chat List</button> {  }
+            <button onClick={() => navigateToRandomChat() }>Random Chat Start</button> 
+          </div>
+        )}
         <br></br>
         <br></br>
         { isLoggedIn && (

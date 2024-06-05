@@ -61,19 +61,19 @@ func (r Repository) AddFriend(ctx context.Context, user_name, friend_name string
 	return f, nil
 }
 
-func (r Repository) RemoveFriend(ctx context.Context, user_name, friend_name string) (*ent.User, error) {
+func (r Repository) RemoveFriend(ctx context.Context, user_name, friend_name string) (bool, error) {
 	f, err := r.entClient.User.
 		Query().
 		Where(user.UsernameEQ(friend_name)).
 		Only(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed creating board: %w", err)
+		return false, fmt.Errorf("failed creating board: %w", err)
 	}
 	_, err = r.entClient.User.Update().Where(user.UsernameEQ(user_name)).RemoveFollwer(f).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed creating board: %w", err)
+		return false, fmt.Errorf("failed creating board: %w", err)
 	}
-	return f, nil
+	return true, nil
 }
 
 func (r Repository) UpdateRole(ctx context.Context, user_name string, role int) (*ent.User, error) {

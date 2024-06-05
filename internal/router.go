@@ -19,6 +19,7 @@ func SetUp(s *Server) {
 	api.POST("/user/friend", utils.ParseJWT(), s.AddFriendValid, s.AddFriend)
 	api.GET("/user/friend", utils.ParseJWT(), s.GetFriendList)
 	api.GET("/user/friend/check", utils.ParseJWT(), s.CheckFriendValid, s.CheckFriend)
+	api.DELETE("/user/friend", utils.ParseJWT(), s.RemoveFriendValid, s.RemoveFriend)
 
 	api.GET("/board", s.GetBoardList)
 	api.GET("/board/:board_id", s.GetBoardWithIDValid, s.GetBoardWithID)
@@ -32,9 +33,12 @@ func SetUp(s *Server) {
 
 	api.GET("/message/ws/:board_id", s.GetBoardMessageValid, s.SocketWriteBoardMessage)
 
-	api.GET("/chat/create", s.CreateChatValid, s.CreateChat)
-	api.GET("/chat", s.GetChatList)
+	api.GET("/chat/:chat_id", utils.ParseJWT(), s.GetChatValid, s.GetChat)
+	api.GET("/chat/create", utils.ParseJWT(), s.CreateChatValid, s.CreateChat)
+	api.GET("/chat", utils.ParseJWT(), s.GetChatList)
+	// ws
 	api.GET("/chat/join", s.JoinChatValid, s.JoinChat)
+	api.GET("/chat/random", utils.ParseJWT(), s.RandomChating)
 	api.GET("/chat/room_condition", s.RoomConditionCheck)
 }
 
