@@ -1,7 +1,7 @@
 // WebRTCComponent.js
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { initializeWebSocket, sendMessage, closeWebSocket } from './webSocket';
+import { initializeChatWebSocket, sendMessage, closeWebSocket } from './webSocket';
 import { createPeerConnection, handleOffer, addIceCandidate, closePeerConnection } from './rtcPeerConnection';
 import { openCamera, stopStreamTracks } from './video';
 import { CheckFriendAxios, AddFriendAxios } from '@/server/user';
@@ -64,7 +64,7 @@ const WebRTCComponent = ({ chatId, userId }) => {
   useEffect(() => {
     const start = async () => {
       userStream.current = await openCamera(userVideo, userStream);
-      webSocketRef.current = initializeWebSocket(chatId, userId, handleWebSocketMessage);
+      webSocketRef.current = initializeChatWebSocket(chatId, userId, handleWebSocketMessage);
       peerRef.current = createPeerConnection(handleNegotiationNeeded, handleIceCandidateEvent, handleTrackEvent);
       
     };

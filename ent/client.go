@@ -760,22 +760,6 @@ func (c *MessageClient) GetX(ctx context.Context, id int) *Message {
 	return obj
 }
 
-// QueryBoard queries the board edge of a Message.
-func (c *MessageClient) QueryBoard(m *Message) *BoardQuery {
-	query := (&BoardClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(message.Table, message.FieldID, id),
-			sqlgraph.To(board.Table, board.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, message.BoardTable, message.BoardColumn),
-		)
-		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *MessageClient) Hooks() []Hook {
 	return c.hooks.Message

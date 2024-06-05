@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) WriteBoardMessageValid(c *gin.Context) {
-	var req dto.WriteBoardMessageRequest
-	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
+func (s *Server) ConnectMessageValid(c *gin.Context) {
+	var req dto.ConnectMessageRequest
+	if err := c.ShouldBind(&req); err != nil {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get block number")
 		return
 	}
@@ -17,12 +17,12 @@ func (s *Server) WriteBoardMessageValid(c *gin.Context) {
 	c.Next()
 }
 
-func (s *Server) GetBoardMessageValid(c *gin.Context) {
-	var reqUri dto.GetBoardMessageRequest
-	if err := c.ShouldBindUri(&reqUri); err != nil {
+func (s *Server) GetFriendMessageValid(c *gin.Context) {
+	var req dto.GetFriendMessageRequest
+	if err := c.ShouldBind(&req); err != nil {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get block number")
 		return
 	}
-	c.Set("reqUri", reqUri)
+	c.Set("req", req)
 	c.Next()
 }

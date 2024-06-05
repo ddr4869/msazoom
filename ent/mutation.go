@@ -1540,13 +1540,12 @@ type MessageMutation struct {
 	op            Op
 	typ           string
 	id            *int
+	sender        *string
+	receiver      *string
 	message       *string
-	writer        *string
 	createdAt     *time.Time
 	updatedAt     *time.Time
 	clearedFields map[string]struct{}
-	board         *int
-	clearedboard  bool
 	done          bool
 	oldValue      func(context.Context) (*Message, error)
 	predicates    []predicate.Message
@@ -1650,6 +1649,78 @@ func (m *MessageMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
+// SetSender sets the "sender" field.
+func (m *MessageMutation) SetSender(s string) {
+	m.sender = &s
+}
+
+// Sender returns the value of the "sender" field in the mutation.
+func (m *MessageMutation) Sender() (r string, exists bool) {
+	v := m.sender
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSender returns the old "sender" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldSender(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSender is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSender requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSender: %w", err)
+	}
+	return oldValue.Sender, nil
+}
+
+// ResetSender resets all changes to the "sender" field.
+func (m *MessageMutation) ResetSender() {
+	m.sender = nil
+}
+
+// SetReceiver sets the "receiver" field.
+func (m *MessageMutation) SetReceiver(s string) {
+	m.receiver = &s
+}
+
+// Receiver returns the value of the "receiver" field in the mutation.
+func (m *MessageMutation) Receiver() (r string, exists bool) {
+	v := m.receiver
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReceiver returns the old "receiver" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldReceiver(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReceiver is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReceiver requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReceiver: %w", err)
+	}
+	return oldValue.Receiver, nil
+}
+
+// ResetReceiver resets all changes to the "receiver" field.
+func (m *MessageMutation) ResetReceiver() {
+	m.receiver = nil
+}
+
 // SetMessage sets the "message" field.
 func (m *MessageMutation) SetMessage(s string) {
 	m.message = &s
@@ -1684,42 +1755,6 @@ func (m *MessageMutation) OldMessage(ctx context.Context) (v string, err error) 
 // ResetMessage resets all changes to the "message" field.
 func (m *MessageMutation) ResetMessage() {
 	m.message = nil
-}
-
-// SetWriter sets the "writer" field.
-func (m *MessageMutation) SetWriter(s string) {
-	m.writer = &s
-}
-
-// Writer returns the value of the "writer" field in the mutation.
-func (m *MessageMutation) Writer() (r string, exists bool) {
-	v := m.writer
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldWriter returns the old "writer" field's value of the Message entity.
-// If the Message object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MessageMutation) OldWriter(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldWriter is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldWriter requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldWriter: %w", err)
-	}
-	return oldValue.Writer, nil
-}
-
-// ResetWriter resets all changes to the "writer" field.
-func (m *MessageMutation) ResetWriter() {
-	m.writer = nil
 }
 
 // SetCreatedAt sets the "createdAt" field.
@@ -1794,45 +1829,6 @@ func (m *MessageMutation) ResetUpdatedAt() {
 	m.updatedAt = nil
 }
 
-// SetBoardID sets the "board" edge to the Board entity by id.
-func (m *MessageMutation) SetBoardID(id int) {
-	m.board = &id
-}
-
-// ClearBoard clears the "board" edge to the Board entity.
-func (m *MessageMutation) ClearBoard() {
-	m.clearedboard = true
-}
-
-// BoardCleared reports if the "board" edge to the Board entity was cleared.
-func (m *MessageMutation) BoardCleared() bool {
-	return m.clearedboard
-}
-
-// BoardID returns the "board" edge ID in the mutation.
-func (m *MessageMutation) BoardID() (id int, exists bool) {
-	if m.board != nil {
-		return *m.board, true
-	}
-	return
-}
-
-// BoardIDs returns the "board" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// BoardID instead. It exists only for internal usage by the builders.
-func (m *MessageMutation) BoardIDs() (ids []int) {
-	if id := m.board; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetBoard resets all changes to the "board" edge.
-func (m *MessageMutation) ResetBoard() {
-	m.board = nil
-	m.clearedboard = false
-}
-
 // Where appends a list predicates to the MessageMutation builder.
 func (m *MessageMutation) Where(ps ...predicate.Message) {
 	m.predicates = append(m.predicates, ps...)
@@ -1867,12 +1863,15 @@ func (m *MessageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MessageMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
+	if m.sender != nil {
+		fields = append(fields, message.FieldSender)
+	}
+	if m.receiver != nil {
+		fields = append(fields, message.FieldReceiver)
+	}
 	if m.message != nil {
 		fields = append(fields, message.FieldMessage)
-	}
-	if m.writer != nil {
-		fields = append(fields, message.FieldWriter)
 	}
 	if m.createdAt != nil {
 		fields = append(fields, message.FieldCreatedAt)
@@ -1888,10 +1887,12 @@ func (m *MessageMutation) Fields() []string {
 // schema.
 func (m *MessageMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case message.FieldSender:
+		return m.Sender()
+	case message.FieldReceiver:
+		return m.Receiver()
 	case message.FieldMessage:
 		return m.Message()
-	case message.FieldWriter:
-		return m.Writer()
 	case message.FieldCreatedAt:
 		return m.CreatedAt()
 	case message.FieldUpdatedAt:
@@ -1905,10 +1906,12 @@ func (m *MessageMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case message.FieldSender:
+		return m.OldSender(ctx)
+	case message.FieldReceiver:
+		return m.OldReceiver(ctx)
 	case message.FieldMessage:
 		return m.OldMessage(ctx)
-	case message.FieldWriter:
-		return m.OldWriter(ctx)
 	case message.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case message.FieldUpdatedAt:
@@ -1922,19 +1925,26 @@ func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *MessageMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case message.FieldSender:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSender(v)
+		return nil
+	case message.FieldReceiver:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReceiver(v)
+		return nil
 	case message.FieldMessage:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMessage(v)
-		return nil
-	case message.FieldWriter:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetWriter(v)
 		return nil
 	case message.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -1999,11 +2009,14 @@ func (m *MessageMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MessageMutation) ResetField(name string) error {
 	switch name {
+	case message.FieldSender:
+		m.ResetSender()
+		return nil
+	case message.FieldReceiver:
+		m.ResetReceiver()
+		return nil
 	case message.FieldMessage:
 		m.ResetMessage()
-		return nil
-	case message.FieldWriter:
-		m.ResetWriter()
 		return nil
 	case message.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -2017,28 +2030,19 @@ func (m *MessageMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MessageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.board != nil {
-		edges = append(edges, message.EdgeBoard)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *MessageMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case message.EdgeBoard:
-		if id := m.board; id != nil {
-			return []ent.Value{*id}
-		}
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MessageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 0)
 	return edges
 }
 
@@ -2050,42 +2054,25 @@ func (m *MessageMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MessageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedboard {
-		edges = append(edges, message.EdgeBoard)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *MessageMutation) EdgeCleared(name string) bool {
-	switch name {
-	case message.EdgeBoard:
-		return m.clearedboard
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *MessageMutation) ClearEdge(name string) error {
-	switch name {
-	case message.EdgeBoard:
-		m.ClearBoard()
-		return nil
-	}
 	return fmt.Errorf("unknown Message unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *MessageMutation) ResetEdge(name string) error {
-	switch name {
-	case message.EdgeBoard:
-		m.ResetBoard()
-		return nil
-	}
 	return fmt.Errorf("unknown Message edge %s", name)
 }
 

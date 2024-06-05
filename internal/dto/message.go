@@ -2,27 +2,27 @@ package dto
 
 import "github.com/ddr4869/msazoom/ent"
 
-type WriteBoardMessageRequest struct {
-	BoardID int    `json:"board_id" binding:"required"`
-	Message string `json:"message" binding:"required"`
+type GetFriendMessageRequest struct {
+	FriendName string `form:"friend_name" binding:"required"`
 }
 
-type GetBoardMessageRequest struct {
-	BoardID int `uri:"board_id"`
+type ConnectMessageRequest struct {
+	UserName   string `form:"user_name" binding:"required"`
+	FriendName string `form:"friend_name" binding:"required"`
 }
 
 type MessageResponse struct {
 	MessageID int    `json:"id"`
-	BoardID   int    `json:"board_id"`
 	Message   string `json:"message"`
 	Writer    string `json:"writer"`
+	Sender    string `json:"sender"`
 }
 
 func MessageEntToResponse(message *ent.Message) MessageResponse {
 	return MessageResponse{
 		MessageID: message.ID,
-		//BoardID:   message.BoardID,
-		Message: message.Message,
-		Writer:  message.Writer,
+		Message:   message.Message,
+		Writer:    message.Sender,
+		Sender:    message.Receiver,
 	}
 }

@@ -63,11 +63,11 @@ func init() {
 	messageFields := schema.Message{}.Fields()
 	_ = messageFields
 	// messageDescCreatedAt is the schema descriptor for createdAt field.
-	messageDescCreatedAt := messageFields[2].Descriptor()
+	messageDescCreatedAt := messageFields[3].Descriptor()
 	// message.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	message.DefaultCreatedAt = messageDescCreatedAt.Default.(func() time.Time)
 	// messageDescUpdatedAt is the schema descriptor for updatedAt field.
-	messageDescUpdatedAt := messageFields[3].Descriptor()
+	messageDescUpdatedAt := messageFields[4].Descriptor()
 	// message.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
 	message.DefaultUpdatedAt = messageDescUpdatedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()

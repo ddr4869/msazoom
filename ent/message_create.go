@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ddr4869/msazoom/ent/board"
 	"github.com/ddr4869/msazoom/ent/message"
 )
 
@@ -21,15 +20,21 @@ type MessageCreate struct {
 	hooks    []Hook
 }
 
-// SetMessage sets the "message" field.
-func (mc *MessageCreate) SetMessage(s string) *MessageCreate {
-	mc.mutation.SetMessage(s)
+// SetSender sets the "sender" field.
+func (mc *MessageCreate) SetSender(s string) *MessageCreate {
+	mc.mutation.SetSender(s)
 	return mc
 }
 
-// SetWriter sets the "writer" field.
-func (mc *MessageCreate) SetWriter(s string) *MessageCreate {
-	mc.mutation.SetWriter(s)
+// SetReceiver sets the "receiver" field.
+func (mc *MessageCreate) SetReceiver(s string) *MessageCreate {
+	mc.mutation.SetReceiver(s)
+	return mc
+}
+
+// SetMessage sets the "message" field.
+func (mc *MessageCreate) SetMessage(s string) *MessageCreate {
+	mc.mutation.SetMessage(s)
 	return mc
 }
 
@@ -59,25 +64,6 @@ func (mc *MessageCreate) SetNillableUpdatedAt(t *time.Time) *MessageCreate {
 		mc.SetUpdatedAt(*t)
 	}
 	return mc
-}
-
-// SetBoardID sets the "board" edge to the Board entity by ID.
-func (mc *MessageCreate) SetBoardID(id int) *MessageCreate {
-	mc.mutation.SetBoardID(id)
-	return mc
-}
-
-// SetNillableBoardID sets the "board" edge to the Board entity by ID if the given value is not nil.
-func (mc *MessageCreate) SetNillableBoardID(id *int) *MessageCreate {
-	if id != nil {
-		mc = mc.SetBoardID(*id)
-	}
-	return mc
-}
-
-// SetBoard sets the "board" edge to the Board entity.
-func (mc *MessageCreate) SetBoard(b *Board) *MessageCreate {
-	return mc.SetBoardID(b.ID)
 }
 
 // Mutation returns the MessageMutation object of the builder.
@@ -127,11 +113,14 @@ func (mc *MessageCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (mc *MessageCreate) check() error {
+	if _, ok := mc.mutation.Sender(); !ok {
+		return &ValidationError{Name: "sender", err: errors.New(`ent: missing required field "Message.sender"`)}
+	}
+	if _, ok := mc.mutation.Receiver(); !ok {
+		return &ValidationError{Name: "receiver", err: errors.New(`ent: missing required field "Message.receiver"`)}
+	}
 	if _, ok := mc.mutation.Message(); !ok {
 		return &ValidationError{Name: "message", err: errors.New(`ent: missing required field "Message.message"`)}
-	}
-	if _, ok := mc.mutation.Writer(); !ok {
-		return &ValidationError{Name: "writer", err: errors.New(`ent: missing required field "Message.writer"`)}
 	}
 	if _, ok := mc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Message.createdAt"`)}
@@ -165,13 +154,17 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 		_node = &Message{config: mc.config}
 		_spec = sqlgraph.NewCreateSpec(message.Table, sqlgraph.NewFieldSpec(message.FieldID, field.TypeInt))
 	)
+	if value, ok := mc.mutation.Sender(); ok {
+		_spec.SetField(message.FieldSender, field.TypeString, value)
+		_node.Sender = value
+	}
+	if value, ok := mc.mutation.Receiver(); ok {
+		_spec.SetField(message.FieldReceiver, field.TypeString, value)
+		_node.Receiver = value
+	}
 	if value, ok := mc.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)
 		_node.Message = value
-	}
-	if value, ok := mc.mutation.Writer(); ok {
-		_spec.SetField(message.FieldWriter, field.TypeString, value)
-		_node.Writer = value
 	}
 	if value, ok := mc.mutation.CreatedAt(); ok {
 		_spec.SetField(message.FieldCreatedAt, field.TypeTime, value)
@@ -180,23 +173,6 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.UpdatedAt(); ok {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
-	}
-	if nodes := mc.mutation.BoardIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   message.BoardTable,
-			Columns: []string{message.BoardColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.board_messages = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

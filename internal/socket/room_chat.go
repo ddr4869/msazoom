@@ -1,8 +1,7 @@
-package rtc
+package socket
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"sync"
 	"time"
@@ -31,26 +30,18 @@ type Participant struct {
 // #### Signaling ####
 var AllRooms RoomMap
 
-type BroadcastMsg struct {
-	Message map[string]interface{}
-	BoardId int
-	Client  *websocket.Conn
-}
-
-var Broadcast = make(chan BroadcastMsg)
-
 func (r *RoomMap) Init() {
 	r.Map = make(map[int]Participants)
 }
 
-func (r *RoomMap) GetRoom(board_id int) Participants {
+func (r *RoomMap) GetRoom(chat_id int) Participants {
 	r.Mutex.RLock()
 	defer r.Mutex.RUnlock()
 	// check if the room exists
-	if _, ok := r.Map[board_id]; !ok {
+	if _, ok := r.Map[chat_id]; !ok {
 		return Participants{}
 	}
-	return r.Map[board_id]
+	return r.Map[chat_id]
 }
 
 func (r *RoomMap) GetRandomRoomKey() int {
@@ -92,31 +83,29 @@ func (r *RoomMap) InsertIntoRoom(chat_id int, chat_title, username string, host 
 }
 
 // If the user is the host, delete the room
-func (r *RoomMap) QuitRoom(board_id int, username string) bool {
+func (r *RoomMap) QuitRoom(chat_id int, username string) bool {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
-	p := r.Map[board_id].Participant[username]
+	p := r.Map[chat_id].Participant[username]
 	if p.Host {
-		delete(r.Map, board_id)
+		delete(r.Map, chat_id)
 		return true
 	} else {
-		delete(r.Map[board_id].Participant, username)
+		delete(r.Map[chat_id].Participant, username)
 		return false
 	}
 }
 
-func Broadcaster() {
+func (r *RoomMap) Broadcast() {
 	for {
-		msg := <-Broadcast
-		fmt.Println("broadcast msg -> ", msg)
-		for _, client := range AllRooms.Map[msg.BoardId].Participant {
-			if client.Conn != msg.Client {
+		socketChannel := <-SocketChannel
+		fmt.Println("broadcast msg -> ", socketChannel)
+		for _, client := range r.Map[socketChannel.ID].Participant {
+			if client.Conn != socketChannel.Client {
 				AllRooms.Mutex.Lock()
-				err := client.Conn.WriteJSON(msg.Message)
+				err := client.Conn.WriteJSON(socketChannel.Data)
 				if err != nil {
-					fmt.Println("broadcast close !!")
-					// print error
-					log.Println("Error broadcasting message: ", err)
+					fmt.Println("broadcast close ->", err)
 					client.Conn.Close()
 					AllRooms.Mutex.Unlock()
 					return

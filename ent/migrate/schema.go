@@ -51,8 +51,9 @@ var (
 	// MessagesColumns holds the columns for the "messages" table.
 	MessagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "message", Type: field.TypeString},
-		{Name: "writer", Type: field.TypeString},
+		{Name: "sender", Type: field.TypeString},
+		{Name: "receiver", Type: field.TypeString},
+		{Name: "message", Type: field.TypeString, Size: 2147483647},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "board_messages", Type: field.TypeInt, Nullable: true},
@@ -65,7 +66,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "messages_boards_messages",
-				Columns:    []*schema.Column{MessagesColumns[5]},
+				Columns:    []*schema.Column{MessagesColumns[6]},
 				RefColumns: []*schema.Column{BoardsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

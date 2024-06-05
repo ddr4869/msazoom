@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ddr4869/msazoom/ent/predicate"
 )
 
@@ -55,14 +54,19 @@ func IDLTE(id int) predicate.Message {
 	return predicate.Message(sql.FieldLTE(FieldID, id))
 }
 
+// Sender applies equality check predicate on the "sender" field. It's identical to SenderEQ.
+func Sender(v string) predicate.Message {
+	return predicate.Message(sql.FieldEQ(FieldSender, v))
+}
+
+// Receiver applies equality check predicate on the "receiver" field. It's identical to ReceiverEQ.
+func Receiver(v string) predicate.Message {
+	return predicate.Message(sql.FieldEQ(FieldReceiver, v))
+}
+
 // Message applies equality check predicate on the "message" field. It's identical to MessageEQ.
 func Message(v string) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldMessage, v))
-}
-
-// Writer applies equality check predicate on the "writer" field. It's identical to WriterEQ.
-func Writer(v string) predicate.Message {
-	return predicate.Message(sql.FieldEQ(FieldWriter, v))
 }
 
 // CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
@@ -73,6 +77,136 @@ func CreatedAt(v time.Time) predicate.Message {
 // UpdatedAt applies equality check predicate on the "updatedAt" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// SenderEQ applies the EQ predicate on the "sender" field.
+func SenderEQ(v string) predicate.Message {
+	return predicate.Message(sql.FieldEQ(FieldSender, v))
+}
+
+// SenderNEQ applies the NEQ predicate on the "sender" field.
+func SenderNEQ(v string) predicate.Message {
+	return predicate.Message(sql.FieldNEQ(FieldSender, v))
+}
+
+// SenderIn applies the In predicate on the "sender" field.
+func SenderIn(vs ...string) predicate.Message {
+	return predicate.Message(sql.FieldIn(FieldSender, vs...))
+}
+
+// SenderNotIn applies the NotIn predicate on the "sender" field.
+func SenderNotIn(vs ...string) predicate.Message {
+	return predicate.Message(sql.FieldNotIn(FieldSender, vs...))
+}
+
+// SenderGT applies the GT predicate on the "sender" field.
+func SenderGT(v string) predicate.Message {
+	return predicate.Message(sql.FieldGT(FieldSender, v))
+}
+
+// SenderGTE applies the GTE predicate on the "sender" field.
+func SenderGTE(v string) predicate.Message {
+	return predicate.Message(sql.FieldGTE(FieldSender, v))
+}
+
+// SenderLT applies the LT predicate on the "sender" field.
+func SenderLT(v string) predicate.Message {
+	return predicate.Message(sql.FieldLT(FieldSender, v))
+}
+
+// SenderLTE applies the LTE predicate on the "sender" field.
+func SenderLTE(v string) predicate.Message {
+	return predicate.Message(sql.FieldLTE(FieldSender, v))
+}
+
+// SenderContains applies the Contains predicate on the "sender" field.
+func SenderContains(v string) predicate.Message {
+	return predicate.Message(sql.FieldContains(FieldSender, v))
+}
+
+// SenderHasPrefix applies the HasPrefix predicate on the "sender" field.
+func SenderHasPrefix(v string) predicate.Message {
+	return predicate.Message(sql.FieldHasPrefix(FieldSender, v))
+}
+
+// SenderHasSuffix applies the HasSuffix predicate on the "sender" field.
+func SenderHasSuffix(v string) predicate.Message {
+	return predicate.Message(sql.FieldHasSuffix(FieldSender, v))
+}
+
+// SenderEqualFold applies the EqualFold predicate on the "sender" field.
+func SenderEqualFold(v string) predicate.Message {
+	return predicate.Message(sql.FieldEqualFold(FieldSender, v))
+}
+
+// SenderContainsFold applies the ContainsFold predicate on the "sender" field.
+func SenderContainsFold(v string) predicate.Message {
+	return predicate.Message(sql.FieldContainsFold(FieldSender, v))
+}
+
+// ReceiverEQ applies the EQ predicate on the "receiver" field.
+func ReceiverEQ(v string) predicate.Message {
+	return predicate.Message(sql.FieldEQ(FieldReceiver, v))
+}
+
+// ReceiverNEQ applies the NEQ predicate on the "receiver" field.
+func ReceiverNEQ(v string) predicate.Message {
+	return predicate.Message(sql.FieldNEQ(FieldReceiver, v))
+}
+
+// ReceiverIn applies the In predicate on the "receiver" field.
+func ReceiverIn(vs ...string) predicate.Message {
+	return predicate.Message(sql.FieldIn(FieldReceiver, vs...))
+}
+
+// ReceiverNotIn applies the NotIn predicate on the "receiver" field.
+func ReceiverNotIn(vs ...string) predicate.Message {
+	return predicate.Message(sql.FieldNotIn(FieldReceiver, vs...))
+}
+
+// ReceiverGT applies the GT predicate on the "receiver" field.
+func ReceiverGT(v string) predicate.Message {
+	return predicate.Message(sql.FieldGT(FieldReceiver, v))
+}
+
+// ReceiverGTE applies the GTE predicate on the "receiver" field.
+func ReceiverGTE(v string) predicate.Message {
+	return predicate.Message(sql.FieldGTE(FieldReceiver, v))
+}
+
+// ReceiverLT applies the LT predicate on the "receiver" field.
+func ReceiverLT(v string) predicate.Message {
+	return predicate.Message(sql.FieldLT(FieldReceiver, v))
+}
+
+// ReceiverLTE applies the LTE predicate on the "receiver" field.
+func ReceiverLTE(v string) predicate.Message {
+	return predicate.Message(sql.FieldLTE(FieldReceiver, v))
+}
+
+// ReceiverContains applies the Contains predicate on the "receiver" field.
+func ReceiverContains(v string) predicate.Message {
+	return predicate.Message(sql.FieldContains(FieldReceiver, v))
+}
+
+// ReceiverHasPrefix applies the HasPrefix predicate on the "receiver" field.
+func ReceiverHasPrefix(v string) predicate.Message {
+	return predicate.Message(sql.FieldHasPrefix(FieldReceiver, v))
+}
+
+// ReceiverHasSuffix applies the HasSuffix predicate on the "receiver" field.
+func ReceiverHasSuffix(v string) predicate.Message {
+	return predicate.Message(sql.FieldHasSuffix(FieldReceiver, v))
+}
+
+// ReceiverEqualFold applies the EqualFold predicate on the "receiver" field.
+func ReceiverEqualFold(v string) predicate.Message {
+	return predicate.Message(sql.FieldEqualFold(FieldReceiver, v))
+}
+
+// ReceiverContainsFold applies the ContainsFold predicate on the "receiver" field.
+func ReceiverContainsFold(v string) predicate.Message {
+	return predicate.Message(sql.FieldContainsFold(FieldReceiver, v))
 }
 
 // MessageEQ applies the EQ predicate on the "message" field.
@@ -138,71 +272,6 @@ func MessageEqualFold(v string) predicate.Message {
 // MessageContainsFold applies the ContainsFold predicate on the "message" field.
 func MessageContainsFold(v string) predicate.Message {
 	return predicate.Message(sql.FieldContainsFold(FieldMessage, v))
-}
-
-// WriterEQ applies the EQ predicate on the "writer" field.
-func WriterEQ(v string) predicate.Message {
-	return predicate.Message(sql.FieldEQ(FieldWriter, v))
-}
-
-// WriterNEQ applies the NEQ predicate on the "writer" field.
-func WriterNEQ(v string) predicate.Message {
-	return predicate.Message(sql.FieldNEQ(FieldWriter, v))
-}
-
-// WriterIn applies the In predicate on the "writer" field.
-func WriterIn(vs ...string) predicate.Message {
-	return predicate.Message(sql.FieldIn(FieldWriter, vs...))
-}
-
-// WriterNotIn applies the NotIn predicate on the "writer" field.
-func WriterNotIn(vs ...string) predicate.Message {
-	return predicate.Message(sql.FieldNotIn(FieldWriter, vs...))
-}
-
-// WriterGT applies the GT predicate on the "writer" field.
-func WriterGT(v string) predicate.Message {
-	return predicate.Message(sql.FieldGT(FieldWriter, v))
-}
-
-// WriterGTE applies the GTE predicate on the "writer" field.
-func WriterGTE(v string) predicate.Message {
-	return predicate.Message(sql.FieldGTE(FieldWriter, v))
-}
-
-// WriterLT applies the LT predicate on the "writer" field.
-func WriterLT(v string) predicate.Message {
-	return predicate.Message(sql.FieldLT(FieldWriter, v))
-}
-
-// WriterLTE applies the LTE predicate on the "writer" field.
-func WriterLTE(v string) predicate.Message {
-	return predicate.Message(sql.FieldLTE(FieldWriter, v))
-}
-
-// WriterContains applies the Contains predicate on the "writer" field.
-func WriterContains(v string) predicate.Message {
-	return predicate.Message(sql.FieldContains(FieldWriter, v))
-}
-
-// WriterHasPrefix applies the HasPrefix predicate on the "writer" field.
-func WriterHasPrefix(v string) predicate.Message {
-	return predicate.Message(sql.FieldHasPrefix(FieldWriter, v))
-}
-
-// WriterHasSuffix applies the HasSuffix predicate on the "writer" field.
-func WriterHasSuffix(v string) predicate.Message {
-	return predicate.Message(sql.FieldHasSuffix(FieldWriter, v))
-}
-
-// WriterEqualFold applies the EqualFold predicate on the "writer" field.
-func WriterEqualFold(v string) predicate.Message {
-	return predicate.Message(sql.FieldEqualFold(FieldWriter, v))
-}
-
-// WriterContainsFold applies the ContainsFold predicate on the "writer" field.
-func WriterContainsFold(v string) predicate.Message {
-	return predicate.Message(sql.FieldContainsFold(FieldWriter, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "createdAt" field.
@@ -283,29 +352,6 @@ func UpdatedAtLT(v time.Time) predicate.Message {
 // UpdatedAtLTE applies the LTE predicate on the "updatedAt" field.
 func UpdatedAtLTE(v time.Time) predicate.Message {
 	return predicate.Message(sql.FieldLTE(FieldUpdatedAt, v))
-}
-
-// HasBoard applies the HasEdge predicate on the "board" edge.
-func HasBoard() predicate.Message {
-	return predicate.Message(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, BoardTable, BoardColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasBoardWith applies the HasEdge predicate on the "board" edge with a given conditions (other predicates).
-func HasBoardWith(preds ...predicate.Board) predicate.Message {
-	return predicate.Message(func(s *sql.Selector) {
-		step := newBoardStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
 }
 
 // And groups predicates with the AND operator between them.

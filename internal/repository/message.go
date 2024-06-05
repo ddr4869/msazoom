@@ -4,12 +4,13 @@ import (
 	"context"
 
 	"github.com/ddr4869/msazoom/ent"
+	"github.com/ddr4869/msazoom/ent/message"
 )
 
-func (r *Repository) WriteBoardMessage(ctx context.Context, boardID int, username string, message string) (*ent.Message, error) {
+func (r *Repository) WriteFriendMessage(ctx context.Context, sender, receiver, message string) (*ent.Message, error) {
 	msg, err := r.entClient.Message.Create().
-		SetBoardID(boardID).
-		SetWriter(username).
+		SetSender(sender).
+		SetReceiver(receiver).
 		SetMessage(message).
 		Save(context.Background())
 	if err != nil {
@@ -18,12 +19,13 @@ func (r *Repository) WriteBoardMessage(ctx context.Context, boardID int, usernam
 	return msg, nil
 }
 
-func (r *Repository) GetBoardMessage(ctx context.Context, boardID int) ([]*ent.Message, error) {
-	messages, err := r.entClient.Message.Query().
-		//Where(message.BoardID(boardID)).
+func (r *Repository) GetFriendMessage(ctx context.Context, sender, receiver string) ([]*ent.Message, error) {
+	msg, err := r.entClient.Message.Query().
+		Where(message.Sender(sender)).
+		Where(message.Receiver(receiver)).
 		All(context.Background())
 	if err != nil {
 		return nil, err
 	}
-	return messages, nil
+	return msg, nil
 }

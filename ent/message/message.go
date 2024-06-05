@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -14,32 +13,26 @@ const (
 	Label = "message"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldSender holds the string denoting the sender field in the database.
+	FieldSender = "sender"
+	// FieldReceiver holds the string denoting the receiver field in the database.
+	FieldReceiver = "receiver"
 	// FieldMessage holds the string denoting the message field in the database.
 	FieldMessage = "message"
-	// FieldWriter holds the string denoting the writer field in the database.
-	FieldWriter = "writer"
 	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
 	FieldUpdatedAt = "updated_at"
-	// EdgeBoard holds the string denoting the board edge name in mutations.
-	EdgeBoard = "board"
 	// Table holds the table name of the message in the database.
 	Table = "messages"
-	// BoardTable is the table that holds the board relation/edge.
-	BoardTable = "messages"
-	// BoardInverseTable is the table name for the Board entity.
-	// It exists in this package in order to avoid circular dependency with the "board" package.
-	BoardInverseTable = "boards"
-	// BoardColumn is the table column denoting the board relation/edge.
-	BoardColumn = "board_messages"
 )
 
 // Columns holds all SQL columns for message fields.
 var Columns = []string{
 	FieldID,
+	FieldSender,
+	FieldReceiver,
 	FieldMessage,
-	FieldWriter,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -80,14 +73,19 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
+// BySender orders the results by the sender field.
+func BySender(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSender, opts...).ToFunc()
+}
+
+// ByReceiver orders the results by the receiver field.
+func ByReceiver(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldReceiver, opts...).ToFunc()
+}
+
 // ByMessage orders the results by the message field.
 func ByMessage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMessage, opts...).ToFunc()
-}
-
-// ByWriter orders the results by the writer field.
-func ByWriter(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldWriter, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the createdAt field.
@@ -98,18 +96,4 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updatedAt field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
-}
-
-// ByBoardField orders the results by board field.
-func ByBoardField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newBoardStep(), sql.OrderByField(field, opts...))
-	}
-}
-func newBoardStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(BoardInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, BoardTable, BoardColumn),
-	)
 }

@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ddr4869/msazoom/ent/board"
 	"github.com/ddr4869/msazoom/ent/message"
 	"github.com/ddr4869/msazoom/ent/predicate"
 )
@@ -22,7 +21,6 @@ type MessageQuery struct {
 	order      []message.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Message
-	withBoard  *BoardQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -58,28 +56,6 @@ func (mq *MessageQuery) Unique(unique bool) *MessageQuery {
 func (mq *MessageQuery) Order(o ...message.OrderOption) *MessageQuery {
 	mq.order = append(mq.order, o...)
 	return mq
-}
-
-// QueryBoard chains the current query on the "board" edge.
-func (mq *MessageQuery) QueryBoard() *BoardQuery {
-	query := (&BoardClient{config: mq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := mq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := mq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(message.Table, message.FieldID, selector),
-			sqlgraph.To(board.Table, board.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, message.BoardTable, message.BoardColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Message entity from the query.
@@ -274,22 +250,10 @@ func (mq *MessageQuery) Clone() *MessageQuery {
 		order:      append([]message.OrderOption{}, mq.order...),
 		inters:     append([]Interceptor{}, mq.inters...),
 		predicates: append([]predicate.Message{}, mq.predicates...),
-		withBoard:  mq.withBoard.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
 	}
-}
-
-// WithBoard tells the query-builder to eager-load the nodes that are connected to
-// the "board" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MessageQuery) WithBoard(opts ...func(*BoardQuery)) *MessageQuery {
-	query := (&BoardClient{config: mq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	mq.withBoard = query
-	return mq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -298,12 +262,12 @@ func (mq *MessageQuery) WithBoard(opts ...func(*BoardQuery)) *MessageQuery {
 // Example:
 //
 //	var v []struct {
-//		Message string `json:"message,omitempty"`
+//		Sender string `json:"sender,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Message.Query().
-//		GroupBy(message.FieldMessage).
+//		GroupBy(message.FieldSender).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (mq *MessageQuery) GroupBy(field string, fields ...string) *MessageGroupBy {
@@ -321,11 +285,11 @@ func (mq *MessageQuery) GroupBy(field string, fields ...string) *MessageGroupBy 
 // Example:
 //
 //	var v []struct {
-//		Message string `json:"message,omitempty"`
+//		Sender string `json:"sender,omitempty"`
 //	}
 //
 //	client.Message.Query().
-//		Select(message.FieldMessage).
+//		Select(message.FieldSender).
 //		Scan(ctx, &v)
 func (mq *MessageQuery) Select(fields ...string) *MessageSelect {
 	mq.ctx.Fields = append(mq.ctx.Fields, fields...)
@@ -368,16 +332,10 @@ func (mq *MessageQuery) prepareQuery(ctx context.Context) error {
 
 func (mq *MessageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Message, error) {
 	var (
-		nodes       = []*Message{}
-		withFKs     = mq.withFKs
-		_spec       = mq.querySpec()
-		loadedTypes = [1]bool{
-			mq.withBoard != nil,
-		}
+		nodes   = []*Message{}
+		withFKs = mq.withFKs
+		_spec   = mq.querySpec()
 	)
-	if mq.withBoard != nil {
-		withFKs = true
-	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, message.ForeignKeys...)
 	}
@@ -387,7 +345,6 @@ func (mq *MessageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mess
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Message{config: mq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -399,46 +356,7 @@ func (mq *MessageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mess
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := mq.withBoard; query != nil {
-		if err := mq.loadBoard(ctx, query, nodes, nil,
-			func(n *Message, e *Board) { n.Edges.Board = e }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
-}
-
-func (mq *MessageQuery) loadBoard(ctx context.Context, query *BoardQuery, nodes []*Message, init func(*Message), assign func(*Message, *Board)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Message)
-	for i := range nodes {
-		if nodes[i].board_messages == nil {
-			continue
-		}
-		fk := *nodes[i].board_messages
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(board.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "board_messages" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (mq *MessageQuery) sqlCount(ctx context.Context) (int, error) {

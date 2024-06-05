@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/ddr4869/msazoom/ent/board"
 	"github.com/ddr4869/msazoom/ent/message"
 )
 
@@ -18,39 +17,18 @@ type Message struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Sender holds the value of the "sender" field.
+	Sender string `json:"sender,omitempty"`
+	// Receiver holds the value of the "receiver" field.
+	Receiver string `json:"receiver,omitempty"`
 	// Message holds the value of the "message" field.
 	Message string `json:"message,omitempty"`
-	// Writer holds the value of the "writer" field.
-	Writer string `json:"writer,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// UpdatedAt holds the value of the "updatedAt" field.
-	UpdatedAt time.Time `json:"updatedAt,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the MessageQuery when eager-loading is set.
-	Edges          MessageEdges `json:"edges"`
+	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
 	board_messages *int
 	selectValues   sql.SelectValues
-}
-
-// MessageEdges holds the relations/edges for other nodes in the graph.
-type MessageEdges struct {
-	// Board holds the value of the board edge.
-	Board *Board `json:"board,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-}
-
-// BoardOrErr returns the Board value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e MessageEdges) BoardOrErr() (*Board, error) {
-	if e.Board != nil {
-		return e.Board, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: board.Label}
-	}
-	return nil, &NotLoadedError{edge: "board"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -60,7 +38,7 @@ func (*Message) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case message.FieldID:
 			values[i] = new(sql.NullInt64)
-		case message.FieldMessage, message.FieldWriter:
+		case message.FieldSender, message.FieldReceiver, message.FieldMessage:
 			values[i] = new(sql.NullString)
 		case message.FieldCreatedAt, message.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -87,17 +65,23 @@ func (m *Message) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			m.ID = int(value.Int64)
+		case message.FieldSender:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field sender", values[i])
+			} else if value.Valid {
+				m.Sender = value.String
+			}
+		case message.FieldReceiver:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field receiver", values[i])
+			} else if value.Valid {
+				m.Receiver = value.String
+			}
 		case message.FieldMessage:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field message", values[i])
 			} else if value.Valid {
 				m.Message = value.String
-			}
-		case message.FieldWriter:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field writer", values[i])
-			} else if value.Valid {
-				m.Writer = value.String
 			}
 		case message.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -131,11 +115,6 @@ func (m *Message) Value(name string) (ent.Value, error) {
 	return m.selectValues.Get(name)
 }
 
-// QueryBoard queries the "board" edge of the Message entity.
-func (m *Message) QueryBoard() *BoardQuery {
-	return NewMessageClient(m.config).QueryBoard(m)
-}
-
 // Update returns a builder for updating this Message.
 // Note that you need to call Message.Unwrap() before calling this method if this Message
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -159,11 +138,14 @@ func (m *Message) String() string {
 	var builder strings.Builder
 	builder.WriteString("Message(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
+	builder.WriteString("sender=")
+	builder.WriteString(m.Sender)
+	builder.WriteString(", ")
+	builder.WriteString("receiver=")
+	builder.WriteString(m.Receiver)
+	builder.WriteString(", ")
 	builder.WriteString("message=")
 	builder.WriteString(m.Message)
-	builder.WriteString(", ")
-	builder.WriteString("writer=")
-	builder.WriteString(m.Writer)
 	builder.WriteString(", ")
 	builder.WriteString("createdAt=")
 	builder.WriteString(m.CreatedAt.Format(time.ANSIC))

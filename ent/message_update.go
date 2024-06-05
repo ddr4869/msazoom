@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ddr4869/msazoom/ent/board"
 	"github.com/ddr4869/msazoom/ent/message"
 	"github.com/ddr4869/msazoom/ent/predicate"
 )
@@ -29,6 +28,34 @@ func (mu *MessageUpdate) Where(ps ...predicate.Message) *MessageUpdate {
 	return mu
 }
 
+// SetSender sets the "sender" field.
+func (mu *MessageUpdate) SetSender(s string) *MessageUpdate {
+	mu.mutation.SetSender(s)
+	return mu
+}
+
+// SetNillableSender sets the "sender" field if the given value is not nil.
+func (mu *MessageUpdate) SetNillableSender(s *string) *MessageUpdate {
+	if s != nil {
+		mu.SetSender(*s)
+	}
+	return mu
+}
+
+// SetReceiver sets the "receiver" field.
+func (mu *MessageUpdate) SetReceiver(s string) *MessageUpdate {
+	mu.mutation.SetReceiver(s)
+	return mu
+}
+
+// SetNillableReceiver sets the "receiver" field if the given value is not nil.
+func (mu *MessageUpdate) SetNillableReceiver(s *string) *MessageUpdate {
+	if s != nil {
+		mu.SetReceiver(*s)
+	}
+	return mu
+}
+
 // SetMessage sets the "message" field.
 func (mu *MessageUpdate) SetMessage(s string) *MessageUpdate {
 	mu.mutation.SetMessage(s)
@@ -39,20 +66,6 @@ func (mu *MessageUpdate) SetMessage(s string) *MessageUpdate {
 func (mu *MessageUpdate) SetNillableMessage(s *string) *MessageUpdate {
 	if s != nil {
 		mu.SetMessage(*s)
-	}
-	return mu
-}
-
-// SetWriter sets the "writer" field.
-func (mu *MessageUpdate) SetWriter(s string) *MessageUpdate {
-	mu.mutation.SetWriter(s)
-	return mu
-}
-
-// SetNillableWriter sets the "writer" field if the given value is not nil.
-func (mu *MessageUpdate) SetNillableWriter(s *string) *MessageUpdate {
-	if s != nil {
-		mu.SetWriter(*s)
 	}
 	return mu
 }
@@ -85,34 +98,9 @@ func (mu *MessageUpdate) SetNillableUpdatedAt(t *time.Time) *MessageUpdate {
 	return mu
 }
 
-// SetBoardID sets the "board" edge to the Board entity by ID.
-func (mu *MessageUpdate) SetBoardID(id int) *MessageUpdate {
-	mu.mutation.SetBoardID(id)
-	return mu
-}
-
-// SetNillableBoardID sets the "board" edge to the Board entity by ID if the given value is not nil.
-func (mu *MessageUpdate) SetNillableBoardID(id *int) *MessageUpdate {
-	if id != nil {
-		mu = mu.SetBoardID(*id)
-	}
-	return mu
-}
-
-// SetBoard sets the "board" edge to the Board entity.
-func (mu *MessageUpdate) SetBoard(b *Board) *MessageUpdate {
-	return mu.SetBoardID(b.ID)
-}
-
 // Mutation returns the MessageMutation object of the builder.
 func (mu *MessageUpdate) Mutation() *MessageMutation {
 	return mu.mutation
-}
-
-// ClearBoard clears the "board" edge to the Board entity.
-func (mu *MessageUpdate) ClearBoard() *MessageUpdate {
-	mu.mutation.ClearBoard()
-	return mu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -151,46 +139,20 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := mu.mutation.Sender(); ok {
+		_spec.SetField(message.FieldSender, field.TypeString, value)
+	}
+	if value, ok := mu.mutation.Receiver(); ok {
+		_spec.SetField(message.FieldReceiver, field.TypeString, value)
+	}
 	if value, ok := mu.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)
-	}
-	if value, ok := mu.mutation.Writer(); ok {
-		_spec.SetField(message.FieldWriter, field.TypeString, value)
 	}
 	if value, ok := mu.mutation.CreatedAt(); ok {
 		_spec.SetField(message.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := mu.mutation.UpdatedAt(); ok {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if mu.mutation.BoardCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   message.BoardTable,
-			Columns: []string{message.BoardColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mu.mutation.BoardIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   message.BoardTable,
-			Columns: []string{message.BoardColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -212,6 +174,34 @@ type MessageUpdateOne struct {
 	mutation *MessageMutation
 }
 
+// SetSender sets the "sender" field.
+func (muo *MessageUpdateOne) SetSender(s string) *MessageUpdateOne {
+	muo.mutation.SetSender(s)
+	return muo
+}
+
+// SetNillableSender sets the "sender" field if the given value is not nil.
+func (muo *MessageUpdateOne) SetNillableSender(s *string) *MessageUpdateOne {
+	if s != nil {
+		muo.SetSender(*s)
+	}
+	return muo
+}
+
+// SetReceiver sets the "receiver" field.
+func (muo *MessageUpdateOne) SetReceiver(s string) *MessageUpdateOne {
+	muo.mutation.SetReceiver(s)
+	return muo
+}
+
+// SetNillableReceiver sets the "receiver" field if the given value is not nil.
+func (muo *MessageUpdateOne) SetNillableReceiver(s *string) *MessageUpdateOne {
+	if s != nil {
+		muo.SetReceiver(*s)
+	}
+	return muo
+}
+
 // SetMessage sets the "message" field.
 func (muo *MessageUpdateOne) SetMessage(s string) *MessageUpdateOne {
 	muo.mutation.SetMessage(s)
@@ -222,20 +212,6 @@ func (muo *MessageUpdateOne) SetMessage(s string) *MessageUpdateOne {
 func (muo *MessageUpdateOne) SetNillableMessage(s *string) *MessageUpdateOne {
 	if s != nil {
 		muo.SetMessage(*s)
-	}
-	return muo
-}
-
-// SetWriter sets the "writer" field.
-func (muo *MessageUpdateOne) SetWriter(s string) *MessageUpdateOne {
-	muo.mutation.SetWriter(s)
-	return muo
-}
-
-// SetNillableWriter sets the "writer" field if the given value is not nil.
-func (muo *MessageUpdateOne) SetNillableWriter(s *string) *MessageUpdateOne {
-	if s != nil {
-		muo.SetWriter(*s)
 	}
 	return muo
 }
@@ -268,34 +244,9 @@ func (muo *MessageUpdateOne) SetNillableUpdatedAt(t *time.Time) *MessageUpdateOn
 	return muo
 }
 
-// SetBoardID sets the "board" edge to the Board entity by ID.
-func (muo *MessageUpdateOne) SetBoardID(id int) *MessageUpdateOne {
-	muo.mutation.SetBoardID(id)
-	return muo
-}
-
-// SetNillableBoardID sets the "board" edge to the Board entity by ID if the given value is not nil.
-func (muo *MessageUpdateOne) SetNillableBoardID(id *int) *MessageUpdateOne {
-	if id != nil {
-		muo = muo.SetBoardID(*id)
-	}
-	return muo
-}
-
-// SetBoard sets the "board" edge to the Board entity.
-func (muo *MessageUpdateOne) SetBoard(b *Board) *MessageUpdateOne {
-	return muo.SetBoardID(b.ID)
-}
-
 // Mutation returns the MessageMutation object of the builder.
 func (muo *MessageUpdateOne) Mutation() *MessageMutation {
 	return muo.mutation
-}
-
-// ClearBoard clears the "board" edge to the Board entity.
-func (muo *MessageUpdateOne) ClearBoard() *MessageUpdateOne {
-	muo.mutation.ClearBoard()
-	return muo
 }
 
 // Where appends a list predicates to the MessageUpdate builder.
@@ -364,46 +315,20 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 			}
 		}
 	}
+	if value, ok := muo.mutation.Sender(); ok {
+		_spec.SetField(message.FieldSender, field.TypeString, value)
+	}
+	if value, ok := muo.mutation.Receiver(); ok {
+		_spec.SetField(message.FieldReceiver, field.TypeString, value)
+	}
 	if value, ok := muo.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)
-	}
-	if value, ok := muo.mutation.Writer(); ok {
-		_spec.SetField(message.FieldWriter, field.TypeString, value)
 	}
 	if value, ok := muo.mutation.CreatedAt(); ok {
 		_spec.SetField(message.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := muo.mutation.UpdatedAt(); ok {
 		_spec.SetField(message.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if muo.mutation.BoardCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   message.BoardTable,
-			Columns: []string{message.BoardColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := muo.mutation.BoardIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   message.BoardTable,
-			Columns: []string{message.BoardColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Message{config: muo.config}
 	_spec.Assign = _node.assignValues
