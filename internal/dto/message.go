@@ -14,15 +14,15 @@ type ConnectMessageRequest struct {
 type MessageResponse struct {
 	MessageID int    `json:"id"`
 	Message   string `json:"message"`
-	Writer    string `json:"writer"`
 	Sender    string `json:"sender"`
+	Receiver  string `json:"receiver"`
 }
 
 func MessageEntToResponse(message *ent.Message) MessageResponse {
 	return MessageResponse{
 		MessageID: message.ID,
 		Message:   message.Message,
-		Writer:    message.Sender,
-		Sender:    message.Receiver,
+		Sender:    message.Sender,
+		Receiver:  message.Receiver,
 	}
 }

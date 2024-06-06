@@ -68,6 +68,20 @@ func (s *Server) GetFriendList(c *gin.Context) {
 	dto.NewSuccessResponse(c, resp)
 }
 
+func (s *Server) GetFriendRequestList(c *gin.Context) {
+	claims := c.MustGet("claims").(*utils.UserClaims)
+	friends, err := s.repository.GetFriendRequestList(c, claims.Name)
+	if err != nil {
+		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get friend request list")
+		return
+	}
+	resp := make([]dto.UserNormalResponse, 0)
+	for _, friend := range friends {
+		resp = append(resp, dto.UserEntToResponse(friend))
+	}
+	dto.NewSuccessResponse(c, resp)
+}
+
 func (s *Server) AddFriend(c *gin.Context) {
 	req := c.MustGet("req").(dto.AddFriendRequest)
 	claims := c.MustGet("claims").(*utils.UserClaims)

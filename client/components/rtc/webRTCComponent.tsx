@@ -64,7 +64,7 @@ const WebRTCComponent = ({ chatId, userId }) => {
   useEffect(() => {
     const start = async () => {
       userStream.current = await openCamera(userVideo, userStream);
-      webSocketRef.current = initializeChatWebSocket(chatId, userId, handleWebSocketMessage);
+      webSocketRef.current = initializeChatWebSocket({chatId, userId, handleWebSocketMessage});
       peerRef.current = createPeerConnection(handleNegotiationNeeded, handleIceCandidateEvent, handleTrackEvent);
       
     };

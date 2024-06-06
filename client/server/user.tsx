@@ -152,3 +152,28 @@ export const RemoveFriendAxios = (token:string, friend_id: string) => {
       throw new Error('Failed to connect server.');
     }
 }
+
+export const GetFollowerAxios = (token:string) => {
+    //noStore()
+    try {
+      return new Promise<any>((resolve, reject) => {
+        const reqUrl = '/user/friend/follower';
+        axios.get(reqUrl,  {
+          headers: {
+            // Bearer 토큰을 Authorization 헤더에 추가
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        .then(res => {
+          resolve(res.data.data);
+        })
+        .catch(err => {
+            console.log(err)
+          reject(err.message);
+        })
+      })
+    } catch (error) {
+      console.error('Server Error:', error);
+      throw new Error('Failed to connect server.');
+    }
+}

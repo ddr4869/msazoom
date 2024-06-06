@@ -6,8 +6,9 @@ import { handleLogin, handleLogout } from '@/utils/auth';
 import ChatList from '@/components/chat/chatList';
 import LoginComponent from '@/components/user/loginComponent';
 import SignUpComponent from '@/components/user/singupComponent';
-import { GetFriendsAxios, RemoveFriendAxios } from '@/server/user';
+import { AddFriendAxios, GetFollowerAxios, GetFriendsAxios, RemoveFriendAxios } from '@/server/user';
 import FriendsList from '@/components/user/friendList';
+import FollowerList from '@/components/user/followerList';
 
 const Home = () => {
   const [username, setUsername] = useState('');
@@ -15,6 +16,7 @@ const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [chats, setChats] = useState([]);
   const [friends, setFriends] = useState([]);
+  const [followers, setFollowers] = useState([]);
   const [chatReload, setChatReload] = useState(false);
   const [showCreateChatForm, setShowCreateChatForm] = useState(false);
   const router = useRouter();
@@ -82,6 +84,17 @@ const Home = () => {
     }
   }
 
+  const addFriend = (friendId: any) => {
+    if (confirm('친구요청을 수락하겠습니까?')) {
+      AddFriendAxios(localStorage.getItem('accessToken'), friendId).then(() => {
+        console.log("add friend success")
+        setChatReload(true);
+    }).catch((error) => {
+      console.error('Error removing friend:', error);
+      })
+    }
+  }
+
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     setIsLoggedIn(!!accessToken);
@@ -100,7 +113,20 @@ const Home = () => {
     const fetchFriends = async (token: string) => {
       try {
         const response = await GetFriendsAxios(token);
-        setFriends(response);
+        if (response !== null) {
+          setFriends(response);
+        }
+      } catch (error) {
+        console.error('Error fetching friends:', error);
+      }
+    }
+
+    const fetchFollower = async (token: string) => {
+      try {
+        const response = await GetFollowerAxios(token);
+        if (response !== null) {
+          setFollowers(response);
+        }
       } catch (error) {
         console.error('Error fetching friends:', error);
       }
@@ -110,6 +136,7 @@ const Home = () => {
     if (isLoggedIn && accessToken) {
       fetchChats(accessToken);
       fetchFriends(accessToken);
+      //fetchFollower(accessToken); -> TODo !!
     } else {
       setChats([]);
       setFriends([]);
@@ -160,16 +187,35 @@ const Home = () => {
             handleSubmitChatForm={handleSubmitChatForm}
             setShowCreateChatForm={setShowCreateChatForm}
           />
-        )}
-        <br></br><br></br>
-        <hr></hr>
+          
 
+        )}
+        {isLoggedIn &&
+          <div>
+          <br></br><br></br>
+          <hr></hr>
+          </div>
+        }
         {isLoggedIn && <h1>Friends List</h1>}
         {isLoggedIn && (          
             <FriendsList 
               friends={friends} 
               navigateToFriendChat={navigateToFriendChat} 
               removeFriend={removeFriend}
+            />
+          )
+        }
+        {isLoggedIn &&
+          <div>
+          <br></br><br></br>
+          <hr></hr>
+          </div>
+        }
+        {isLoggedIn && <h1>Following Request</h1>}
+        {isLoggedIn && (          
+            <FollowerList 
+              followers={followers} 
+              addFriend={addFriend} 
             />
           )
         }

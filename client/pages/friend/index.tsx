@@ -21,7 +21,6 @@ export default function Page() {
     return (
         <div>
             <ChatFriendComponent username={username} friendname={friend_id} />
-            Your name is {username}, and Friend ID is {friend_id}.
         </div>
     );
 }

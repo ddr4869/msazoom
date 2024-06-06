@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState,  } from 'react';
+import { useRouter } from 'next/router';
 import { closeWebSocket, initializeMessageWebSocket, sendMessage } from './webSocket';
 import { getFriendMessageAxios } from '@/server/message';
 
 const ChatFriendComponent = ({ username, friendname }: { username: string, friendname: string }) => {
+    const router = useRouter();
     const webSocketRef = useRef<WebSocket | null>(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
@@ -42,7 +44,7 @@ const ChatFriendComponent = ({ username, friendname }: { username: string, frien
     const handleSendMessage = () => {
         if (webSocketRef.current && newMessage.trim() !== '') {
             console.log('handleSendMessage -> ', newMessage);
-            const messageData = { message: newMessage, writer: username, sender: username, receiver: friendname };
+            const messageData = { message: newMessage, sender: username, receiver: friendname };
             webSocketRef.current.send(JSON.stringify(messageData));
             setMessages(prevMessages => [...prevMessages, messageData]);
             setNewMessage('');
@@ -71,16 +73,19 @@ const ChatFriendComponent = ({ username, friendname }: { username: string, frien
     const disconnect = () => {
         sendMessage(webSocketRef.current, { disconnect: true });
         closeWebSocket(webSocketRef.current);
+        router.push({ pathname: '/' });
     };
 
     return (
+        
         <div>
-            <div className="chat-container" ref={chatContainerRef}>
-                {messages.map((msg, index) => (
-                    <div key={index} className={msg.writer === username ? 'my-message' : 'friend-message'}>
-                        <span>{msg.message}</span>
-                    </div>
-                ))}
+            <h1>To {friendname}</h1>
+            <div style={{ border: '1px solid black', height: '600px', overflowY: 'scroll', padding: '10px' }} ref={chatContainerRef}>
+            {messages.map((msg, index) => (
+                <div key={index} style={{ textAlign: msg.sender === username ? 'right' : 'left', marginBottom: '5px' }}>
+                <strong>{msg.sender}:</strong> {msg.message}
+                </div>
+            ))}
             </div>
             <div className="input-container">
                 <input
@@ -93,51 +98,13 @@ const ChatFriendComponent = ({ username, friendname }: { username: string, frien
                           handleSendMessage()
                         }
                       }}
+                      style={{ width: '80%', marginRight: '10px' }}
                 />
                 <button onClick={handleSendMessage}>Send</button>
             </div>
-            <style jsx>{`
-                .chat-container {
-                    display: flex;
-                    flex-direction: column;
-                    max-height: 300px;
-                    overflow-y: auto;
-                    padding: 10px;
-                }
-                .my-message {
-                    align-self: flex-end;
-                    background-color: #DCF8C6;
-                    padding: 5px 10px;
-                    border-radius: 10px;
-                    margin: 5px;
-                }
-                .friend-message {
-                    align-self: flex-start;
-                    background-color: #FFF;
-                    padding: 5px 10px;
-                    border-radius: 10px;
-                    margin: 5px;
-                }
-                .input-container {
-                    display: flex;
-                    margin-top: 10px;
-                }
-                .input-container input {
-                    flex: 1;
-                    padding: 10px;
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                }
-                .input-container button {
-                    padding: 10px 20px;
-                    border: none;
-                    background-color: #4CAF50;
-                    color: white;
-                    cursor: pointer;
-                    border-radius: 5px;
-                    margin-left: 10px;
-                }
-            `}</style>
+                <br></br>
+            <button onClick={disconnect}>Back</button>
+
         </div>
     );
 };

@@ -46,6 +46,18 @@ func (r Repository) GetFriendList(ctx context.Context, user_name string) ([]*ent
 	return friends, nil
 }
 
+func (r Repository) GetFriendRequestList(ctx context.Context, user_name string) ([]*ent.User, error) {
+	// query all users that have user_name in their follower list
+	friends, err := r.entClient.User.
+		Query().
+		Where(user.HasFollwerWith(user.Username(user_name))).
+		All(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed creating board: %w", err)
+	}
+	return friends, nil
+}
+
 func (r Repository) AddFriend(ctx context.Context, user_name, friend_name string) (*ent.User, error) {
 	f, err := r.entClient.User.
 		Query().

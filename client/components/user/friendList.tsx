@@ -1,5 +1,5 @@
 import boardStyles from '@/styles/board-styles.module.css';
-import FriendCard from './friendCart';
+import FriendCard from './friendCard';
 
 const FriendsList = ({friends, navigateToFriendChat, removeFriend}) => (
     <div className={boardStyles.friendList}>

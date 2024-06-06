@@ -27,7 +27,7 @@ export const initializeMessageWebSocket = (  {username ,  friendname,  handleWeb
 
 export const initializeChatWebSocket = ( {chatId, userId, handleWebSocketMessage}: initializeChatWebSocketProps) => {
   // fix!  
-  
+  console.log(`ws://`+process.env.NEXT_PUBLIC_HOST+`/api/chat/join?chat_id=${chatId}&username=${userId}`)
   const webSocket = new WebSocket(`ws://`+process.env.NEXT_PUBLIC_HOST+`/api/chat/join?chat_id=${chatId}&username=${userId}`);
   webSocket.addEventListener('open', () => {
     console.log('WebSocket connection opened');
