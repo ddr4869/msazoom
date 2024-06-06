@@ -21,9 +21,20 @@ func (r *Repository) WriteFriendMessage(ctx context.Context, sender, receiver, m
 
 func (r *Repository) GetFriendMessage(ctx context.Context, sender, receiver string) ([]*ent.Message, error) {
 	msg, err := r.entClient.Message.Query().
-		Where(message.Sender(sender)).
-		Where(message.Receiver(receiver)).
-		All(context.Background())
+		Where(
+			message.Or(
+				message.And(
+					message.Sender(sender),
+					message.Receiver(receiver),
+				),
+				message.And(
+					message.Sender(receiver),
+					message.Receiver(sender),
+				),
+			),
+		).
+		Order(ent.Asc(message.FieldCreatedAt)).
+		All(ctx)
 	if err != nil {
 		return nil, err
 	}

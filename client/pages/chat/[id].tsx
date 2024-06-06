@@ -6,13 +6,11 @@ import WebRTCComponent from '@/components/rtc/webRTCComponent';
 import { useEffect } from 'react';
 
 export default function Page({ id }) {
-  const username = localStorage.getItem('username')
   const { data: session } = useSession();
-
   return (
     <SessionProvider session={session}>
       <div>
-        <WebRTCComponent chatId={id} userId={username} />
+        <WebRTCComponent chatId={id} userId={localStorage.getItem('username')} />
       </div>
       <div>
         <h1>Chat Room</h1>

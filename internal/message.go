@@ -43,7 +43,7 @@ func (s *Server) ConnectMessage(c *gin.Context) {
 	key := GenerateSocketKey(req.UserName, req.FriendName)
 	socket.AllMessageRooms.InsertIntoRoom(key, req.UserName, req.FriendName, ws)
 
-	go socket.AllMessageRooms.Broadcast()
+	go socket.AllMessageRooms.Broadcast(c, s.repository)
 	var socketData socket.MessageSocketData
 	socketData.Client = ws
 	socketData.ID = key

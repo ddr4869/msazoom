@@ -1,9 +1,13 @@
 package socket
 
 import (
+	"context"
+	"fmt"
+	"log"
 	"sync"
 	"time"
 
+	"github.com/ddr4869/msazoom/internal/repository"
 	"github.com/gorilla/websocket"
 )
 
@@ -71,9 +75,34 @@ func (m *MessageMap) QuitRoom(chat_key string, username string) bool {
 	}
 }
 
-func (m *MessageMap) Broadcast() {
+func (m *MessageMap) Broadcast(c context.Context, r repository.Repository) {
 	for {
 		socketData := <-MessageSocketChannel
+		// type assertion
+		sender, ok := socketData.Data["sender"].(string)
+		if !ok {
+			log.Println("Invalid type for sender")
+			continue
+		}
+
+		receiver, ok := socketData.Data["receiver"].(string)
+		if !ok {
+			log.Println("Invalid type for receiver")
+			continue
+		}
+
+		message, ok := socketData.Data["message"].(string)
+		if !ok {
+			log.Println("Invalid type for message")
+			continue
+		}
+		fmt.Println("socketData.Client set, sender, receiver, message", sender, receiver, message)
+		_, err := r.WriteFriendMessage(c, sender, receiver, message)
+		if err != nil {
+			log.Println("Failed to write friend message, err ->  ", err)
+			continue
+		}
+
 		for _, client := range m.Map[socketData.ID].Participant {
 			if client.Conn != socketData.Client {
 				AllChatRooms.Mutex.Lock()
