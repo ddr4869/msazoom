@@ -8,11 +8,12 @@ import (
 	"github.com/ddr4869/msazoom/ent/user"
 )
 
-func (r Repository) CreateUser(ctx context.Context, user_name, password_hash string) (*ent.User, error) {
+func (r Repository) CreateUser(ctx context.Context, user_name, password_hash, email string) (*ent.User, error) {
 	user, err := r.entClient.User.
 		Create().
 		SetUsername(user_name).
 		SetPassword(password_hash).
+		SetEmail(email).
 		Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("User already exists: %w", err)
@@ -47,15 +48,34 @@ func (r Repository) GetFriendList(ctx context.Context, user_name string) ([]*ent
 }
 
 func (r Repository) GetFriendRequestList(ctx context.Context, user_name string) ([]*ent.User, error) {
-	// query all users that have user_name in their follower list
-	friends, err := r.entClient.User.
+	follow_users, err := r.entClient.User.
 		Query().
 		Where(user.HasFollwerWith(user.Username(user_name))).
 		All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating board: %w", err)
 	}
-	return friends, nil
+
+	// query user_name's all followers
+	user_follower, err := r.entClient.User.
+		Query().
+		Where(user.UsernameEQ(user_name)).
+		QueryFollwer().
+		All(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed creating board: %w", err)
+	}
+
+	// remove user_name's all followers from follow_users
+	for _, f := range user_follower {
+		for i, u := range follow_users {
+			if f.Username == u.Username {
+				follow_users = append(follow_users[:i], follow_users[i+1:]...)
+				break
+			}
+		}
+	}
+	return follow_users, nil
 }
 
 func (r Repository) AddFriend(ctx context.Context, user_name, friend_name string) (*ent.User, error) {
@@ -66,7 +86,11 @@ func (r Repository) AddFriend(ctx context.Context, user_name, friend_name string
 	if err != nil {
 		return nil, fmt.Errorf("failed creating board: %w", err)
 	}
-	_, err = r.entClient.User.Update().Where(user.UsernameEQ(user_name)).AddFollwer(f).Save(ctx)
+	_, err = r.entClient.User.
+		Update().
+		Where(user.UsernameEQ(user_name)).
+		AddFollwer(f).
+		Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating board: %w", err)
 	}

@@ -32,10 +32,10 @@ const UserProfile = ({ handleLogout }) => (
         <p>Welcome, <strong>{localStorage.getItem('username')}</strong></p>
         <button onClick={handleLogout}>Logout</button>
       </div>
-      <div className={`${userStyles.userStyles} ${userStyles.additionalInfo}`}>
+      {/* <div className={`${userStyles.userStyles} ${userStyles.additionalInfo}`}>
         <p>Email: example@example.com</p>
         <p>Role: Administrator</p>
-      </div>
+      </div> */}
     </div>
   );
 

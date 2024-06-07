@@ -21,6 +21,7 @@ func (User) Fields() []ent.Field {
 		field.String("password"),
 		field.Int("role").
 			Default(0),
+		field.String("email"),
 		field.Time("createdAt").
 			Default(time.Now),
 		field.Time("updatedAt").

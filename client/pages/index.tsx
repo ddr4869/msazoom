@@ -136,7 +136,7 @@ const Home = () => {
     if (isLoggedIn && accessToken) {
       fetchChats(accessToken);
       fetchFriends(accessToken);
-      //fetchFollower(accessToken); -> TODo !!
+      fetchFollower(accessToken); 
     } else {
       setChats([]);
       setFriends([]);

@@ -42,7 +42,7 @@ func (s *Server) UserCreate(c *gin.Context) {
 		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to hash password")
 		return
 	}
-	user, err := s.repository.CreateUser(c, req.Username, hash)
+	user, err := s.repository.CreateUser(c, req.Username, hash, req.Email)
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to create user")
 		return
@@ -50,6 +50,7 @@ func (s *Server) UserCreate(c *gin.Context) {
 	resp := dto.UserNormalResponse{
 		Username: user.Username,
 		Role:     user.Role,
+		Email:    user.Email,
 	}
 	dto.NewSuccessResponse(c, resp)
 }

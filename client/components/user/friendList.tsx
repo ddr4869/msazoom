@@ -8,7 +8,7 @@ const FriendsList = ({friends, navigateToFriendChat, removeFriend}) => (
     }
     {friends.map((friend) => (
       <FriendCard
-        //key={friend.id}
+        key={friend.id}
         friend={friend}
         navigateToFriendChat={navigateToFriendChat}
         removeFriend={removeFriend}

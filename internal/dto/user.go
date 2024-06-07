@@ -10,11 +10,13 @@ type UserLoginRequest struct {
 type UserCreateRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
 type UserLoginResponse struct {
 	Username    string `json:"username"`
 	Role        int    `json:"role"`
+	Email       string `json:"email"`
 	AccessToken string `json:"access_token"`
 }
 
@@ -33,11 +35,13 @@ type RemoveFriendRequest struct {
 type UserNormalResponse struct {
 	Username string `json:"username"`
 	Role     int    `json:"role"`
+	Email    string `json:"email"`
 }
 
 func UserEntToResponse(user *ent.User) UserNormalResponse {
 	return UserNormalResponse{
 		Username: user.Username,
 		Role:     user.Role,
+		Email:    user.Email,
 	}
 }
