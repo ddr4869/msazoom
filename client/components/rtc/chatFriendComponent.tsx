@@ -71,7 +71,7 @@ const ChatFriendComponent = ({ username, friendname }: { username: string, frien
     }, [messages]);
 
     const disconnect = () => {
-        sendMessage(webSocketRef.current, { disconnect: true });
+        //sendMessage(webSocketRef.current, { disconnect: true });
         closeWebSocket(webSocketRef.current);
         router.push({ pathname: '/' });
     };

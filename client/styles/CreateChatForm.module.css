@@ -1,0 +1,16 @@
+/* CreateChatForm.module.css */
+
+.form {
+  display: flex;
+  align-items: center; /* 입력창과 버튼들을 같은 높이에 맞춤 */
+  gap: 10px; /* 입력창과 버튼들 사이의 간격 설정 */
+}
+
+.input {
+  width: 200px; /* 입력창의 너비를 200px로 설정 */
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 10px; /* 버튼들 사이의 간격을 10px로 설정 */
+}

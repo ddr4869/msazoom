@@ -1,11 +1,22 @@
 import boardStyles from '@/styles/board-styles.module.css';
+export interface Chat {
+  id: number;
+  title: string;
+  admin: string;
+  created_at: string;
+}
 
-const ChatCard = ({ chat, navigateToChat }) => (
+interface ChatCardProps {
+  chat: Chat;
+  navigateToChat: (id: number) => void;
+}
+
+const ChatCard = (props:ChatCardProps) => (
   <div className={boardStyles.boardCard}>
-    <div><h2>{chat.title}</h2></div>
-    <div>Admin: {chat.admin}</div>
-    <div>Created: {chat.created_at}</div>
-    <button onClick={() => navigateToChat(chat.id)}>Enter Chat</button>{" "}
+    <div><h2>{props.chat.title}</h2></div>
+    <div>Admin: {props.chat.admin}</div>
+    <div>Created: {props.chat.created_at}</div>
+    <button onClick={() => props.navigateToChat(props.chat.id)}>Enter Chat</button>{" "}
   </div>
 );
 
