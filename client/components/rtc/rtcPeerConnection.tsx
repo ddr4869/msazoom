@@ -4,6 +4,15 @@ interface createPeerConnectionProps {
   handleTrackEvent: (event: RTCTrackEvent) => void;
 }
 
+interface RTCSessionDescriptionInit {
+  type: RTCSdpType;
+  sdp: string;
+}
+
+interface SendMessage {
+  (message: { answer: RTCSessionDescription | null }): void;
+}
+
 export const createPeerConnection = ({ handleNegotiationNeeded, handleIceCandidateEvent, handleTrackEvent }: createPeerConnectionProps): RTCPeerConnection => {
   console.log('Creating Peer Connection');
   const peer = new RTCPeerConnection({
@@ -16,15 +25,6 @@ export const createPeerConnection = ({ handleNegotiationNeeded, handleIceCandida
 
   return peer;
 };
-
-interface RTCSessionDescriptionInit {
-  type: RTCSdpType;
-  sdp: string;
-}
-
-interface SendMessage {
-  (message: { answer: RTCSessionDescription | null }): void;
-}
 
 export const handleOffer = async (
   peer: RTCPeerConnection,

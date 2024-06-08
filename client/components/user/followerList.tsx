@@ -1,5 +1,4 @@
 import boardStyles from '@/styles/board-styles.module.css';
-import FriendCard from './friendCard';
 import FollowerCard from './followerCard';
 interface FollowerListProps {
   followers: { id: number; username: string }[];

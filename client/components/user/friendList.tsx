@@ -2,8 +2,8 @@ import boardStyles from '@/styles/board-styles.module.css';
 import FriendCard from './friendCard';
 interface FriendListProps {
   friends: { id: number; username: string }[];
-  navigateToFriendChat: (id: number) => void;
-  removeFriend: (id: number) => void;
+  navigateToFriendChat: (name: string) => void;
+  removeFriend: (name: string) => void;
 }
 const FriendsList = ({friends, navigateToFriendChat, removeFriend}:FriendListProps) => (
     <div className={boardStyles.friendList}>

@@ -1,4 +1,13 @@
-const SignupForm = ( {username, setUsername, password, setPassword, handleSubmit, setShowSignupForm} ) => { 
+interface SignupFormProps {
+    username: string;
+    setUsername: (username: string) => void;
+    password: string;
+    setPassword: (password: string) => void;
+    handleSubmit: (e: React.FormEvent) => void;
+    setShowSignupForm: (showSignupForm: boolean) => void;
+}
+
+const SignupForm = ( {username, setUsername, password, setPassword, handleSubmit, setShowSignupForm}:SignupFormProps ) => { 
     return (     
         <form onSubmit={handleSubmit}>
             <input 

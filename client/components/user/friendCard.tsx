@@ -1,6 +1,10 @@
 import boardStyles from '@/styles/board-styles.module.css';
-
-const FriendCard = ({ friend, navigateToFriendChat, removeFriend }) => (
+interface FriendCardProps {
+  friend: { id: number; username: string };
+  navigateToFriendChat: (username: string) => void;
+  removeFriend: (username: string) => void;
+}
+const FriendCard = ({ friend, navigateToFriendChat, removeFriend }:FriendCardProps) => (
   <div className={boardStyles.boardCard}>
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <h2 style={{ marginRight: 'auto', letterSpacing: '2px' }}>

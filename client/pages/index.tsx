@@ -65,7 +65,7 @@ const Home = () => {
     });
   }
 
-  const navigateToFriendChat = (friendId: any) => {
+  const navigateToFriendChat = (friendId: string) => {
     console.log("friendId -> ", friendId)
     router.push({
       pathname: `/friend`,
@@ -73,7 +73,7 @@ const Home = () => {
     });
   }
 
-  const removeFriend = (friendId: any) => {
+  const removeFriend = (friendId: string) => {
     if (confirm('친구목록에서 삭제하겠습니까?')) {
       RemoveFriendAxios(accessToken, friendId).then(() => {
         console.log("remove friend success")

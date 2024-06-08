@@ -46,7 +46,10 @@
     ```
     http://localhost:3000
 
-
+3. Deployment(daemon)
+    ```bash
+    docker-compose up -d
+    ``` 
 
 
 ## 사용 방법

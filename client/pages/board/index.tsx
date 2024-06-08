@@ -13,7 +13,7 @@ const Home = () => {
   const [boards, setBoards] = useState([]);
   const [boardReload, setBoardReload] = useState(false);
   const [showCreateBoardForm, setShowCreateBoardForm] = useState(false);
-  const accessToken = localStorage.getItem('accessToken') || '';
+  const [accessToken, setAccessToken] = useState<string>('');
   const router = useRouter();
 
   const handleCreateBoardClick = () => {
@@ -60,7 +60,8 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') || '';
+    setAccessToken(token);
     setIsLoggedIn(!!accessToken);
   }, []);
 
