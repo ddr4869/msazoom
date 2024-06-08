@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styles from '@/styles/user-styles.module.css';
 
-const AddFriendModal = ({ onClose }) => {
+const AddFriendModal = ({ onClose }:any) => {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -19,6 +19,12 @@ const AddFriendModal = ({ onClose }) => {
     return null;
   }
 
+  const modalRoot = document.getElementById('modal-root');
+  if (!modalRoot) {
+    console.error('The element with id "modal-root" was not found.');
+    return null;
+  }
+
   return ReactDOM.createPortal(
     <div className={styles['modal-overlay']}>
       <div className={styles.modal}>
@@ -29,7 +35,7 @@ const AddFriendModal = ({ onClose }) => {
         </div>
       </div>
     </div>,
-    document.getElementById('modal-root')
+    modalRoot
   );
 }
 

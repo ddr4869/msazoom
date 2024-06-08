@@ -1,10 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const ChatModal = ({ onClose }) => {
+interface ChatModalProps {
+  onClose: () => void;
+}
+
+const ChatModal: React.FC<ChatModalProps> = ({ onClose }) => {
   const handleSendMessage = () => {
     // 메시지 전송 기능 구현
   };
+
+  const modalRoot = document.getElementById('modal-root');
+  if (!modalRoot) {
+    console.error('The element with id "modal-root" was not found.');
+    return null;
+  }
 
   return ReactDOM.createPortal(
     <div className="modal">
@@ -15,8 +25,8 @@ const ChatModal = ({ onClose }) => {
         <button onClick={handleSendMessage}>Send</button>
       </div>
     </div>,
-    document.getElementById('modal-root') // 모달이 렌더링될 DOM 노드 지정
+    modalRoot
   );
-}
+};
 
 export default ChatModal;

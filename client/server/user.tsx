@@ -1,6 +1,5 @@
 import axios from './axios'
-
-export const LoginAxios = (username, password) => {
+export const LoginAxios = (username:string, password:string) => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
@@ -28,7 +27,7 @@ export const LoginAxios = (username, password) => {
 }
 
 // signupAxios
-export const SignupAxios = (username, password) => {
+export const SignupAxios = (username:string, password:string) => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {

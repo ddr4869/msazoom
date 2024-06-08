@@ -1,5 +1,5 @@
 
-const CreateBoardForm = ({ handleSubmitBoardForm, setShowCreateBoardForm }) => (
+const CreateBoardForm = ({ handleSubmitBoardForm, setShowCreateBoardForm }:any) => (
   <form onSubmit={handleSubmitBoardForm}>
     <input type="text" placeholder="Board Name" name="board_name" required />
     <input type="password" placeholder="Board Password" name="board_password" required />

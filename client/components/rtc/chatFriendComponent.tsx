@@ -6,10 +6,15 @@ import { getFriendMessageAxios } from '@/server/message';
 const ChatFriendComponent = ({ username, friendname }: { username: string, friendname: string }) => {
     const router = useRouter();
     const webSocketRef = useRef<WebSocket | null>(null);
-    const [messages, setMessages] = useState([]);
+    interface Message {
+        message: string;
+        sender: string;
+        receiver: string;
+    }
+    const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
-    const chatContainerRef = useRef();
-
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+    
     const handleWebSocketMessage = async (e: any) => {
         console.log('WebSocket message received:', e.data);
         const message = JSON.parse(e.data);
@@ -22,7 +27,8 @@ const ChatFriendComponent = ({ username, friendname }: { username: string, frien
     useEffect(() => {
         const start = async () => {
             try {
-                const response = await getFriendMessageAxios(localStorage.getItem("accessToken"), friendname);
+                const accessToken = localStorage.getItem("accessToken") || '';
+                const response = await getFriendMessageAxios(accessToken, friendname);
                 setMessages(response);
             } catch (error) {
                 console.error('Error fetching messages:', error);
@@ -72,7 +78,9 @@ const ChatFriendComponent = ({ username, friendname }: { username: string, frien
 
     const disconnect = () => {
         //sendMessage(webSocketRef.current, { disconnect: true });
-        closeWebSocket(webSocketRef.current);
+        if (webSocketRef.current) {
+            closeWebSocket(webSocketRef.current);
+        }
         router.push({ pathname: '/' });
     };
 

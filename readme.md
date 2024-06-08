@@ -1,8 +1,10 @@
 # WebRTC와 WebSocket을 이용한 화상채팅 애플리케이션
 
 ### TODO
-- 기능별 MSA 분리 및 적용 
-- gRPC 적용
+- 기능별 MSA 분리
+    - Pub/Sub 적용 (Kafka?)
+    - gRPC로 서비스간 통신
+- 1:N Streaming
 
 ## 주요 기능
 

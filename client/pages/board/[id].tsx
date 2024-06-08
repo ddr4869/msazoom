@@ -1,13 +1,12 @@
 // /pages/[id].js
 import { useRouter } from 'next/router';
 import { useSession, SessionProvider } from 'next-auth/react';
-import { useWebSocket } from '../socket/websocket';
 import WebRTCComponent from '@/components/rtc/webRTCComponent';
 import { useEffect } from 'react';
 
-export default function Page({ id }) {
+export default function Page({ id }:any) {
   const router = useRouter();
-  const username = localStorage.getItem('username')
+  const username = localStorage.getItem('username') || '';
   const { data: session } = useSession();
   
   const navigateToDashboard = () => {
@@ -26,6 +25,6 @@ export default function Page({ id }) {
   );
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(context:any) {
   return { props: { id: context.params.id } };
 }

@@ -1,52 +1,56 @@
-// WebRTCComponent.js
-import { useEffect, useState, useRef } from 'react';
+// WebRTCComponent.tsx
+import { useEffect, useState, useRef, MutableRefObject } from 'react';
 import { useRouter } from 'next/router';
 import { initializeChatWebSocket, sendMessage, closeWebSocket } from './webSocket';
 import { createPeerConnection, handleOffer, addIceCandidate, closePeerConnection } from './rtcPeerConnection';
 import { openCamera, stopStreamTracks } from './video';
 import { CheckFriendAxios, AddFriendAxios } from '@/server/user';
 
+interface WebRTCComponentProps {
+  chatId: string;
+  userId: string;
+}
 
-const WebRTCComponent = ({ chatId, userId }) => {
+const WebRTCComponent = ({ chatId, userId }: WebRTCComponentProps) => {
   const router = useRouter();
-  const userVideo = useRef();
-  const userStream = useRef();
-  const partnerVideo = useRef();
-  const peerRef = useRef();
-  const webSocketRef = useRef();
-  const chatEndRef = useRef();
-  const [partnerUsername, setPartnerUsername] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const userVideo = useRef<HTMLVideoElement>(null);
+  const userStream = useRef<MediaStream | null>(null);
+  const partnerVideo = useRef<HTMLVideoElement>(null);
+  const peerRef = useRef<RTCPeerConnection | null>(null);
+  const webSocketRef = useRef<WebSocket | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [partnerUsername, setPartnerUsername] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Array<{ from: string; text: string }>>([]);
   const [newMessage, setNewMessage] = useState('');
 
-  const handleWebSocketMessage = async (e) => {
+  const handleWebSocketMessage = async (e: MessageEvent) => {
     const message = JSON.parse(e.data);
 
     if (message.join) {
       console.log('Joining Room -> ', message.join);
       setPartnerUsername(message.partnerUsername);
-      setMessages((prevMessages) => [...prevMessages, { from: 'System', text: message.partnerUsername+' Joined' }]);
-      webSocketRef.current.send(JSON.stringify({ hostUserName: userId })); 
+      setMessages((prevMessages) => [...prevMessages, { from: 'System', text: message.partnerUsername + ' Joined' }]);
+      webSocketRef.current?.send(JSON.stringify({ hostUserName: userId }));
       await createAndCallUser();
     }
 
     if (message.hostUserName) {
-        console.log('Host -> ', message.hostUserName);
-        setPartnerUsername(message.hostUserName);
-        setMessages((prevMessages) => [...prevMessages, { from: 'System', text: 'You Joined Chat' }]);
+      console.log('Host -> ', message.hostUserName);
+      setPartnerUsername(message.hostUserName);
+      setMessages((prevMessages) => [...prevMessages, { from: 'System', text: 'You Joined Chat' }]);
     }
 
     if (message.offer) {
       console.log('Receiving Offer -> ', message.offer);
-      await handleOffer(peerRef.current, message.offer, userStream.current, (msg) => sendMessage(webSocketRef.current, msg));
+      await handleOffer(peerRef.current!, message.offer, userStream.current!, (msg) => sendMessage(webSocketRef.current!, msg));
     }
 
     if (message.answer) {
-      await peerRef.current.setRemoteDescription(new RTCSessionDescription(message.answer));
+      await peerRef.current?.setRemoteDescription(new RTCSessionDescription(message.answer));
     }
 
     if (message.iceCandidate && peerRef.current) {
-      console.log("iceCandidate", message.iceCandidate)
+      console.log("iceCandidate", message.iceCandidate);
       await addIceCandidate(peerRef.current, message.iceCandidate);
     }
 
@@ -63,10 +67,9 @@ const WebRTCComponent = ({ chatId, userId }) => {
 
   useEffect(() => {
     const start = async () => {
-      userStream.current = await openCamera(userVideo, userStream);
-      webSocketRef.current = initializeChatWebSocket({chatId, userId, handleWebSocketMessage});
-      peerRef.current = createPeerConnection(handleNegotiationNeeded, handleIceCandidateEvent, handleTrackEvent);
-      
+      userStream.current = await openCamera({ userVideoRef: userVideo, userStreamRef: userStream });
+      webSocketRef.current = initializeChatWebSocket({ chatId, userId, handleWebSocketMessage });
+      peerRef.current = createPeerConnection({ handleNegotiationNeeded, handleIceCandidateEvent, handleTrackEvent });
     };
 
     if (chatId) {
@@ -75,45 +78,47 @@ const WebRTCComponent = ({ chatId, userId }) => {
   }, [chatId]);
 
   useEffect(() => {
-    chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const createAndCallUser = async () => {
     if (peerRef.current) {
       closePeerConnection(peerRef.current);
     }
-    peerRef.current = createPeerConnection(handleNegotiationNeeded, handleIceCandidateEvent, handleTrackEvent);
+    peerRef.current = createPeerConnection({ handleNegotiationNeeded, handleIceCandidateEvent, handleTrackEvent });
     callUser();
   };
 
   const callUser = async () => {
-    userStream.current.getTracks().forEach(track => {
-      peerRef.current.addTrack(track, userStream.current);
+    userStream.current?.getTracks().forEach(track => {
+      peerRef.current?.addTrack(track, userStream.current!);
     });
   };
 
   const handleNegotiationNeeded = async () => {
-    console.log("Negotiation Needed")
-    const offer = await peerRef.current.createOffer();
-    await peerRef.current.setLocalDescription(offer);
-    sendMessage(webSocketRef.current, { offer: peerRef.current.localDescription });
+    console.log("Negotiation Needed");
+    const offer = await peerRef.current!.createOffer();
+    await peerRef.current!.setLocalDescription(offer);
+    sendMessage(webSocketRef.current!, { offer: peerRef.current!.localDescription });
   };
 
-  const handleIceCandidateEvent = (e) => {
-    console.log("Ice Candidate Event")
+  const handleIceCandidateEvent = (e: RTCPeerConnectionIceEvent) => {
+    console.log("Ice Candidate Event");
     if (e.candidate) {
-      sendMessage(webSocketRef.current, { iceCandidate: e.candidate });
+      sendMessage(webSocketRef.current!, { iceCandidate: e.candidate });
     }
   };
 
-  const handleTrackEvent = (e) => {
-    console.log("Track Event")
-    partnerVideo.current.srcObject = e.streams[0];
+  const handleTrackEvent = (e: RTCTrackEvent) => {
+    console.log("Track Event");
+    if (partnerVideo.current) {
+      partnerVideo.current.srcObject = e.streams[0];
+    }
   };
 
   const handlePeerDisconnect = () => {
-    if (partnerVideo.current && partnerVideo.current.srcObject) {
-      stopStreamTracks(partnerVideo.current.srcObject);
+    if (partnerVideo.current?.srcObject) {
+      stopStreamTracks(partnerVideo.current.srcObject as MediaStream);
       partnerVideo.current.srcObject = null;
     }
     closePeerConnection(peerRef.current);
@@ -137,53 +142,63 @@ const WebRTCComponent = ({ chatId, userId }) => {
   }, []);
 
   const disconnect = () => {
-    sendMessage(webSocketRef.current, { disconnect: true });
-    stopStreamTracks(userStream.current);
-    closePeerConnection(peerRef.current);
-    closeWebSocket(webSocketRef.current);
+    sendMessage(webSocketRef.current!, { disconnect: true });
+    if (userStream.current) {
+      stopStreamTracks(userStream.current);
+    }
+    if (peerRef.current) {
+      closePeerConnection(peerRef.current);
+    }
+    if (webSocketRef.current) {
+      closeWebSocket(webSocketRef.current);
+    }
   };
 
   const handleSendMessage = () => {
     if (newMessage.trim() !== '') {
       console.log('new Message -> ', newMessage);
-      sendMessage(webSocketRef.current, { chatMessage: newMessage, chatFrom: userId});
+      sendMessage(webSocketRef.current!, { chatMessage: newMessage, chatFrom: userId });
       setMessages((prevMessages) => [...prevMessages, { from: 'Me', text: newMessage }]);
       setNewMessage('');
     }
   };
 
-  const  handleUsernameClick = () => {
-    CheckFriendAxios(localStorage.getItem('accessToken'), partnerUsername).
-      then((data) => {
-        console.log("res->", data)
+  const handleUsernameClick = () => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) return;
+
+    CheckFriendAxios(accessToken, partnerUsername!)
+      .then((data) => {
+        console.log("res->", data);
         if (data === true) {
           alert(partnerUsername + "는 이미 친구입니다.");
         } else {
-          if (confirm(partnerUsername + "를 친구 추가 하시겠습니까?")){
-            console.log("친구 추가")
-            AddFriendAxios(localStorage.getItem('accessToken'), partnerUsername).then((data) => {
+          if (confirm(partnerUsername + "를 친구 추가 하시겠습니까?")) {
+            console.log("친구 추가");
+            AddFriendAxios(accessToken, partnerUsername!).then((data) => {
               alert(partnerUsername + "가 친구로 추가되었습니다.");
               // have to send gRPC to server
-            })
-        }}
-      }).catch((err) => { 
+            });
+          }
+        }
+      })
+      .catch((err) => {
         console.log(err);
-      }
-    )
-  }
+      });
+  };
 
   return (
     <div>
       <button onClick={navigateToHome}>Disconnect</button>
       <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', top: '100px', right: '100px', borderRadius: '10px', overflow: 'hidden' }}>
         <div style={{ textAlign: 'center' }}>
-            {
-                partnerUsername ? (   
-                <h2 onClick={handleUsernameClick} style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline'  }}>{partnerUsername}</h2>
-                ) : (
-                    <h2>Waiting for Partner</h2>
-                )
-            }
+          {
+            partnerUsername ? (
+              <h2 onClick={handleUsernameClick} style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}>{partnerUsername}</h2>
+            ) : (
+              <h2>Waiting for Partner</h2>
+            )
+          }
           <video playsInline autoPlay controls ref={partnerVideo} style={{ width: '500px', height: '350px' }} />
         </div>
         <div style={{ textAlign: 'center' }}>
@@ -208,7 +223,7 @@ const WebRTCComponent = ({ chatId, userId }) => {
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyPress={(e) => {
             if (e.key === 'Enter') {
-              handleSendMessage()
+              handleSendMessage();
             }
           }}
           //onKeyDown={handleKeyDown} // 한글 입력시 버그 발생

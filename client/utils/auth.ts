@@ -1,6 +1,7 @@
 import { LoginAxios, SignupAxios } from '@/server/user';
+import { FormEvent } from 'react';
 
-export const handleLogin = async (username: string, password: string, setIsLoggedIn: (value: boolean) => void, event: FormEvent<HTMLFormElement>) => {
+export const handleLogin = async (username: string, password: string, setIsLoggedIn: (value: boolean) => void, event: any) => {
   event.preventDefault();
   await LoginAxios(username, password);
   setIsLoggedIn(true);

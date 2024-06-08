@@ -1,7 +1,11 @@
 import boardStyles from '@/styles/board-styles.module.css';
 import FriendCard from './friendCard';
-
-const FriendsList = ({friends, navigateToFriendChat, removeFriend}) => (
+interface FriendListProps {
+  friends: { id: number; username: string }[];
+  navigateToFriendChat: (id: number) => void;
+  removeFriend: (id: number) => void;
+}
+const FriendsList = ({friends, navigateToFriendChat, removeFriend}:FriendListProps) => (
     <div className={boardStyles.friendList}>
     {friends.length === 0 && 
       <h2> 친구가 없어요 ㅠ.</h2>

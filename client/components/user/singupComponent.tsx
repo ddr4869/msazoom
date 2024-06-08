@@ -9,7 +9,7 @@ const SignUpComponent = () => {
   const [password, setPassword] = useState('');
   const [showSignupForm, setShowSignupForm] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e:any) => {
     e.preventDefault();
     console.log("username -> ", username)
     SignupAxios(username, password).then((res) => {

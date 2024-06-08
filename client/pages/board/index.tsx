@@ -1,11 +1,10 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from "next/router";
 import { createBoardAxios, getBoardsAxios, recommendBoardAxios, deleteBoardAxios } from '@/server/board';
-import BoardList from '@/components/Board/BoardList';
+import BoardList from '@/components/board/boardList';
 import CreateBoardForm from '@/ui/board/createBoardForm';
-import LoginForm from '@/components/User/LoginForm';
-import UserProfile from '@/components/User/UserProfile';
-import { handleLogin, handleLogout } from '@/utils/auth';
+import LoginForm from '@/components/user/loginForm';
+import { handleLogin } from '@/utils/auth';
 
 const Home = () => {
   const [username, setUsername] = useState('');
@@ -14,6 +13,7 @@ const Home = () => {
   const [boards, setBoards] = useState([]);
   const [boardReload, setBoardReload] = useState(false);
   const [showCreateBoardForm, setShowCreateBoardForm] = useState(false);
+  const accessToken = localStorage.getItem('accessToken') || '';
   const router = useRouter();
 
   const handleCreateBoardClick = () => {
@@ -26,7 +26,7 @@ const Home = () => {
       const formData = new FormData(event.currentTarget);
       const boardName = formData.get('board_name') as string;
       const boardPassword = formData.get('board_password') as string;
-      await createBoardAxios(localStorage.getItem('accessToken'), boardName, boardPassword);
+      await createBoardAxios(accessToken, boardName, boardPassword);
       setShowCreateBoardForm(false);
       setBoardReload(true);
     } catch (error) {
@@ -52,7 +52,7 @@ const Home = () => {
 
   const handleDeleteBoard = async (board_id: number, board_password: string) => {
     try {
-      await deleteBoardAxios(localStorage.getItem('accessToken'), board_id, board_password);
+      await deleteBoardAxios(accessToken, board_id, board_password);
       setBoardReload(true);
     } catch (error) {
       console.error('Error deleting board:', error);
@@ -60,7 +60,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = localStorage.getItem('accessToken') || '';
     setIsLoggedIn(!!accessToken);
   }, []);
 
@@ -88,7 +88,7 @@ const Home = () => {
       <header>
         <h1>Chat Board</h1>
         <div id="login-section">
-          {!isLoggedIn ? (
+          {!isLoggedIn && (
             <LoginForm
               username={username}
               setUsername={setUsername}
@@ -96,9 +96,8 @@ const Home = () => {
               setPassword={setPassword}
               handleLogin={(event) => handleLogin(username, password, setIsLoggedIn, event)}
             />
-          ) : (
-            <UserProfile handleLogout={() => handleLogout(setIsLoggedIn)} />
-          )}
+          ) 
+        }
         </div>
       </header>
       <main>
