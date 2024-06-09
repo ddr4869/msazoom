@@ -1,10 +1,11 @@
 import axios from './axios'
 
-export const getBoardsAxios = (token:string) => {
+export const getBoardsAxios = () => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
         const reqUrl = '/board';
+        const token = localStorage.getItem('accessToken')
         axios.get(reqUrl,  {
             headers: {
               // Bearer 토큰을 Authorization 헤더에 추가
@@ -26,10 +27,11 @@ export const getBoardsAxios = (token:string) => {
 }
 
 // create board
-export const createBoardAxios = (token:string, board_name:string, board_password:string) => {
+export const createBoardAxios = (board_name:string, board_password:string) => {
     try {
       return new Promise<any>((resolve, reject) => {
         const reqUrl = '/board';
+        const token = localStorage.getItem('accessToken')
         axios.post(reqUrl, {
             board_name: board_name,
             board_password: board_password
@@ -78,10 +80,11 @@ export const recommendBoardAxios = (board_id:number) => {
 }
 
 // delete board
-export const deleteBoardAxios = (token:string, board_id:number, board_password:string) => {
+export const deleteBoardAxios = (board_id:number, board_password:string) => {
     try {
       return new Promise<any>((resolve, reject) => {
         const reqUrl = `/board/remove`;
+        const token = localStorage.getItem('accessToken')
         axios.post(reqUrl, {
           board_id: board_id,
           board_password: board_password

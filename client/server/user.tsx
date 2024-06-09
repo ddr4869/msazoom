@@ -50,11 +50,12 @@ export const SignupAxios = (username:string, password:string) => {
     }
 }
 
-export const CheckFriendAxios = (token:string, friend_name: string) => {
+export const CheckFriendAxios = (friend_name: string) => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
         const reqUrl = '/user/friend/check?friend=' + friend_name;
+        const token = localStorage.getItem('accessToken') || '';
         axios.get(reqUrl,  {
           headers: {
             // Bearer 토큰을 Authorization 헤더에 추가
@@ -75,11 +76,12 @@ export const CheckFriendAxios = (token:string, friend_name: string) => {
     }
 }
 
-export const AddFriendAxios = (token:string, friend_name: string) => {
+export const AddFriendAxios = (friend_name: string) => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
         const reqUrl = '/user/friend';
+        const token = localStorage.getItem('accessToken') || '';
         axios.post(reqUrl, {
           friend: friend_name
         }, {
@@ -102,11 +104,12 @@ export const AddFriendAxios = (token:string, friend_name: string) => {
     }
 }
 
-export const GetFriendsAxios = (token:string) => {
+export const GetFriendsAxios = () => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
         const reqUrl = '/user/friend';
+        const token = localStorage.getItem('accessToken') || '';
         axios.get(reqUrl,  {
           headers: {
             // Bearer 토큰을 Authorization 헤더에 추가
@@ -127,11 +130,12 @@ export const GetFriendsAxios = (token:string) => {
     }
 }
 
-export const RemoveFriendAxios = (token:string, friend_id: string) => {
+export const RemoveFriendAxios = (friend_id: string) => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
         const reqUrl = '/user/friend?friend=' + friend_id;
+        const token = localStorage.getItem('accessToken') || '';
         axios.delete(reqUrl,  {
           headers: {
             // Bearer 토큰을 Authorization 헤더에 추가
@@ -152,11 +156,12 @@ export const RemoveFriendAxios = (token:string, friend_id: string) => {
     }
 }
 
-export const GetFollowerAxios = (token:string) => {
+export const GetFollowerAxios = () => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
         const reqUrl = '/user/friend/follower';
+        const token = localStorage.getItem('accessToken') || '';
         axios.get(reqUrl,  {
           headers: {
             // Bearer 토큰을 Authorization 헤더에 추가

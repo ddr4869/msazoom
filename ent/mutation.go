@@ -790,6 +790,7 @@ type ChatMutation struct {
 	id            *int
 	chat_name     *string
 	chat_user     *string
+	chat_password *string
 	createdAt     *time.Time
 	updatedAt     *time.Time
 	clearedFields map[string]struct{}
@@ -968,6 +969,55 @@ func (m *ChatMutation) ResetChatUser() {
 	m.chat_user = nil
 }
 
+// SetChatPassword sets the "chat_password" field.
+func (m *ChatMutation) SetChatPassword(s string) {
+	m.chat_password = &s
+}
+
+// ChatPassword returns the value of the "chat_password" field in the mutation.
+func (m *ChatMutation) ChatPassword() (r string, exists bool) {
+	v := m.chat_password
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChatPassword returns the old "chat_password" field's value of the Chat entity.
+// If the Chat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChatMutation) OldChatPassword(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChatPassword is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChatPassword requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChatPassword: %w", err)
+	}
+	return oldValue.ChatPassword, nil
+}
+
+// ClearChatPassword clears the value of the "chat_password" field.
+func (m *ChatMutation) ClearChatPassword() {
+	m.chat_password = nil
+	m.clearedFields[chat.FieldChatPassword] = struct{}{}
+}
+
+// ChatPasswordCleared returns if the "chat_password" field was cleared in this mutation.
+func (m *ChatMutation) ChatPasswordCleared() bool {
+	_, ok := m.clearedFields[chat.FieldChatPassword]
+	return ok
+}
+
+// ResetChatPassword resets all changes to the "chat_password" field.
+func (m *ChatMutation) ResetChatPassword() {
+	m.chat_password = nil
+	delete(m.clearedFields, chat.FieldChatPassword)
+}
+
 // SetCreatedAt sets the "createdAt" field.
 func (m *ChatMutation) SetCreatedAt(t time.Time) {
 	m.createdAt = &t
@@ -1074,12 +1124,15 @@ func (m *ChatMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChatMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.chat_name != nil {
 		fields = append(fields, chat.FieldChatName)
 	}
 	if m.chat_user != nil {
 		fields = append(fields, chat.FieldChatUser)
+	}
+	if m.chat_password != nil {
+		fields = append(fields, chat.FieldChatPassword)
 	}
 	if m.createdAt != nil {
 		fields = append(fields, chat.FieldCreatedAt)
@@ -1099,6 +1152,8 @@ func (m *ChatMutation) Field(name string) (ent.Value, bool) {
 		return m.ChatName()
 	case chat.FieldChatUser:
 		return m.ChatUser()
+	case chat.FieldChatPassword:
+		return m.ChatPassword()
 	case chat.FieldCreatedAt:
 		return m.CreatedAt()
 	case chat.FieldUpdatedAt:
@@ -1116,6 +1171,8 @@ func (m *ChatMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldChatName(ctx)
 	case chat.FieldChatUser:
 		return m.OldChatUser(ctx)
+	case chat.FieldChatPassword:
+		return m.OldChatPassword(ctx)
 	case chat.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case chat.FieldUpdatedAt:
@@ -1142,6 +1199,13 @@ func (m *ChatMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetChatUser(v)
+		return nil
+	case chat.FieldChatPassword:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChatPassword(v)
 		return nil
 	case chat.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -1186,7 +1250,11 @@ func (m *ChatMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ChatMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(chat.FieldChatPassword) {
+		fields = append(fields, chat.FieldChatPassword)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1199,6 +1267,11 @@ func (m *ChatMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ChatMutation) ClearField(name string) error {
+	switch name {
+	case chat.FieldChatPassword:
+		m.ClearChatPassword()
+		return nil
+	}
 	return fmt.Errorf("unknown Chat nullable field %s", name)
 }
 
@@ -1211,6 +1284,9 @@ func (m *ChatMutation) ResetField(name string) error {
 		return nil
 	case chat.FieldChatUser:
 		m.ResetChatUser()
+		return nil
+	case chat.FieldChatPassword:
+		m.ResetChatPassword()
 		return nil
 	case chat.FieldCreatedAt:
 		m.ResetCreatedAt()

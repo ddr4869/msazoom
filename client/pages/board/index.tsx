@@ -26,7 +26,7 @@ const Home = () => {
       const formData = new FormData(event.currentTarget);
       const boardName = formData.get('board_name') as string;
       const boardPassword = formData.get('board_password') as string;
-      await createBoardAxios(accessToken, boardName, boardPassword);
+      await createBoardAxios(boardName, boardPassword);
       setShowCreateBoardForm(false);
       setBoardReload(true);
     } catch (error) {
@@ -52,7 +52,7 @@ const Home = () => {
 
   const handleDeleteBoard = async (board_id: number, board_password: string) => {
     try {
-      await deleteBoardAxios(accessToken, board_id, board_password);
+      await deleteBoardAxios(board_id, board_password);
       setBoardReload(true);
     } catch (error) {
       console.error('Error deleting board:', error);
@@ -66,9 +66,9 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const fetchBoards = async (token: string) => {
+    const fetchBoards = async () => {
       try {
-        const response = await getBoardsAxios(token);
+        const response = await getBoardsAxios();
         setBoards(response);
       } catch (error) {
         console.error('Error fetching boards:', error);
@@ -77,7 +77,7 @@ const Home = () => {
 
     const accessToken = localStorage.getItem('accessToken');
     if (isLoggedIn && accessToken) {
-      fetchBoards(accessToken);
+      fetchBoards();
     } else {
       setBoards([]);
     }

@@ -56,6 +56,26 @@ func (cu *ChatUpdate) SetNillableChatUser(s *string) *ChatUpdate {
 	return cu
 }
 
+// SetChatPassword sets the "chat_password" field.
+func (cu *ChatUpdate) SetChatPassword(s string) *ChatUpdate {
+	cu.mutation.SetChatPassword(s)
+	return cu
+}
+
+// SetNillableChatPassword sets the "chat_password" field if the given value is not nil.
+func (cu *ChatUpdate) SetNillableChatPassword(s *string) *ChatUpdate {
+	if s != nil {
+		cu.SetChatPassword(*s)
+	}
+	return cu
+}
+
+// ClearChatPassword clears the value of the "chat_password" field.
+func (cu *ChatUpdate) ClearChatPassword() *ChatUpdate {
+	cu.mutation.ClearChatPassword()
+	return cu
+}
+
 // SetCreatedAt sets the "createdAt" field.
 func (cu *ChatUpdate) SetCreatedAt(t time.Time) *ChatUpdate {
 	cu.mutation.SetCreatedAt(t)
@@ -131,6 +151,12 @@ func (cu *ChatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.ChatUser(); ok {
 		_spec.SetField(chat.FieldChatUser, field.TypeString, value)
 	}
+	if value, ok := cu.mutation.ChatPassword(); ok {
+		_spec.SetField(chat.FieldChatPassword, field.TypeString, value)
+	}
+	if cu.mutation.ChatPasswordCleared() {
+		_spec.ClearField(chat.FieldChatPassword, field.TypeString)
+	}
 	if value, ok := cu.mutation.CreatedAt(); ok {
 		_spec.SetField(chat.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -182,6 +208,26 @@ func (cuo *ChatUpdateOne) SetNillableChatUser(s *string) *ChatUpdateOne {
 	if s != nil {
 		cuo.SetChatUser(*s)
 	}
+	return cuo
+}
+
+// SetChatPassword sets the "chat_password" field.
+func (cuo *ChatUpdateOne) SetChatPassword(s string) *ChatUpdateOne {
+	cuo.mutation.SetChatPassword(s)
+	return cuo
+}
+
+// SetNillableChatPassword sets the "chat_password" field if the given value is not nil.
+func (cuo *ChatUpdateOne) SetNillableChatPassword(s *string) *ChatUpdateOne {
+	if s != nil {
+		cuo.SetChatPassword(*s)
+	}
+	return cuo
+}
+
+// ClearChatPassword clears the value of the "chat_password" field.
+func (cuo *ChatUpdateOne) ClearChatPassword() *ChatUpdateOne {
+	cuo.mutation.ClearChatPassword()
 	return cuo
 }
 
@@ -289,6 +335,12 @@ func (cuo *ChatUpdateOne) sqlSave(ctx context.Context) (_node *Chat, err error) 
 	}
 	if value, ok := cuo.mutation.ChatUser(); ok {
 		_spec.SetField(chat.FieldChatUser, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.ChatPassword(); ok {
+		_spec.SetField(chat.FieldChatPassword, field.TypeString, value)
+	}
+	if cuo.mutation.ChatPasswordCleared() {
+		_spec.ClearField(chat.FieldChatPassword, field.TypeString)
 	}
 	if value, ok := cuo.mutation.CreatedAt(); ok {
 		_spec.SetField(chat.FieldCreatedAt, field.TypeTime, value)

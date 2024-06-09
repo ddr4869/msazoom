@@ -1,5 +1,3 @@
-import { getFriendMessageAxios } from "@/server/message";
-
 type initializeMessageWebSocketProps = {
   username: string;
   friendname: string;

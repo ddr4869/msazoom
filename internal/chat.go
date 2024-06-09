@@ -7,6 +7,7 @@ import (
 
 	"github.com/ddr4869/msazoom/internal/dto"
 	"github.com/ddr4869/msazoom/internal/socket"
+	"github.com/ddr4869/msazoom/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,7 +29,16 @@ func (s *Server) GetChat(c *gin.Context) {
 
 func (s *Server) CreateChat(c *gin.Context) {
 	req := c.MustGet("req").(dto.CreateChatRequest)
-	chat, err := s.repository.CreateChat(c, req.Title, req.Username)
+	hash := ""
+	var err error
+	if req.Password != "" {
+		hash, err = utils.HashPassword(req.Password)
+		if err != nil {
+			dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to hash password")
+			return
+		}
+	}
+	chat, err := s.repository.CreateChat(c, req.Title, req.Username, hash)
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to create chat")
 	}
@@ -43,10 +53,21 @@ func (s *Server) JoinChat(c *gin.Context) {
 	if err != nil {
 		log.Fatal("Web Socket Upgrade Error", err)
 	}
-
+	hash := ""
+	if req.Password != "" {
+		hash, err = utils.HashPassword(req.Password)
+		if err != nil {
+			dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to hash password")
+			return
+		}
+	}
 	chat, err := s.repository.GetChat(c, req.ChatID)
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to get chat")
+		return
+	}
+	if chat.ChatPassword != hash {
+		dto.NewErrorResponse(c, http.StatusBadRequest, nil, "Password is incorrect")
 		return
 	}
 

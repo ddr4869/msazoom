@@ -15,7 +15,7 @@ const Home = () => {
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [chats, setChats] = useState([]);
-  const [friends, setFriends] = useState([]);
+  const [friends, setFriends] = useState<any>([]);
   const [followers, setFollowers] = useState([]);
   const [chatReload, setChatReload] = useState(false);
   const [showCreateChatForm, setShowCreateChatForm] = useState(false);
@@ -30,8 +30,7 @@ const Home = () => {
     try {
       const formData = new FormData(event.currentTarget);
       const chat_title = formData.get('title') as string;
-      const response = await createChatAxios(accessToken, username, chat_title);
-      console.log("handleSubmitChatForm response -> ", response)
+      const response = await createChatAxios(username, chat_title);
       setShowCreateChatForm(false);
       setChatReload(true);
       router.push({
@@ -44,7 +43,7 @@ const Home = () => {
 
 
   const navigateToChat = (chatId: any) => {
-    getChatAxios(accessToken, chatId).then((response) => {
+    getChatAxios(chatId).then((response) => {
       console.log("response -> ", response)
       router.push({
         pathname: `/chat/${chatId}`,
@@ -56,7 +55,7 @@ const Home = () => {
   };
 
   const navigateToRandomChat = () => {
-    getRandomChatIdAxios(accessToken).then((response) => {
+    getRandomChatIdAxios().then((response) => {
       console.log("response -> ", response)
       navigateToChat(response);
     }).catch((error) => {
@@ -75,7 +74,7 @@ const Home = () => {
 
   const removeFriend = (friendId: string) => {
     if (confirm('친구목록에서 삭제하겠습니까?')) {
-      RemoveFriendAxios(accessToken, friendId).then(() => {
+      RemoveFriendAxios(friendId).then(() => {
         console.log("remove friend success")
         setChatReload(true);
     }).catch((error) => {
@@ -86,7 +85,7 @@ const Home = () => {
 
   const addFriend = (friendId: any) => {
     if (confirm('친구요청을 수락하겠습니까?')) {
-      AddFriendAxios(accessToken, friendId).then(() => {
+      AddFriendAxios(friendId).then(() => {
         console.log("add friend success")
         setChatReload(true);
     }).catch((error) => {
@@ -101,21 +100,21 @@ const Home = () => {
     setAccessToken(token);
     setUsername(userId);
     setIsLoggedIn(!!token);
-  }, []);
+  }, [router]);
 
   useEffect(() => {
-    const fetchChats = async (token: string) => {
+    const fetchChats = async () => {
       try {
-        const response = await getChatsAxios(token);
+        const response = await getChatsAxios();
         setChats(response);
       } catch (error) {
         console.error('Error fetching chats:', error);
       }
     };
 
-    const fetchFriends = async (token: string) => {
+    const fetchFriends = async () => {
       try {
-        const response = await GetFriendsAxios(token);
+        const response = await GetFriendsAxios();
         if (response !== null) {
           setFriends(response);
         }
@@ -124,9 +123,9 @@ const Home = () => {
       }
     }
 
-    const fetchFollower = async (token: string) => {
+    const fetchFollower = async () => {
       try {
-        const response = await GetFollowerAxios(token);
+        const response = await GetFollowerAxios();
         if (response !== null) {
           setFollowers(response);
         }
@@ -137,9 +136,9 @@ const Home = () => {
 
     const accessToken = localStorage.getItem('accessToken');
     if (isLoggedIn && accessToken) {
-      fetchChats(accessToken);
-      fetchFriends(accessToken);
-      fetchFollower(accessToken); 
+      fetchChats();
+      fetchFriends();
+      fetchFollower(); 
     } else {
       setChats([]);
       setFriends([]);
@@ -202,6 +201,7 @@ const Home = () => {
         {isLoggedIn && <h1>Friends List</h1>}
         {isLoggedIn && (          
             <FriendsList 
+              key={friends.id}
               friends={friends} 
               navigateToFriendChat={navigateToFriendChat} 
               removeFriend={removeFriend}

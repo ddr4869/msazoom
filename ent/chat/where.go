@@ -64,6 +64,11 @@ func ChatUser(v string) predicate.Chat {
 	return predicate.Chat(sql.FieldEQ(FieldChatUser, v))
 }
 
+// ChatPassword applies equality check predicate on the "chat_password" field. It's identical to ChatPasswordEQ.
+func ChatPassword(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldEQ(FieldChatPassword, v))
+}
+
 // CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Chat {
 	return predicate.Chat(sql.FieldEQ(FieldCreatedAt, v))
@@ -202,6 +207,81 @@ func ChatUserEqualFold(v string) predicate.Chat {
 // ChatUserContainsFold applies the ContainsFold predicate on the "chat_user" field.
 func ChatUserContainsFold(v string) predicate.Chat {
 	return predicate.Chat(sql.FieldContainsFold(FieldChatUser, v))
+}
+
+// ChatPasswordEQ applies the EQ predicate on the "chat_password" field.
+func ChatPasswordEQ(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldEQ(FieldChatPassword, v))
+}
+
+// ChatPasswordNEQ applies the NEQ predicate on the "chat_password" field.
+func ChatPasswordNEQ(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldNEQ(FieldChatPassword, v))
+}
+
+// ChatPasswordIn applies the In predicate on the "chat_password" field.
+func ChatPasswordIn(vs ...string) predicate.Chat {
+	return predicate.Chat(sql.FieldIn(FieldChatPassword, vs...))
+}
+
+// ChatPasswordNotIn applies the NotIn predicate on the "chat_password" field.
+func ChatPasswordNotIn(vs ...string) predicate.Chat {
+	return predicate.Chat(sql.FieldNotIn(FieldChatPassword, vs...))
+}
+
+// ChatPasswordGT applies the GT predicate on the "chat_password" field.
+func ChatPasswordGT(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldGT(FieldChatPassword, v))
+}
+
+// ChatPasswordGTE applies the GTE predicate on the "chat_password" field.
+func ChatPasswordGTE(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldGTE(FieldChatPassword, v))
+}
+
+// ChatPasswordLT applies the LT predicate on the "chat_password" field.
+func ChatPasswordLT(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldLT(FieldChatPassword, v))
+}
+
+// ChatPasswordLTE applies the LTE predicate on the "chat_password" field.
+func ChatPasswordLTE(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldLTE(FieldChatPassword, v))
+}
+
+// ChatPasswordContains applies the Contains predicate on the "chat_password" field.
+func ChatPasswordContains(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldContains(FieldChatPassword, v))
+}
+
+// ChatPasswordHasPrefix applies the HasPrefix predicate on the "chat_password" field.
+func ChatPasswordHasPrefix(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldHasPrefix(FieldChatPassword, v))
+}
+
+// ChatPasswordHasSuffix applies the HasSuffix predicate on the "chat_password" field.
+func ChatPasswordHasSuffix(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldHasSuffix(FieldChatPassword, v))
+}
+
+// ChatPasswordIsNil applies the IsNil predicate on the "chat_password" field.
+func ChatPasswordIsNil() predicate.Chat {
+	return predicate.Chat(sql.FieldIsNull(FieldChatPassword))
+}
+
+// ChatPasswordNotNil applies the NotNil predicate on the "chat_password" field.
+func ChatPasswordNotNil() predicate.Chat {
+	return predicate.Chat(sql.FieldNotNull(FieldChatPassword))
+}
+
+// ChatPasswordEqualFold applies the EqualFold predicate on the "chat_password" field.
+func ChatPasswordEqualFold(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldEqualFold(FieldChatPassword, v))
+}
+
+// ChatPasswordContainsFold applies the ContainsFold predicate on the "chat_password" field.
+func ChatPasswordContainsFold(v string) predicate.Chat {
+	return predicate.Chat(sql.FieldContainsFold(FieldChatPassword, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "createdAt" field.

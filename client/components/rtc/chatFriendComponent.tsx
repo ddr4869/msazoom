@@ -27,8 +27,7 @@ const ChatFriendComponent = ({ username, friendname }: { username: string, frien
     useEffect(() => {
         const start = async () => {
             try {
-                const accessToken = localStorage.getItem("accessToken") || '';
-                const response = await getFriendMessageAxios(accessToken, friendname);
+                const response = await getFriendMessageAxios(friendname);
                 setMessages(response);
             } catch (error) {
                 console.error('Error fetching messages:', error);

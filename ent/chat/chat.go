@@ -17,6 +17,8 @@ const (
 	FieldChatName = "chat_name"
 	// FieldChatUser holds the string denoting the chat_user field in the database.
 	FieldChatUser = "chat_user"
+	// FieldChatPassword holds the string denoting the chat_password field in the database.
+	FieldChatPassword = "chat_password"
 	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
@@ -30,6 +32,7 @@ var Columns = []string{
 	FieldID,
 	FieldChatName,
 	FieldChatUser,
+	FieldChatPassword,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -71,6 +74,11 @@ func ByChatName(opts ...sql.OrderTermOption) OrderOption {
 // ByChatUser orders the results by the chat_user field.
 func ByChatUser(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldChatUser, opts...).ToFunc()
+}
+
+// ByChatPassword orders the results by the chat_password field.
+func ByChatPassword(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldChatPassword, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the createdAt field.

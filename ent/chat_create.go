@@ -48,6 +48,20 @@ func (cc *ChatCreate) SetNillableChatUser(s *string) *ChatCreate {
 	return cc
 }
 
+// SetChatPassword sets the "chat_password" field.
+func (cc *ChatCreate) SetChatPassword(s string) *ChatCreate {
+	cc.mutation.SetChatPassword(s)
+	return cc
+}
+
+// SetNillableChatPassword sets the "chat_password" field if the given value is not nil.
+func (cc *ChatCreate) SetNillableChatPassword(s *string) *ChatCreate {
+	if s != nil {
+		cc.SetChatPassword(*s)
+	}
+	return cc
+}
+
 // SetCreatedAt sets the "createdAt" field.
 func (cc *ChatCreate) SetCreatedAt(t time.Time) *ChatCreate {
 	cc.mutation.SetCreatedAt(t)
@@ -176,6 +190,10 @@ func (cc *ChatCreate) createSpec() (*Chat, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.ChatUser(); ok {
 		_spec.SetField(chat.FieldChatUser, field.TypeString, value)
 		_node.ChatUser = value
+	}
+	if value, ok := cc.mutation.ChatPassword(); ok {
+		_spec.SetField(chat.FieldChatPassword, field.TypeString, value)
+		_node.ChatPassword = value
 	}
 	if value, ok := cc.mutation.CreatedAt(); ok {
 		_spec.SetField(chat.FieldCreatedAt, field.TypeTime, value)

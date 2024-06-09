@@ -21,6 +21,8 @@ type Chat struct {
 	ChatName string `json:"chat_name,omitempty"`
 	// ChatUser holds the value of the "chat_user" field.
 	ChatUser string `json:"chat_user,omitempty"`
+	// ChatPassword holds the value of the "chat_password" field.
+	ChatPassword string `json:"chat_password,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// UpdatedAt holds the value of the "updatedAt" field.
@@ -35,7 +37,7 @@ func (*Chat) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case chat.FieldID:
 			values[i] = new(sql.NullInt64)
-		case chat.FieldChatName, chat.FieldChatUser:
+		case chat.FieldChatName, chat.FieldChatUser, chat.FieldChatPassword:
 			values[i] = new(sql.NullString)
 		case chat.FieldCreatedAt, chat.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -71,6 +73,12 @@ func (c *Chat) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field chat_user", values[i])
 			} else if value.Valid {
 				c.ChatUser = value.String
+			}
+		case chat.FieldChatPassword:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field chat_password", values[i])
+			} else if value.Valid {
+				c.ChatPassword = value.String
 			}
 		case chat.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -125,6 +133,9 @@ func (c *Chat) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("chat_user=")
 	builder.WriteString(c.ChatUser)
+	builder.WriteString(", ")
+	builder.WriteString("chat_password=")
+	builder.WriteString(c.ChatPassword)
 	builder.WriteString(", ")
 	builder.WriteString("createdAt=")
 	builder.WriteString(c.CreatedAt.Format(time.ANSIC))

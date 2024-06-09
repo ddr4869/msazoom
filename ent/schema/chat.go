@@ -19,6 +19,8 @@ func (Chat) Fields() []ent.Field {
 			Default("unknown"),
 		field.String("chat_user").
 			Default("unknown"),
+		field.String("chat_password").
+			Optional(),
 		field.Time("createdAt").
 			Default(time.Now),
 		field.Time("updatedAt").

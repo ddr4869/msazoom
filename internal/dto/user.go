@@ -33,6 +33,7 @@ type RemoveFriendRequest struct {
 }
 
 type UserNormalResponse struct {
+	ID       int    `json:"id"`
 	Username string `json:"username"`
 	Role     int    `json:"role"`
 	Email    string `json:"email"`
@@ -40,6 +41,7 @@ type UserNormalResponse struct {
 
 func UserEntToResponse(user *ent.User) UserNormalResponse {
 	return UserNormalResponse{
+		ID:       user.ID,
 		Username: user.Username,
 		Role:     user.Role,
 		Email:    user.Email,

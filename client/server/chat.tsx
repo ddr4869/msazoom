@@ -1,10 +1,11 @@
 
 import axios from './axios'
 // create board
-export const createChatAxios = (token:string, username:string, chat_title:string) => {
+export const createChatAxios = (username:string, chat_title:string) => {
   try {
     return new Promise<any>((resolve, reject) => {
       const reqUrl = `/chat/create?title=${chat_title}&username=${username}`;
+      const token = localStorage.getItem('accessToken')
       axios.get(reqUrl,  {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -24,11 +25,12 @@ export const createChatAxios = (token:string, username:string, chat_title:string
   }
 }
 
-export const getChatsAxios = (token:string) => {
+export const getChatsAxios = () => {
   //noStore()
   try {
     return new Promise<any>((resolve, reject) => {
       const reqUrl = '/chat';
+      const token = localStorage.getItem('accessToken')
       axios.get(reqUrl,  {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -48,11 +50,12 @@ export const getChatsAxios = (token:string) => {
   }
 }
 
-export const getChatAxios = (token:string, chat_id:string) => {
+export const getChatAxios = (chat_id:string) => {
   //noStore()
   try {
     return new Promise<any>((resolve, reject) => {
       const reqUrl = '/chat/' + chat_id;
+      const token = localStorage.getItem('accessToken')
       axios.get(reqUrl,  {
           headers: {
             // Bearer 토큰을 Authorization 헤더에 추가
@@ -73,10 +76,11 @@ export const getChatAxios = (token:string, chat_id:string) => {
   }
 }
 
-export const getRandomChatIdAxios = (token:string) => {
+export const getRandomChatIdAxios = () => {
   try {
     return new Promise<any>((resolve, reject) => {
       const reqUrl = '/chat/random';
+      const token = localStorage.getItem('accessToken')
       axios.get(reqUrl, {
         headers: {
           'Authorization': `Bearer ${token}`

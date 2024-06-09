@@ -48,6 +48,7 @@ func (s *Server) UserCreate(c *gin.Context) {
 		return
 	}
 	resp := dto.UserNormalResponse{
+		ID:       user.ID,
 		Username: user.Username,
 		Role:     user.Role,
 		Email:    user.Email,

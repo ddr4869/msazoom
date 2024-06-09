@@ -167,7 +167,7 @@ const WebRTCComponent = ({ chatId, userId }: WebRTCComponentProps) => {
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) return;
 
-    CheckFriendAxios(accessToken, partnerUsername!)
+    CheckFriendAxios(partnerUsername!)
       .then((data) => {
         console.log("res->", data);
         if (data === true) {
@@ -175,7 +175,7 @@ const WebRTCComponent = ({ chatId, userId }: WebRTCComponentProps) => {
         } else {
           if (confirm(partnerUsername + "를 친구 추가 하시겠습니까?")) {
             console.log("친구 추가");
-            AddFriendAxios(accessToken, partnerUsername!).then((data) => {
+            AddFriendAxios(partnerUsername!).then((data) => {
               alert(partnerUsername + "가 친구로 추가되었습니다.");
               // have to send gRPC to server
             });

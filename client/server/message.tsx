@@ -1,9 +1,10 @@
 import axios from './axios'
 
-export const getFriendMessageAxios = async (token:string, friend_name: string) => {
+export const getFriendMessageAxios = async (friend_name: string) => {
     try {
         return new Promise<any>((resolve, reject) => {
             const reqUrl = `/message?friend_name=` + friend_name;
+            const token = localStorage.getItem('accessToken') || '';
             axios.get(reqUrl, {
                 headers: {
                     'Authorization': `Bearer ${token}`

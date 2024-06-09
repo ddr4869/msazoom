@@ -8,8 +8,13 @@ import (
 	"github.com/ddr4869/msazoom/ent/chat"
 )
 
-func (r Repository) CreateChat(ctx context.Context, title, username string) (*ent.Chat, error) {
-	c, err := r.entClient.Chat.Create().SetChatName(title).SetChatUser(username).Save(ctx)
+func (r Repository) CreateChat(ctx context.Context, title, username, password string) (*ent.Chat, error) {
+	c, err := r.entClient.Chat.
+		Create().
+		SetChatName(title).
+		SetChatPassword(password).
+		SetChatUser(username).
+		Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating board: %w", err)
 	}

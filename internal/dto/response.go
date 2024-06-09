@@ -2,10 +2,14 @@ package dto
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
+
+var zapLogger, _ = zap.NewDevelopment()
 
 type SuccessResponse struct {
 	Data interface{} `json:"data"`
@@ -29,6 +33,7 @@ func NewErrorResponse(c *gin.Context, code int, err error, message string) {
 	if err == nil {
 		err = errors.New(message)
 	}
+	zapLogger.Error(fmt.Sprintf("Error: %s", err.Error()))
 	c.AbortWithStatusJSON(code, ErrorResponse{
 		Error:   err.Error(),
 		Message: message,

@@ -29,6 +29,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "chat_name", Type: field.TypeString, Default: "unknown"},
 		{Name: "chat_user", Type: field.TypeString, Default: "unknown"},
+		{Name: "chat_password", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

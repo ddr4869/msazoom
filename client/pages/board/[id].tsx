@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 
 export default function Page({ id }:any) {
   const router = useRouter();
-  const username = localStorage.getItem('username') || '';
+  const username = localStorage.getItem('username') || router.push('/login');
   const { data: session } = useSession();
   
   const navigateToDashboard = () => {
