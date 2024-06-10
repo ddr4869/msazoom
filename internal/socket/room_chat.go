@@ -1,7 +1,6 @@
 package socket
 
 import (
-	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -18,6 +17,7 @@ type RoomMap struct {
 type RoomChat struct {
 	Participant map[string]Participant
 	Title       string
+	Private     bool
 	Admin       string
 	Created_at  time.Time
 }
@@ -47,18 +47,19 @@ func (r *RoomMap) GetRandomRoomKey() int {
 		return -1
 	}
 	keys := make([]int, 0, len(r.Map))
-	for key := range r.Map {
-		keys = append(keys, key)
+	for k, roomChat := range r.Map {
+		if !roomChat.Private {
+			keys = append(keys, k)
+		}
 	}
-	return keys[rand.Intn(len(r.Map))]
+	return keys[rand.Intn(len(keys))]
 }
 
 // If the room does not exist, create a new room
 // If the room already exists, insert the user into the room
-func (r *RoomMap) InsertIntoRoom(chat_id int, chat_title, username string, host bool, ws *websocket.Conn) {
+func (r *RoomMap) InsertIntoRoom(chat_id int, chat_title, username string, private, host bool, ws *websocket.Conn) {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
-
 	now := time.Now()
 
 	p := Participant{
@@ -69,6 +70,7 @@ func (r *RoomMap) InsertIntoRoom(chat_id int, chat_title, username string, host 
 		r.Map[chat_id] = RoomChat{
 			Participant: map[string]Participant{username: p},
 			Title:       chat_title,
+			Private:     private,
 			Admin:       username,
 			Created_at:  now,
 		}
@@ -99,7 +101,6 @@ func (r *RoomMap) Broadcast() {
 				AllChatRooms.Mutex.Lock()
 				err := client.Conn.WriteJSON(socketChannel.Data)
 				if err != nil {
-					fmt.Println("broadcast close ->", err)
 					client.Conn.Close()
 					AllChatRooms.Mutex.Unlock()
 					return

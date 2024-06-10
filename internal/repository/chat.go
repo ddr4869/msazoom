@@ -8,11 +8,11 @@ import (
 	"github.com/ddr4869/msazoom/ent/chat"
 )
 
-func (r Repository) CreateChat(ctx context.Context, title, username, password string) (*ent.Chat, error) {
+func (r Repository) CreateChat(ctx context.Context, title, username, hash string) (*ent.Chat, error) {
 	c, err := r.entClient.Chat.
 		Create().
 		SetChatName(title).
-		SetChatPassword(password).
+		SetChatPassword(hash).
 		SetChatUser(username).
 		Save(ctx)
 	if err != nil {

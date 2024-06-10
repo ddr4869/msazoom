@@ -1,5 +1,5 @@
 // WebRTCComponent.tsx
-import { useEffect, useState, useRef, MutableRefObject } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { initializeChatWebSocket, sendMessage, closeWebSocket } from './webSocket';
 import { createPeerConnection, handleOffer, addIceCandidate, closePeerConnection } from './rtcPeerConnection';
@@ -9,9 +9,10 @@ import { CheckFriendAxios, AddFriendAxios } from '@/server/user';
 interface WebRTCComponentProps {
   chatId: string;
   userId: string;
+  password: string;
 }
 
-const WebRTCComponent = ({ chatId, userId }: WebRTCComponentProps) => {
+const WebRTCComponent = ({ chatId, userId, password }: WebRTCComponentProps) => {
   const router = useRouter();
   const userVideo = useRef<HTMLVideoElement>(null);
   const userStream = useRef<MediaStream | null>(null);
@@ -25,7 +26,7 @@ const WebRTCComponent = ({ chatId, userId }: WebRTCComponentProps) => {
 
   const handleWebSocketMessage = async (e: MessageEvent) => {
     const message = JSON.parse(e.data);
-
+    console.log('Received Message -> ', message)
     if (message.join) {
       console.log('Joining Room -> ', message.join);
       setPartnerUsername(message.partnerUsername);
@@ -68,7 +69,7 @@ const WebRTCComponent = ({ chatId, userId }: WebRTCComponentProps) => {
   useEffect(() => {
     const start = async () => {
       userStream.current = await openCamera({ userVideoRef: userVideo, userStreamRef: userStream });
-      webSocketRef.current = initializeChatWebSocket({ chatId, userId, handleWebSocketMessage });
+      webSocketRef.current = initializeChatWebSocket({ chatId, userId, password, handleWebSocketMessage });
       peerRef.current = createPeerConnection({ handleNegotiationNeeded, handleIceCandidateEvent, handleTrackEvent });
     };
 

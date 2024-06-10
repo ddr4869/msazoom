@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -56,7 +55,6 @@ func (r *RoomManager) GetRoom(id string) Room {
 func (r *RoomManager) InsertIntoRoom(chat_id string, room Room) {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
-	fmt.Println("InsertIntoRoom, room -> ", room)
 	switch room := room.(type) {
 	case *MessageRoom:
 		if _, exists := r.Map[chat_id]; !exists {

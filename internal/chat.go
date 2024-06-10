@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -42,43 +41,38 @@ func (s *Server) CreateChat(c *gin.Context) {
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to create chat")
 	}
-	fmt.Println("Chat Created: ", chat.ID)
 	dto.NewSuccessResponse(c, chat)
 }
 
 func (s *Server) JoinChat(c *gin.Context) {
-	// get roomID from query
 	req := c.MustGet("req").(dto.JoinChatRequest)
 	ws, err := socket.Upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Fatal("Web Socket Upgrade Error", err)
-	}
-	hash := ""
-	if req.Password != "" {
-		hash, err = utils.HashPassword(req.Password)
-		if err != nil {
-			dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to hash password")
-			return
-		}
 	}
 	chat, err := s.repository.GetChat(c, req.ChatID)
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to get chat")
 		return
 	}
-	if chat.ChatPassword != hash {
+	if req.Password != "" && !utils.CheckPasswordHash(req.Password, chat.ChatPassword) {
 		dto.NewErrorResponse(c, http.StatusBadRequest, nil, "Password is incorrect")
 		return
 	}
 
-	var isHost bool
 	if chat.ChatUser == req.Username {
-		isHost = true
+		if chat.ChatPassword != "" {
+			socket.AllChatRooms.InsertIntoRoom(req.ChatID, chat.ChatName, req.Username, true, true, ws)
+		} else {
+			socket.AllChatRooms.InsertIntoRoom(req.ChatID, chat.ChatName, req.Username, false, true, ws)
+		}
 	} else {
-		isHost = false
+		if chat.ChatPassword != "" {
+			socket.AllChatRooms.InsertIntoRoom(req.ChatID, chat.ChatName, req.Username, true, false, ws)
+		} else {
+			socket.AllChatRooms.InsertIntoRoom(req.ChatID, chat.ChatName, req.Username, false, false, ws)
+		}
 	}
-
-	socket.AllChatRooms.InsertIntoRoom(req.ChatID, chat.ChatName, req.Username, isHost, ws)
 
 	go socket.AllChatRooms.Broadcast()
 
@@ -86,7 +80,6 @@ func (s *Server) JoinChat(c *gin.Context) {
 		var socketData socket.ChatSocketData
 		err := ws.ReadJSON(&socketData.Data)
 		if err != nil {
-			log.Println("Quit or Delete room")
 			ws.Close()
 			isDelete := socket.AllChatRooms.QuitRoom(req.ChatID, req.Username)
 			if isDelete {

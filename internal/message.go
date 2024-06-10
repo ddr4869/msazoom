@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -55,8 +54,6 @@ func (s *Server) ConnectMessage(c *gin.Context) {
 			_ = socket.AllMessageRooms.QuitRoom(key, req.UserName)
 			break
 		}
-		fmt.Println("socketData.Client set, req.username", req.UserName)
-
 		socket.MessageSocketChannel <- socketData
 	}
 }

@@ -36,7 +36,6 @@ func (s *Server) UserLogin(c *gin.Context) {
 
 func (s *Server) UserCreate(c *gin.Context) {
 	req := c.MustGet("req").(dto.UserCreateRequest)
-
 	hash, err := utils.HashPassword(req.Password)
 	if err != nil {
 		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to hash password")

@@ -16,12 +16,7 @@ export default function Page({ id }:any) {
   };
 
   return (
-    <SessionProvider session={session}>
-      <button onClick={navigateToDashboard}>뒤로가기</button>
-      <div>
-        <WebRTCComponent chatId={id} userId={username} />
-      </div>
-    </SessionProvider>
+    <p></p>
   );
 }
 

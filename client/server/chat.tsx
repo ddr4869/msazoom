@@ -1,10 +1,10 @@
 
 import axios from './axios'
 // create board
-export const createChatAxios = (username:string, chat_title:string) => {
+export const createChatAxios = (username:string, chat_title:string, password:string) => {
   try {
     return new Promise<any>((resolve, reject) => {
-      const reqUrl = `/chat/create?title=${chat_title}&username=${username}`;
+      const reqUrl = `/chat/create?title=${chat_title}&username=${username}&password=${password}`;
       const token = localStorage.getItem('accessToken')
       axios.get(reqUrl,  {
           headers: {

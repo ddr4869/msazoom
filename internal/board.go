@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ddr4869/msazoom/internal/dto"
@@ -38,7 +37,6 @@ func (s *Server) GetBoardList(c *gin.Context) {
 	for _, board := range boardList {
 		boardResponse = append(boardResponse, dto.BoardEntToResponse(board))
 	}
-	fmt.Println(boardResponse)
 	dto.NewSuccessResponse(c, boardResponse)
 }
 

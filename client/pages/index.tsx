@@ -30,11 +30,13 @@ const Home = () => {
     try {
       const formData = new FormData(event.currentTarget);
       const chat_title = formData.get('title') as string;
-      const response = await createChatAxios(username, chat_title);
+      const password = formData.get('password') ? formData.get('password') as string : '';
+      const response = await createChatAxios(username, chat_title, password);
       setShowCreateChatForm(false);
       setChatReload(true);
       router.push({
         pathname: `/chat/${response.id}`,
+        //query: { password: password } 
       });
     } catch (error) {
       console.error('Error creating chat:', error);

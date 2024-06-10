@@ -2,7 +2,6 @@ package socket
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -96,7 +95,6 @@ func (m *MessageMap) Broadcast(c context.Context, r repository.Repository) {
 			log.Println("Invalid type for message")
 			continue
 		}
-		fmt.Println("socketData.Client set, sender, receiver, message", sender, receiver, message)
 		_, err := r.WriteFriendMessage(c, sender, receiver, message)
 		if err != nil {
 			log.Println("Failed to write friend message, err ->  ", err)
