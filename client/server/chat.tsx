@@ -99,3 +99,30 @@ export const getRandomChatIdAxios = () => {
     throw new Error('Failed to connect server.');
   }
 }
+
+export const checkChatPasswordAxios = (chat_id:string, password:string) => {
+  try {
+    return new Promise<any>((resolve, reject) => {
+      const reqUrl = '/chat/check_password';
+      const token = localStorage.getItem('accessToken')
+      axios.post(reqUrl, {
+        chat_id: chat_id,
+        password: password
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(res => {
+        resolve(res.data.data);
+      })
+      .catch(err => {
+          console.log(err)
+        reject(err.message);
+      })
+    })
+  } catch (error) {
+    console.error('Server Error:', error);
+    throw new Error('Failed to connect server.');
+  }
+}

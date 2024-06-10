@@ -27,6 +27,16 @@ func (s *Server) CreateChatValid(c *gin.Context) {
 	c.Next()
 }
 
+func (s *Server) CheckPasswordValid(c *gin.Context) {
+	var req dto.CheckPasswordRequest
+	if err := c.ShouldBind(&req); err != nil {
+		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get block number")
+		return
+	}
+	c.Set("req", req)
+	c.Next()
+}
+
 func (s *Server) JoinChatValid(c *gin.Context) {
 	var req dto.JoinChatRequest
 	if err := c.ShouldBind(&req); err != nil {

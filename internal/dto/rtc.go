@@ -20,6 +20,11 @@ type ChatResponse struct {
 	ID         int    `json:"id"`
 	Title      string `json:"title"`
 	Admin      string `json:"admin"`
-	Password   string `json:"password"`
+	Private    bool   `json:"private"`
 	Created_at string `json:"created_at"`
+}
+
+type CheckPasswordRequest struct {
+	ChatID   int    `json:"chat_id" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }

@@ -103,10 +103,25 @@ func (s *Server) GetChatList(c *gin.Context) {
 			ID:         id,
 			Title:      chat.Title,
 			Admin:      chat.Admin,
+			Private:    chat.Private,
 			Created_at: chat.Created_at.Format("2006-01-02 15:04:05"),
 		})
 	}
 	dto.NewSuccessResponse(c, ChatResponse)
+}
+
+func (s *Server) CheckPassword(c *gin.Context) {
+	req := c.MustGet("req").(dto.CheckPasswordRequest)
+	chat, err := s.repository.GetChat(c, req.ChatID)
+	if err != nil {
+		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to get chat")
+		return
+	}
+	if !utils.CheckPasswordHash(req.Password, chat.ChatPassword) {
+		dto.NewErrorResponse(c, http.StatusBadRequest, nil, "Password is incorrect")
+		return
+	}
+	dto.NewSuccessResponse(c, true)
 }
 
 func (s *Server) RandomChating(c *gin.Context) {

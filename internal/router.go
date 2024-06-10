@@ -37,6 +37,7 @@ func SetUp(s *Server) {
 	api.GET("/chat/:chat_id", utils.ParseJWT(), s.GetChatValid, s.GetChat)
 	api.GET("/chat/create", utils.ParseJWT(), s.CreateChatValid, s.CreateChat)
 	api.GET("/chat", utils.ParseJWT(), s.GetChatList)
+	api.POST("/chat/check_password", utils.ParseJWT(), s.CheckPasswordValid, s.CheckPassword)
 	// ws
 	api.GET("/chat/join", s.JoinChatValid, s.JoinChat)
 	api.GET("/chat/random", utils.ParseJWT(), s.RandomChating)

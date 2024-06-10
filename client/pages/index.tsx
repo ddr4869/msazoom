@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from "next/router";
-import { createChatAxios, getChatsAxios, getRandomChatIdAxios, getChatAxios } from '@/server/chat';
+import { createChatAxios, getChatsAxios, getRandomChatIdAxios, getChatAxios, checkChatPasswordAxios } from '@/server/chat';
 import CreateChatForm from '@/ui/chat/createChatForm';
 import { handleLogin, handleLogout } from '@/utils/auth';
 import ChatList from '@/components/chat/chatList';
@@ -36,7 +36,7 @@ const Home = () => {
       setChatReload(true);
       router.push({
         pathname: `/chat/${response.id}`,
-        //query: { password: password } 
+        query: { password: password } 
       });
     } catch (error) {
       console.error('Error creating chat:', error);
@@ -47,9 +47,18 @@ const Home = () => {
   const navigateToChat = (chatId: any) => {
     getChatAxios(chatId).then((response) => {
       console.log("response -> ", response)
-      router.push({
-        pathname: `/chat/${chatId}`,
-      });
+      if (response.Private) {
+        const password = prompt('Password Required');
+        if (password) {
+          checkChatPasswordAxios(chatId, password).then(() => {
+            router.push({ pathname: `/chat/${chatId}` });
+          }).catch((error) => {
+            alert('Invalid Password.');
+          })
+        }
+          return;
+        }
+        router.push({ pathname: `/chat/${chatId}` });
     }).catch((error) => {
       alert('이미 종료된 채팅입니다.');
       setChatReload(true);

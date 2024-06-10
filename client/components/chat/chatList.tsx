@@ -6,6 +6,7 @@ export interface Chat {
   id: number;
   title: string;
   admin: string;
+  private: boolean;
   created_at: string;
 }
 

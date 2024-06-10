@@ -5,7 +5,7 @@ import WebRTCComponent from '@/components/rtc/webRTCComponent';
 
 export default function Page({ id }:any) {
   const router = useRouter();
-  //const password = Array.isArray(router.query.password) ? router.query.password[0] : router.query.password || "";
+  const password = Array.isArray(router.query.password) ? router.query.password[0] : router.query.password || "";
   const [username, setUsername] = useState<string>("");
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function Page({ id }:any) {
   return (
     <>
       <div>
-        <WebRTCComponent chatId={id} userId={username} password=''/>
+        <WebRTCComponent chatId={id} userId={username} password={password}/>
       </div>
       <div>
         <h1>Chat Room</h1>
