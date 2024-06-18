@@ -3,6 +3,8 @@ package internal
 import (
 	"log"
 	"net/http"
+	"slices"
+	"strings"
 
 	"github.com/ddr4869/msazoom/internal/dto"
 	"github.com/ddr4869/msazoom/internal/socket"
@@ -39,24 +41,13 @@ func (s *Server) ConnectMessage(c *gin.Context) {
 	}
 	defer ws.Close()
 
-	key := GenerateSocketKey(req.UserName, req.FriendName)
+	key := GenerateSocketKey([]string{req.UserName, req.FriendName})
 	socket.AllMessageRooms.InsertIntoRoom(key, req.UserName, req.FriendName, ws)
 
 	go socket.AllMessageRooms.Broadcast(c, s.repository)
 	var socketData socket.MessageSocketData
 	socketData.Client = ws
 	socketData.ID = key
-
-	// consumer test
-	// partitionConsumer, err := socket.Consumer.ConsumePartition("chat-messages", 0, sarama.OffsetNewest)
-	// if err != nil {
-	// 	log.Fatalf("Failed to start Kafka partition consumer: %v", err)
-	// }
-	// defer partitionConsumer.Close()
-	// for message := range partitionConsumer.Messages() {
-	// 	fmt.Println("!! consumer test !!")
-	// 	fmt.Println(message.Value)
-	// }
 
 	for {
 		err := ws.ReadJSON(&socketData.Data)
@@ -70,10 +61,7 @@ func (s *Server) ConnectMessage(c *gin.Context) {
 	}
 }
 
-func GenerateSocketKey(key1, key2 string) string {
-	if key1 > key2 {
-		return key1 + key2
-	} else {
-		return key2 + key1
-	}
+func GenerateSocketKey(keys []string) string {
+	slices.Sort(keys)
+	return strings.Join(keys, "")
 }

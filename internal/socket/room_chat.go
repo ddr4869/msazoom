@@ -48,7 +48,7 @@ func (r *RoomMap) GetRandomRoomKey() int {
 	}
 	keys := make([]int, 0, len(r.Map))
 	for k, roomChat := range r.Map {
-		if !roomChat.Private {
+		if !roomChat.Private && len(roomChat.Participant) == 1 {
 			keys = append(keys, k)
 		}
 	}

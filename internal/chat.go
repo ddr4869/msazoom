@@ -99,6 +99,9 @@ func (s *Server) JoinChat(c *gin.Context) {
 func (s *Server) GetChatList(c *gin.Context) {
 	ChatResponse := make([]dto.ChatResponse, 0)
 	for id, chat := range socket.AllChatRooms.Map {
+		if len(chat.Participant) != 1 {
+			continue
+		}
 		ChatResponse = append(ChatResponse, dto.ChatResponse{
 			ID:         id,
 			Title:      chat.Title,
