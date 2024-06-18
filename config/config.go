@@ -52,6 +52,10 @@ func Init() *Config {
 	socket.AllChatRooms.Init()
 	socket.AllMessageRooms.Init()
 
+	// Initialize Kafka
+	socket.InitKafkaProducer()
+	go socket.InitKafkaConsumer()
+
 	JwtSecretPassword = os.Getenv("JWT_SECRET_PASSWORD")
 
 	return &Config{

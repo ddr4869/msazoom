@@ -2,10 +2,12 @@ package socket
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"time"
 
+	"github.com/IBM/sarama"
 	"github.com/ddr4869/msazoom/internal/repository"
 	"github.com/gorilla/websocket"
 )
@@ -102,8 +104,22 @@ func (m *MessageMap) Broadcast(c context.Context, r repository.Repository) {
 		}
 
 		for _, client := range m.Map[socketData.ID].Participant {
+			// kafka test
+			kafkaMessage := &sarama.ProducerMessage{
+				Topic:     GenerateSocketKey(sender, receiver),
+				Key:       sarama.StringEncoder("TEST"),
+				Value:     sarama.ByteEncoder(message),
+				Partition: int32(0),
+			}
+			_, _, err = Producer.SendMessage(kafkaMessage)
+			if err != nil {
+				log.Printf("Failed to send message to Kafka: %v", err)
+			}
+			fmt.Println("!Producer Send!")
+
 			if client.Conn != socketData.Client {
 				AllChatRooms.Mutex.Lock()
+				// kafka chat
 				err := client.Conn.WriteJSON(socketData.Data)
 				if err != nil {
 					client.Conn.Close()
@@ -113,5 +129,13 @@ func (m *MessageMap) Broadcast(c context.Context, r repository.Repository) {
 				AllChatRooms.Mutex.Unlock()
 			}
 		}
+	}
+}
+
+func GenerateSocketKey(key1, key2 string) string {
+	if key1 > key2 {
+		return key1 + key2
+	} else {
+		return key2 + key1
 	}
 }

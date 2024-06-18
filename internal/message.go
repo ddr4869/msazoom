@@ -46,6 +46,18 @@ func (s *Server) ConnectMessage(c *gin.Context) {
 	var socketData socket.MessageSocketData
 	socketData.Client = ws
 	socketData.ID = key
+
+	// consumer test
+	// partitionConsumer, err := socket.Consumer.ConsumePartition("chat-messages", 0, sarama.OffsetNewest)
+	// if err != nil {
+	// 	log.Fatalf("Failed to start Kafka partition consumer: %v", err)
+	// }
+	// defer partitionConsumer.Close()
+	// for message := range partitionConsumer.Messages() {
+	// 	fmt.Println("!! consumer test !!")
+	// 	fmt.Println(message.Value)
+	// }
+
 	for {
 		err := ws.ReadJSON(&socketData.Data)
 		if err != nil {
