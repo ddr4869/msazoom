@@ -115,14 +115,14 @@ func (m *MessageMap) Broadcast(c context.Context, r repository.Repository) {
 			// }
 
 			if client.Conn != socketData.Client {
-				AllChatRooms.Mutex.Lock()
+				AllMessageRooms.Mutex.Lock()
 				err := client.Conn.WriteJSON(socketData.Data)
 				if err != nil {
 					client.Conn.Close()
-					AllChatRooms.Mutex.Unlock()
+					AllMessageRooms.Mutex.Unlock()
 					return
 				}
-				AllChatRooms.Mutex.Unlock()
+				AllMessageRooms.Mutex.Unlock()
 			}
 		}
 	}

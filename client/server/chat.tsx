@@ -4,7 +4,7 @@ import axios from './axios'
 export const createChatAxios = (username:string, chat_title:string, password:string) => {
   try {
     return new Promise<any>((resolve, reject) => {
-      const reqUrl = `/chat/create?title=${chat_title}&username=${username}&password=${password}`;
+      const reqUrl = process.env.NEXT_PUBLIC_CHAT_SERVICE+`/chat/create?title=${chat_title}&username=${username}&password=${password}`;
       const token = localStorage.getItem('accessToken')
       axios.get(reqUrl,  {
           headers: {
@@ -29,7 +29,7 @@ export const getChatsAxios = () => {
   //noStore()
   try {
     return new Promise<any>((resolve, reject) => {
-      const reqUrl = '/chat';
+      const reqUrl = process.env.NEXT_PUBLIC_CHAT_SERVICE+'/chat';
       const token = localStorage.getItem('accessToken')
       axios.get(reqUrl,  {
           headers: {
@@ -54,7 +54,7 @@ export const getChatAxios = (chat_id:string) => {
   //noStore()
   try {
     return new Promise<any>((resolve, reject) => {
-      const reqUrl = '/chat/' + chat_id;
+      const reqUrl = process.env.NEXT_PUBLIC_CHAT_SERVICE+'/chat/' + chat_id;
       const token = localStorage.getItem('accessToken')
       axios.get(reqUrl,  {
           headers: {
@@ -79,7 +79,7 @@ export const getChatAxios = (chat_id:string) => {
 export const getRandomChatIdAxios = () => {
   try {
     return new Promise<any>((resolve, reject) => {
-      const reqUrl = '/chat/random';
+      const reqUrl = process.env.NEXT_PUBLIC_CHAT_SERVICE+'/chat/random';
       const token = localStorage.getItem('accessToken')
       axios.get(reqUrl, {
         headers: {
@@ -103,7 +103,7 @@ export const getRandomChatIdAxios = () => {
 export const checkChatPasswordAxios = (chat_id:string, password:string) => {
   try {
     return new Promise<any>((resolve, reject) => {
-      const reqUrl = '/chat/check_password';
+      const reqUrl = process.env.NEXT_PUBLIC_CHAT_SERVICE+'/chat/check_password';
       const token = localStorage.getItem('accessToken')
       axios.post(reqUrl, {
         chat_id: chat_id,

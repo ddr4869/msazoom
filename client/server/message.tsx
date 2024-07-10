@@ -3,7 +3,7 @@ import axios from './axios'
 export const getFriendMessageAxios = async (friend_name: string) => {
     try {
         return new Promise<any>((resolve, reject) => {
-            const reqUrl = `/message?friend_name=` + friend_name;
+            const reqUrl = process.env.NEXT_PUBLIC_MESSAGE_SERVICE+`/message?friend_name=` + friend_name;
             const token = localStorage.getItem('accessToken') || '';
             axios.get(reqUrl, {
                 headers: {

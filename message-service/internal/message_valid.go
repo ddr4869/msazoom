@@ -3,7 +3,7 @@ package internal
 import (
 	"net/http"
 
-	"github.com/ddr4869/msazoom/internal/dto"
+	"github.com/ddr4869/msazoom/message-service/internal/dto"
 	"github.com/gin-gonic/gin"
 )
 

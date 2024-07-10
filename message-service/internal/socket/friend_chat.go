@@ -41,7 +41,6 @@ func (m *MessageMap) GetRoom(chat_key string) MessageChat {
 func (m *MessageMap) InsertIntoRoom(chat_key string, sender, receiver string, ws *websocket.Conn) {
 	m.Mutex.Lock()
 	defer m.Mutex.Unlock()
-
 	now := time.Now()
 
 	p := Participant{
@@ -115,14 +114,14 @@ func (m *MessageMap) Broadcast(c context.Context, r repository.Repository) {
 			// }
 
 			if client.Conn != socketData.Client {
-				AllChatRooms.Mutex.Lock()
+				AllMessageRooms.Mutex.Lock()
 				err := client.Conn.WriteJSON(socketData.Data)
 				if err != nil {
 					client.Conn.Close()
-					AllChatRooms.Mutex.Unlock()
+					AllMessageRooms.Mutex.Unlock()
 					return
 				}
-				AllChatRooms.Mutex.Unlock()
+				AllMessageRooms.Mutex.Unlock()
 			}
 		}
 	}

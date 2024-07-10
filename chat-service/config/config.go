@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/ddr4869/msazoom/chat-service/internal/socket"
 	"github.com/joho/godotenv"
 )
 
@@ -48,6 +49,8 @@ func Init() *Config {
 	}
 
 	JwtSecretPassword = os.Getenv("JWT_SECRET_PASSWORD")
+
+	socket.AllChatRooms.Init()
 
 	return &Config{
 		Gin: GinConfig,

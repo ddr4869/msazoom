@@ -3,7 +3,7 @@ export const LoginAxios = (username:string, password:string) => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
-        const reqUrl = '/user/login';
+        const reqUrl = process.env.NEXT_PUBLIC_USER_SERVICE+'/user/login';
         axios.post(reqUrl,  {
             username: username,
             password: password
@@ -31,7 +31,7 @@ export const SignupAxios = (username:string, password:string) => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
-        const reqUrl = '/user';
+        const reqUrl = process.env.NEXT_PUBLIC_USER_SERVICE+'/user';
         axios.post(reqUrl,  {
             username: username,
             password: password
@@ -54,7 +54,7 @@ export const CheckFriendAxios = (friend_name: string) => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
-        const reqUrl = '/user/friend/check?friend=' + friend_name;
+        const reqUrl = process.env.NEXT_PUBLIC_USER_SERVICE+'/user/friend/check?friend=' + friend_name;
         const token = localStorage.getItem('accessToken') || '';
         axios.get(reqUrl,  {
           headers: {
@@ -80,7 +80,7 @@ export const AddFriendAxios = (friend_name: string) => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
-        const reqUrl = '/user/friend';
+        const reqUrl = process.env.NEXT_PUBLIC_USER_SERVICE+'/user/friend';
         const token = localStorage.getItem('accessToken') || '';
         axios.post(reqUrl, {
           friend: friend_name
@@ -108,7 +108,7 @@ export const GetFriendsAxios = () => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
-        const reqUrl = '/user/friend';
+        const reqUrl = process.env.NEXT_PUBLIC_USER_SERVICE+'/user/friend';
         const token = localStorage.getItem('accessToken') || '';
         axios.get(reqUrl,  {
           headers: {
@@ -134,7 +134,7 @@ export const RemoveFriendAxios = (friend_id: string) => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
-        const reqUrl = '/user/friend?friend=' + friend_id;
+        const reqUrl = process.env.NEXT_PUBLIC_USER_SERVICE+'/user/friend?friend=' + friend_id;
         const token = localStorage.getItem('accessToken') || '';
         axios.delete(reqUrl,  {
           headers: {
@@ -160,7 +160,7 @@ export const GetFollowerAxios = () => {
     //noStore()
     try {
       return new Promise<any>((resolve, reject) => {
-        const reqUrl = '/user/friend/follower';
+        const reqUrl = process.env.NEXT_PUBLIC_USER_SERVICE+'/user/friend/follower';
         const token = localStorage.getItem('accessToken') || '';
         axios.get(reqUrl,  {
           headers: {
