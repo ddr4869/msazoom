@@ -23,6 +23,8 @@ type Message struct {
 	Receiver string `json:"receiver,omitempty"`
 	// Message holds the value of the "message" field.
 	Message string `json:"message,omitempty"`
+	// IsRead holds the value of the "isRead" field.
+	IsRead bool `json:"isRead,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// UpdatedAt holds the value of the "updatedAt" field.
@@ -35,6 +37,8 @@ func (*Message) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case message.FieldIsRead:
+			values[i] = new(sql.NullBool)
 		case message.FieldID:
 			values[i] = new(sql.NullInt64)
 		case message.FieldSender, message.FieldReceiver, message.FieldMessage:
@@ -79,6 +83,12 @@ func (m *Message) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field message", values[i])
 			} else if value.Valid {
 				m.Message = value.String
+			}
+		case message.FieldIsRead:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field isRead", values[i])
+			} else if value.Valid {
+				m.IsRead = value.Bool
 			}
 		case message.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -136,6 +146,9 @@ func (m *Message) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("message=")
 	builder.WriteString(m.Message)
+	builder.WriteString(", ")
+	builder.WriteString("isRead=")
+	builder.WriteString(fmt.Sprintf("%v", m.IsRead))
 	builder.WriteString(", ")
 	builder.WriteString("createdAt=")
 	builder.WriteString(m.CreatedAt.Format(time.ANSIC))

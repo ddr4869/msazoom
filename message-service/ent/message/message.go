@@ -19,6 +19,8 @@ const (
 	FieldReceiver = "receiver"
 	// FieldMessage holds the string denoting the message field in the database.
 	FieldMessage = "message"
+	// FieldIsRead holds the string denoting the isread field in the database.
+	FieldIsRead = "is_read"
 	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
@@ -33,6 +35,7 @@ var Columns = []string{
 	FieldSender,
 	FieldReceiver,
 	FieldMessage,
+	FieldIsRead,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -75,6 +78,11 @@ func ByReceiver(opts ...sql.OrderTermOption) OrderOption {
 // ByMessage orders the results by the message field.
 func ByMessage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMessage, opts...).ToFunc()
+}
+
+// ByIsRead orders the results by the isRead field.
+func ByIsRead(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsRead, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the createdAt field.

@@ -18,6 +18,7 @@ func (Message) Fields() []ent.Field {
 		field.String("sender"),
 		field.String("receiver"),
 		field.Text("message"),
+		field.Bool("isRead"),
 		field.Time("createdAt").
 			Default(time.Now),
 		field.Time("updatedAt").

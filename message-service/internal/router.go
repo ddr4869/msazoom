@@ -16,6 +16,7 @@ func SetUp(s *Server) {
 
 	//api.GET("/message/connect", s.ConnectMessageValid, s.ConnectMessage)
 	api.GET("/message", utils.ParseJWT(), s.GetFriendMessageValid, s.GetFriendMessage)
+	api.GET("/message/unread/count", utils.ParseJWT(), s.GetFriendMessageValid, s.GetNumberOfUnreadMessage)
 	api.GET("/message/connect", s.ConnectMessageValid, s.ConnectMessage)
 	api.GET("/message/condition", s.MessageConditionCheck)
 }

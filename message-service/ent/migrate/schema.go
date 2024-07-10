@@ -14,6 +14,7 @@ var (
 		{Name: "sender", Type: field.TypeString},
 		{Name: "receiver", Type: field.TypeString},
 		{Name: "message", Type: field.TypeString, Size: 2147483647},
+		{Name: "is_read", Type: field.TypeBool},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

@@ -36,6 +36,7 @@ type MessageMutation struct {
 	sender        *string
 	receiver      *string
 	message       *string
+	isRead        *bool
 	createdAt     *time.Time
 	updatedAt     *time.Time
 	clearedFields map[string]struct{}
@@ -250,6 +251,42 @@ func (m *MessageMutation) ResetMessage() {
 	m.message = nil
 }
 
+// SetIsRead sets the "isRead" field.
+func (m *MessageMutation) SetIsRead(b bool) {
+	m.isRead = &b
+}
+
+// IsRead returns the value of the "isRead" field in the mutation.
+func (m *MessageMutation) IsRead() (r bool, exists bool) {
+	v := m.isRead
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsRead returns the old "isRead" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldIsRead(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsRead is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsRead requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsRead: %w", err)
+	}
+	return oldValue.IsRead, nil
+}
+
+// ResetIsRead resets all changes to the "isRead" field.
+func (m *MessageMutation) ResetIsRead() {
+	m.isRead = nil
+}
+
 // SetCreatedAt sets the "createdAt" field.
 func (m *MessageMutation) SetCreatedAt(t time.Time) {
 	m.createdAt = &t
@@ -356,7 +393,7 @@ func (m *MessageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MessageMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.sender != nil {
 		fields = append(fields, message.FieldSender)
 	}
@@ -365,6 +402,9 @@ func (m *MessageMutation) Fields() []string {
 	}
 	if m.message != nil {
 		fields = append(fields, message.FieldMessage)
+	}
+	if m.isRead != nil {
+		fields = append(fields, message.FieldIsRead)
 	}
 	if m.createdAt != nil {
 		fields = append(fields, message.FieldCreatedAt)
@@ -386,6 +426,8 @@ func (m *MessageMutation) Field(name string) (ent.Value, bool) {
 		return m.Receiver()
 	case message.FieldMessage:
 		return m.Message()
+	case message.FieldIsRead:
+		return m.IsRead()
 	case message.FieldCreatedAt:
 		return m.CreatedAt()
 	case message.FieldUpdatedAt:
@@ -405,6 +447,8 @@ func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldReceiver(ctx)
 	case message.FieldMessage:
 		return m.OldMessage(ctx)
+	case message.FieldIsRead:
+		return m.OldIsRead(ctx)
 	case message.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case message.FieldUpdatedAt:
@@ -438,6 +482,13 @@ func (m *MessageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMessage(v)
+		return nil
+	case message.FieldIsRead:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsRead(v)
 		return nil
 	case message.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -510,6 +561,9 @@ func (m *MessageMutation) ResetField(name string) error {
 		return nil
 	case message.FieldMessage:
 		m.ResetMessage()
+		return nil
+	case message.FieldIsRead:
+		m.ResetIsRead()
 		return nil
 	case message.FieldCreatedAt:
 		m.ResetCreatedAt()

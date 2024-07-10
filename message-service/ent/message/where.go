@@ -69,6 +69,11 @@ func Message(v string) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldMessage, v))
 }
 
+// IsRead applies equality check predicate on the "isRead" field. It's identical to IsReadEQ.
+func IsRead(v bool) predicate.Message {
+	return predicate.Message(sql.FieldEQ(FieldIsRead, v))
+}
+
 // CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Message {
 	return predicate.Message(sql.FieldEQ(FieldCreatedAt, v))
@@ -272,6 +277,16 @@ func MessageEqualFold(v string) predicate.Message {
 // MessageContainsFold applies the ContainsFold predicate on the "message" field.
 func MessageContainsFold(v string) predicate.Message {
 	return predicate.Message(sql.FieldContainsFold(FieldMessage, v))
+}
+
+// IsReadEQ applies the EQ predicate on the "isRead" field.
+func IsReadEQ(v bool) predicate.Message {
+	return predicate.Message(sql.FieldEQ(FieldIsRead, v))
+}
+
+// IsReadNEQ applies the NEQ predicate on the "isRead" field.
+func IsReadNEQ(v bool) predicate.Message {
+	return predicate.Message(sql.FieldNEQ(FieldIsRead, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "createdAt" field.

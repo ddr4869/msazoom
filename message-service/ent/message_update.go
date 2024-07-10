@@ -70,6 +70,20 @@ func (mu *MessageUpdate) SetNillableMessage(s *string) *MessageUpdate {
 	return mu
 }
 
+// SetIsRead sets the "isRead" field.
+func (mu *MessageUpdate) SetIsRead(b bool) *MessageUpdate {
+	mu.mutation.SetIsRead(b)
+	return mu
+}
+
+// SetNillableIsRead sets the "isRead" field if the given value is not nil.
+func (mu *MessageUpdate) SetNillableIsRead(b *bool) *MessageUpdate {
+	if b != nil {
+		mu.SetIsRead(*b)
+	}
+	return mu
+}
+
 // SetCreatedAt sets the "createdAt" field.
 func (mu *MessageUpdate) SetCreatedAt(t time.Time) *MessageUpdate {
 	mu.mutation.SetCreatedAt(t)
@@ -148,6 +162,9 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)
 	}
+	if value, ok := mu.mutation.IsRead(); ok {
+		_spec.SetField(message.FieldIsRead, field.TypeBool, value)
+	}
 	if value, ok := mu.mutation.CreatedAt(); ok {
 		_spec.SetField(message.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -212,6 +229,20 @@ func (muo *MessageUpdateOne) SetMessage(s string) *MessageUpdateOne {
 func (muo *MessageUpdateOne) SetNillableMessage(s *string) *MessageUpdateOne {
 	if s != nil {
 		muo.SetMessage(*s)
+	}
+	return muo
+}
+
+// SetIsRead sets the "isRead" field.
+func (muo *MessageUpdateOne) SetIsRead(b bool) *MessageUpdateOne {
+	muo.mutation.SetIsRead(b)
+	return muo
+}
+
+// SetNillableIsRead sets the "isRead" field if the given value is not nil.
+func (muo *MessageUpdateOne) SetNillableIsRead(b *bool) *MessageUpdateOne {
+	if b != nil {
+		muo.SetIsRead(*b)
 	}
 	return muo
 }
@@ -323,6 +354,9 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 	}
 	if value, ok := muo.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)
+	}
+	if value, ok := muo.mutation.IsRead(); ok {
+		_spec.SetField(message.FieldIsRead, field.TypeBool, value)
 	}
 	if value, ok := muo.mutation.CreatedAt(); ok {
 		_spec.SetField(message.FieldCreatedAt, field.TypeTime, value)

@@ -38,6 +38,12 @@ func (mc *MessageCreate) SetMessage(s string) *MessageCreate {
 	return mc
 }
 
+// SetIsRead sets the "isRead" field.
+func (mc *MessageCreate) SetIsRead(b bool) *MessageCreate {
+	mc.mutation.SetIsRead(b)
+	return mc
+}
+
 // SetCreatedAt sets the "createdAt" field.
 func (mc *MessageCreate) SetCreatedAt(t time.Time) *MessageCreate {
 	mc.mutation.SetCreatedAt(t)
@@ -122,6 +128,9 @@ func (mc *MessageCreate) check() error {
 	if _, ok := mc.mutation.Message(); !ok {
 		return &ValidationError{Name: "message", err: errors.New(`ent: missing required field "Message.message"`)}
 	}
+	if _, ok := mc.mutation.IsRead(); !ok {
+		return &ValidationError{Name: "isRead", err: errors.New(`ent: missing required field "Message.isRead"`)}
+	}
 	if _, ok := mc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Message.createdAt"`)}
 	}
@@ -165,6 +174,10 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.Message(); ok {
 		_spec.SetField(message.FieldMessage, field.TypeString, value)
 		_node.Message = value
+	}
+	if value, ok := mc.mutation.IsRead(); ok {
+		_spec.SetField(message.FieldIsRead, field.TypeBool, value)
+		_node.IsRead = value
 	}
 	if value, ok := mc.mutation.CreatedAt(); ok {
 		_spec.SetField(message.FieldCreatedAt, field.TypeTime, value)

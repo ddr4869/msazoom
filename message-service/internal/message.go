@@ -32,6 +32,18 @@ func (s *Server) GetFriendMessage(c *gin.Context) {
 	dto.NewSuccessResponse(c, messageResponse)
 }
 
+func (s *Server) GetNumberOfUnreadMessage(c *gin.Context) {
+	req := c.MustGet("req").(dto.GetFriendMessageRequest)
+	claims := c.MustGet("claims").(*utils.UserClaims)
+
+	count, err := s.repository.GetNumberOfUnreadMessage(c, req.FriendName, claims.Name)
+	if err != nil {
+		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to get number of unread message")
+		return
+	}
+	dto.NewSuccessResponse(c, count)
+}
+
 func (s *Server) ConnectMessage(c *gin.Context) {
 	req := c.MustGet("req").(dto.ConnectMessageRequest)
 	ws, err := socket.Upgrader.Upgrade(c.Writer, c.Request, nil)
