@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/ddr4869/msazoom/internal/socket"
 	"github.com/joho/godotenv"
 )
 
@@ -47,14 +46,6 @@ func Init() *Config {
 		Name:     os.Getenv("DB_NAME"),
 		Password: os.Getenv("DB_PASSWORD"),
 	}
-
-	// Initialize RoomMap
-	socket.AllChatRooms.Init()
-	socket.AllMessageRooms.Init()
-
-	// Initialize Kafka
-	//socket.InitKafkaProducer()
-	//go socket.InitKafkaConsumer()
 
 	JwtSecretPassword = os.Getenv("JWT_SECRET_PASSWORD")
 

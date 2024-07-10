@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ddr4869/msazoom/ent"
-	"github.com/ddr4869/msazoom/ent/user"
+	"github.com/ddr4869/msazoom/user-service/ent"
+	"github.com/ddr4869/msazoom/user-service/ent/user"
 )
 
 func (r Repository) CreateUser(ctx context.Context, user_name, password_hash, email string) (*ent.User, error) {
@@ -16,7 +16,7 @@ func (r Repository) CreateUser(ctx context.Context, user_name, password_hash, em
 		SetEmail(email).
 		Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("User already exists: %w", err)
+		return nil, fmt.Errorf("User Create Error: %w", err)
 	}
 	return user, nil
 }

@@ -1,0 +1,51 @@
+# defaultEntryPoints = ["http", "https"]
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":7777"
+
+[api]
+  dashboard = true
+  insecure = true
+
+[providers]
+  [providers.file]
+    filename = "traefik.toml"
+    watch = true
+
+[http]
+  [http.routers]
+    [http.routers.userservice]
+      entryPoints = ["http"]
+      rule = "PathPrefix(`/msazoom.userservice`)"
+      service = "userservice"
+      
+    [http.routers.messageservice]
+      entryPoints = ["http"]
+      rule = "PathPrefix(`/msazoom.messageservice`)"
+      service = "messageservice"
+
+    [http.routers.chatservice]
+      entryPoints = ["http"]
+      rule = "PathPrefix(`/msazoom.chatservice`)"
+      service = "chatservice"
+
+
+    # Adding a router for the Traefik dashboard
+    [http.routers.api]
+      rule = "PathPrefix(`/dashboard`)"
+      service = "api@internal"
+      entryPoints = ["http"]
+
+  [http.services]
+    [http.services.userservice.loadBalancer]
+      [[http.services.userservice.loadBalancer.servers]]
+        url = "http://127.0.0.1:8083"
+
+    [http.services.messageservice.loadBalancer]
+      [[http.services.messageservice.loadBalancer.servers]]
+        url = "http://127.0.0.1:8081"
+
+    [http.services.chatservice.loadBalancer]
+      [[http.services.chatservice.loadBalancer.servers]]
+        url = "http://127.0.0.1:8082"

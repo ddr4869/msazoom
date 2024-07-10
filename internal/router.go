@@ -24,7 +24,6 @@ func SetUp(s *Server) {
 
 	api.GET("/board", s.GetBoardList)
 	api.GET("/board/:board_id", s.GetBoardWithIDValid, s.GetBoardWithID)
-
 	api.POST("/board", utils.ParseJWT(), s.CreateBoardValid, s.CreateBoard)
 	api.POST("/board/recommend", s.RecommendBoardValid, s.RecommendBoard)
 	api.POST("/board/remove", utils.ParseJWT(), s.DeleteBoardValid, s.DeleteBoard)
