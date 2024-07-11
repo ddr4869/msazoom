@@ -6,6 +6,7 @@ interface FriendListProps {
   removeFriend: (name: string) => void;
 }
 const FriendsList = ({friends, navigateToFriendChat, removeFriend}:FriendListProps) => (
+
     <div className={boardStyles.friendList}>
     {friends.length === 0 && 
       <h2> 친구가 없어요 ㅠ.</h2>
