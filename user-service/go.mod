@@ -4,7 +4,6 @@ go 1.22.2
 
 require (
 	entgo.io/ent v0.13.1
-	github.com/ddr4869/msazoom/proto v0.0.0-00010101000000-000000000000
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
@@ -13,6 +12,7 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.25.0
 	google.golang.org/grpc v1.65.0
+	google.golang.org/protobuf v1.34.2
 )
 
 require (
@@ -51,7 +51,6 @@ require (
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

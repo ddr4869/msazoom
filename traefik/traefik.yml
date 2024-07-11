@@ -1,0 +1,45 @@
+entryPoints:
+  http:
+    address: :7777
+api:
+  dashboard: true
+  insecure: true
+providers:
+  file:
+    filename: traefik.toml
+    watch: true
+http:
+  routers:
+    userservice:
+      entryPoints:
+        - http
+      rule: PathPrefix(`/msazoom.userservice`)
+      service: userservice
+    messageservice:
+      entryPoints:
+        - http
+      rule: PathPrefix(`/msazoom.messageservice`)
+      service: messageservice
+    chatservice:
+      entryPoints:
+        - http
+      rule: PathPrefix(`/msazoom.chatservice`)
+      service: chatservice
+    api:
+      rule: PathPrefix(`/dashboard`)
+      service: api@internal
+      entryPoints:
+        - http
+  services:
+    userservice:
+      loadBalancer:
+        servers:
+          - url: http://127.0.0.1:8083
+    messageservice:
+      loadBalancer:
+        servers:
+          - url: http://127.0.0.1:8081
+    chatservice:
+      loadBalancer:
+        servers:
+          - url: http://127.0.0.1:8082

@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/ddr4869/msazoom/message-service/config"
+	pb_msg "github.com/ddr4869/msazoom/message-service/grpc/proto/message"
 	"github.com/ddr4869/msazoom/message-service/internal/repository"
-	pb_msg "github.com/ddr4869/msazoom/proto/message"
 	"google.golang.org/grpc"
 )
 

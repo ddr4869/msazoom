@@ -1,32 +1,112 @@
 version: '3.8'
+
 services:
-  db:
+  # PostgreSQL for chat-service
+  chat-db:
     image: postgres:13
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1821
-      POSTGRES_DB: postgres
+      POSTGRES_DB: chat_postgres
     ports:
-      - "5432:5432"
-
-  backend:
-    build: .
+      - "5434:5432"
+  
+  # chat-service backend
+  chat-backend:
+    build: ./chat-service
     ports:
-      - "8080:8080"
+      - "8082:8082"
     depends_on:
-      - db
+      - chat-db
     environment:
-      DB_HOST: db
+      DB_HOST: chat-db
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: 1821
-      DB_NAME: postgres
+      DB_NAME: chat_postgres
+    labels:
+      - "traefik.http.routers.chatservice.rule=PathPrefix(`/msazoom.chatservice`)"
+      - "traefik.http.services.chatservice.loadbalancer.server.port=8082"
+
+  # PostgreSQL for message-service
+  message-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1821
+      POSTGRES_DB: message_postgres
+    ports:
+      - "5433:5432"
+  
+  # message-service backend
+  message-backend:
+    build: ./message-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - message-db
+    environment:
+      DB_HOST: message-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: 1821
+      DB_NAME: message_postgres
+    labels:
+      - "traefik.http.routers.messageservice.rule=PathPrefix(`/msazoom.messageservice`)"
+      - "traefik.http.services.messageservice.loadbalancer.server.port=8081"
+
+  # PostgreSQL for user-service
+  user-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1821
+      POSTGRES_DB: user_postgres
+    ports:
+      - "5432:5432"
+  
+  # user-service backend
+  user-backend:
+    build: ./user-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - user-db
+    environment:
+      DB_HOST: user-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: 1821
+      DB_NAME: user_postgres
+    labels:
+      - "traefik.http.routers.userservice.rule=PathPrefix(`/msazoom.userservice`)"
+      - "traefik.http.services.userservice.loadbalancer.server.port=8080"
+
+  # Traefik service
+  # traefik:
+  #   image: traefik:v2.5
+  #   command:
+  #     - "--api.insecure=true"
+  #     - "--providers.file=true"
+  #     - "--providers.file.filename=/etc/traefik/traefik.toml"
+  #   ports:
+  #     - "7777:7777"
+  #     - "8080:8080"  # Traefik dashboard
+  #   volumes:
+  #     - ./traefik/traefik.toml:/etc/traefik/traefik.toml
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.api.rule=PathPrefix(`/dashboard`)"
+  #     - "traefik.http.routers.api.service=api@internal"
 
   frontend:
       build: ./client
       ports:
         - "3000:3000"
       depends_on:
-        - backend
+        - user-backend
+        - message-backend
+        - chat-backend
       env_file:
         - ./client/.env.local

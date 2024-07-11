@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	pb_msg "github.com/ddr4869/msazoom/proto/message"
+	pb_msg "github.com/ddr4869/msazoom/user-service/grpc/proto/message"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

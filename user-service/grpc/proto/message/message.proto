@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package message;
+
+option go_package = "/Users/ieungyu/go/src/github.com/ddr4869/msazoom/user-service/grpc/proto/message";
+
+service MessageService {
+    rpc GetUnreadMessagesCount (UnreadMessagesRequest) returns (UnreadMessagesResponse) {}
+}
+
+message UnreadMessagesRequest {
+    string user_id = 1;
+    string friend_id = 2;
+}
+
+message UnreadMessagesResponse {
+    int32 unread_count = 1;
+}

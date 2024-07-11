@@ -1,16 +1,19 @@
 version: '3'
 
 services:
-  reverse-proxy:
-    # The official v3 Traefik docker image
-    image: traefik:v3.0
-    # Enables the web UI and tells Traefik to listen to docker
-    command: --api.insecure=true --providers.docker
+  traefik:
+    image: traefik:v2.5
+    command:
+      - "--api.insecure=true"
+      - "--providers.file=true"
+      - "--providers.file.directory=/etc/traefik"
     ports:
-      # The HTTP port
-      - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
+      - "7777:7777"
+      - "8080:8080"  # Traefik dashboard
     volumes:
-      # So that Traefik can listen to the Docker events
+      - ./:/etc/traefik
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=PathPrefix(`/dashboard`)"
+      - "traefik.http.routers.api.service=api@internal"
