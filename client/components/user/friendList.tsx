@@ -1,7 +1,7 @@
 import boardStyles from '@/styles/board-styles.module.css';
 import FriendCard from './friendCard';
 interface FriendListProps {
-  friends: { id: number; username: string }[];
+  friends: { id: number; username: string, Message: { unread_message_count: number } }[];
   navigateToFriendChat: (name: string) => void;
   removeFriend: (name: string) => void;
 }
