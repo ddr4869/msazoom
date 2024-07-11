@@ -1,9 +1,11 @@
 package internal
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/ddr4869/msazoom/user-service/grpc"
 	"github.com/ddr4869/msazoom/user-service/internal/dto"
 	"github.com/ddr4869/msazoom/user-service/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -62,9 +64,15 @@ func (s *Server) GetFriendList(c *gin.Context) {
 		dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get friend list")
 		return
 	}
-	resp := make([]dto.UserNormalResponse, 0)
+	log.Print(grpc.RpcClientInstance)
+	resp := make([]dto.UserWithMessageResponse, 0)
 	for _, friend := range friends {
-		resp = append(resp, dto.UserEntToResponse(friend))
+		unreadCount, err := grpc.RpcClientInstance.GetUnreadMessagesCount(friend.Username, claims.Name)
+		if err != nil {
+			dto.NewErrorResponse(c, http.StatusBadRequest, err, "failed to get unread message count")
+			return
+		}
+		resp = append(resp, dto.UserEntToResponseWithMessage(friend, dto.UnreadMessage{UnreadMessageCount: unreadCount}))
 	}
 	dto.NewSuccessResponse(c, resp)
 }

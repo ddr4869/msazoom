@@ -28,6 +28,7 @@ func NewRestController(cfg *config.Config) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	server := &Server{router, cfg, repo}
 	SetUp(server)
 	return server, nil
