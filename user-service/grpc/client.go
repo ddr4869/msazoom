@@ -17,7 +17,7 @@ type RpcClient struct {
 var RpcClientInstance RpcClient
 
 func NewMessageClient() *grpc.ClientConn {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("msazoom-message-backend-1:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("could not connect to message-service: %v", err)
 	}
