@@ -127,7 +127,7 @@ protoc --go_out=. --go_opt=paths=source_relative \
 ```
 
 ## Docker
-<img src="./docs/picture/docker_container.png" width="800" height="500"/>
+<img src="./docs/picture/docker_container.png" width="600" height="500"/>
 
 - 총 7개의 컨테이너
     - 3개의 Backend 서비스, 서비스 당 Postgres DB Container
@@ -145,13 +145,13 @@ protoc --go_out=. --go_opt=paths=source_relative \
 
 ## Pictures
 > ### 대시 보드
-> <img src="./docs/picture/dashboard.png" width="800" height="500"/>
+> <img src="./docs/picture/dashboard.png" width="600" height="500"/>
 
 > ### 화상 채팅
-> <img src="./docs/picture/chat.png" width="800" height="500"/>
+> <img src="./docs/picture/chat.png" width="600" height="500"/>
 
 > ### 친구 채팅
-> <img src="./docs/picture/message.png" width="800" height="500"/>
+> <img src="./docs/picture/message.png" width="600" height="500"/>
 
 
 ### TODO
