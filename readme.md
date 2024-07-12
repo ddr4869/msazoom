@@ -27,26 +27,26 @@ MSAZOOM
 - **Traefik**: Request의 서비스 간 분기를 위해 사용(API Gateway)
 
 ## 주요 기능 
-> **User Service(msazoom.userservice)**
-    > - 회원가입 기능
-    > - 로그인 및 로그아웃 기능.
-    > - 친구 추가 및 관리 기능.
-    > - 1:1 채팅
-    > - 친구 삭제
-    > - 팔로우 요청 보내기 및 수락하기 기능
+**User Service(msazoom.userservice)**
+  - 회원가입 기능
+  - 로그인 및 로그아웃 기능.
+  - 친구 추가 및 관리 기능.
+  - 1:1 채팅
+  - 친구 삭제
+  - 팔로우 요청 보내기 및 수락하기 기능
 
-> **Chat Service(chat.userservice)** 
-    > - WebRTC를 이용한 실시간 화상 통신.
-    > - 공개/비공개 방 구분
-    > - 공개방 랜덤 채팅 기능
-    > - 채팅 참여자 친구 추가 기능
-    > - 단체 화상 채팅 기능 (TODO)
-    > - 음소거/캠 off/Mute 기능 적용 (TODO)
+**Chat Service(chat.userservice)** 
+  - WebRTC를 이용한 실시간 화상 통신.
+  - 공개/비공개 방 구분
+  - 공개방 랜덤 채팅 기능
+  - 채팅 참여자 친구 추가 기능
+  - 단체 화상 채팅 기능 (TODO)
+  - 음소거/캠 off/Mute 기능 적용 (TODO)
 
-> **Message Service(message.userservice)**
-    > - 채팅방 생성 및 참여 기능.
-    > - File/VOD 등 전송 기능 (TODO)
-    > - 안 읽은 메세지가 몇개 왔는지 확인
+**Message Service(message.userservice)**
+  - 채팅방 생성 및 참여 기능.
+  - File/VOD 등 전송 기능 (TODO)
+  - 안 읽은 메세지가 몇개 왔는지 확인
 
 
 ## Traefik
