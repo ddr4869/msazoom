@@ -14,6 +14,7 @@ const Home = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
   const [chats, setChats] = useState([]);
   const [friends, setFriends] = useState<any>([]);
   const [followers, setFollowers] = useState([]);
@@ -27,16 +28,30 @@ const Home = () => {
 
   const handleSubmitChatForm = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
+    // 먼저 username이 있는지 확인
+    if (!username) {
+      const storedUsername = localStorage.getItem('username');
+      if (storedUsername) {
+        setUsername(storedUsername);
+      } else {
+        console.error('No username found');
+        return;
+      }
+    }
+  
     try {
       const formData = new FormData(event.currentTarget);
       const chat_title = formData.get('title') as string;
-      const password = formData.get('password') ? formData.get('password') as string : '';
-      const response = await createChatAxios(username, chat_title, password);
+      const password = formData.get('password') ? (formData.get('password') as string) : '';
+      
+      const response = await createChatAxios(username || localStorage.getItem('username') || '', chat_title, password);
+      
       setShowCreateChatForm(false);
       setChatReload(true);
       router.push({
         pathname: `/chat/${response.id}`,
-        query: { password: password } 
+        query: { password: password },
       });
     } catch (error) {
       console.error('Error creating chat:', error);
@@ -47,7 +62,8 @@ const Home = () => {
     try {
       const response = await GuestLoginAxios();
       setIsLoggedIn(true);
-      setUsername(response.id);  
+      setUsername(response.id); 
+      setIsGuest(true); 
       setAccessToken(response.access_token);
     } catch (error) {
       console.error('Error during guest login:', error);
@@ -227,7 +243,7 @@ const Home = () => {
           <hr></hr>
           </div>
         }
-        {isLoggedIn && <h1>Friends List</h1>}
+        {isLoggedIn && !isGuest && <h1>Friends List</h1>}
         {isLoggedIn && (          
             <FriendsList 
               key={friends.id}
@@ -237,7 +253,7 @@ const Home = () => {
             />
           )
         }
-        {isLoggedIn &&
+        {isLoggedIn && !isGuest &&
           <div>
           <br></br><br></br>
           <hr></hr>
