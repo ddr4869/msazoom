@@ -53,6 +53,7 @@ MSAZOOM
 ### Request
 - Port -> :7777
 - **traefik/traefik.toml** 설정값 적용
+- ./traefik --configFile=traefik.toml
 ```
 # defaultEntryPoints = ["http", "https"]
 
