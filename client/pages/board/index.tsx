@@ -2,8 +2,8 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from "next/router";
 import { createBoardAxios, getBoardsAxios, recommendBoardAxios, deleteBoardAxios } from '@/server/board';
 import BoardList from '@/components/board/boardList';
-import CreateBoardForm from '@/ui/board/createBoardForm';
-import LoginForm from '@/components/user/loginForm';
+import CreateBoardForm from '@/ui/board/CreateBoardForm';
+import LoginForm from '@/components/user/LoginForm';
 import { handleLogin } from '@/utils/auth';
 
 const Home = () => {

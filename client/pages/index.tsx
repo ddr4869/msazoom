@@ -1,10 +1,10 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from "next/router";
 import { createChatAxios, getChatsAxios, getRandomChatIdAxios, getChatAxios, checkChatPasswordAxios } from '@/server/chat';
-import CreateChatForm from '@/ui/chat/createChatForm';
+import CreateChatForm from '@/ui/chat/CreateChatForm';
 import { handleLogin, handleLogout } from '@/utils/auth';
 import ChatList from '@/components/chat/chatList';
-import LoginComponent from '@/components/user/loginComponent';
+import LoginComponent from '@/components/user/LoginComponent';
 import SignUpComponent from '@/components/user/singupComponent';
 import { AddFriendAxios, GetFollowerAxios, GetFriendsAxios, RemoveFriendAxios } from '@/server/user';
 import FriendsList from '@/components/user/friendList';
