@@ -34,9 +34,9 @@ export const GuestLoginAxios = () => {
         .then(res => {
           resolve(res.data.data);
           const { data } = res.data;
-          const { id, access_token } = data;
+          const { username, access_token } = data;
           localStorage.setItem('accessToken', access_token);
-          localStorage.setItem('username', id);  // 비회원 로그인 시 생성된 ID
+          localStorage.setItem('username', username);  // 비회원 로그인 시 생성된 ID
         })
         .catch(err => {
           console.log(err);
