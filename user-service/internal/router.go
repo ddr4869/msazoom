@@ -16,6 +16,7 @@ func SetUp(s *Server) {
 
 	api.POST("/user", s.UserCreateValid, s.UserCreate)
 	api.POST("/user/login", s.UserLoginValid, s.UserLogin)
+	api.POST("/user/login/non-member", s.UserNonMemberLogin)
 	api.POST("/user/friend", utils.ParseJWT(), s.AddFriendValid, s.AddFriend)
 	api.GET("/user/friend", utils.ParseJWT(), s.GetFriendList)
 	api.GET("/user/friend/follower", utils.ParseJWT(), s.GetFriendRequestList)

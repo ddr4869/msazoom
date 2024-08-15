@@ -9,6 +9,7 @@ import (
 	"github.com/ddr4869/msazoom/user-service/internal/dto"
 	"github.com/ddr4869/msazoom/user-service/internal/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func (s *Server) UserLogin(c *gin.Context) {
@@ -31,6 +32,21 @@ func (s *Server) UserLogin(c *gin.Context) {
 	resp := dto.UserLoginResponse{
 		Username:    user.Username,
 		Role:        user.Role,
+		AccessToken: token,
+	}
+	dto.NewSuccessResponse(c, resp)
+}
+
+func (s *Server) UserNonMemberLogin(c *gin.Context) {
+	id := "User-" + uuid.New().String()[:8]
+	token, err := utils.GenerateJWT(id, "-1")
+	if err != nil {
+		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "failed to generate token")
+		return
+	}
+	resp := dto.UserLoginResponse{
+		Username:    id,
+		Role:        -1,
 		AccessToken: token,
 	}
 	dto.NewSuccessResponse(c, resp)

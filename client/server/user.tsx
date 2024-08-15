@@ -29,7 +29,7 @@ export const LoginAxios = (username:string, password:string) => {
 export const GuestLoginAxios = () => {
   try {
     return new Promise<any>((resolve, reject) => {
-      const reqUrl =  process.env.NEXT_PUBLIC_USER_SERVICE+'/user/non-member';
+      const reqUrl = process.env.NEXT_PUBLIC_USER_SERVICE+'/user/login/non-member';
       axios.post(reqUrl)
         .then(res => {
           resolve(res.data.data);
