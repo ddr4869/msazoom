@@ -183,7 +183,7 @@ const Home = () => {
       <main>
         <br></br>
  
-          {isLoggedIn ? <h1>Chat List</h1> : <h2>Sign up for an account if you don't have one.</h2> } 
+          {isLoggedIn ? <h1>Chat List</h1> : <h2>Sign up</h2> } 
           {!isLoggedIn && (
           <>
             <SignUpComponent />
