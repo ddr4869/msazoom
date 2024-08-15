@@ -13,7 +13,7 @@ type initializeChatWebSocketProps = {
 
 export const initializeMessageWebSocket = (  {username ,  friendname,  handleWebSocketMessage} : initializeMessageWebSocketProps) => {
 
-  const webSocket = new WebSocket(`ws://`+process.env.NEXT_PUBLIC_HOST+process.env.NEXT_PUBLIC_MESSAGE_SERVICE+`/message/connect?user_name=${username}&friend_name=${friendname}`);
+  const webSocket = new WebSocket(`wss://`+process.env.NEXT_PUBLIC_HOST+'/'+process.env.NEXT_PUBLIC_MESSAGE_SERVICE+`/message/connect?user_name=${username}&friend_name=${friendname}`);
   
     webSocket.addEventListener('open', () => {
       console.log('WebSocket connection opened');
@@ -26,7 +26,7 @@ export const initializeMessageWebSocket = (  {username ,  friendname,  handleWeb
 
 export const initializeChatWebSocket = ( {chatId, userId, password, handleWebSocketMessage}: initializeChatWebSocketProps) => {
   // fix!  
-  const webSocket = new WebSocket(`ws://`+process.env.NEXT_PUBLIC_HOST+process.env.NEXT_PUBLIC_CHAT_SERVICE+`/chat/join?chat_id=${chatId}&username=${userId}&password=${password}`);
+  const webSocket = new WebSocket(`wss://`+process.env.NEXT_PUBLIC_HOST+'/'+process.env.NEXT_PUBLIC_CHAT_SERVICE+`/chat/join?chat_id=${chatId}&username=${userId}&password=${password}`);
   webSocket.addEventListener('open', () => {
     console.log('WebSocket connection opened');
     webSocket.send(JSON.stringify({ join: true, partnerUsername:userId }));
