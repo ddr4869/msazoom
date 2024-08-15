@@ -6,7 +6,7 @@ import { handleLogin, handleLogout } from '@/utils/auth';
 import ChatList from '@/components/chat/chatList';
 import LoginComponent from '@/components/user/LoginComponent';
 import SignUpComponent from '@/components/user/singupComponent';
-import { AddFriendAxios, GetFollowerAxios, GetFriendsAxios, RemoveFriendAxios } from '@/server/user';
+import { AddFriendAxios, GetFollowerAxios, GetFriendsAxios, RemoveFriendAxios, GuestLoginAxios } from '@/server/user';
 import FriendsList from '@/components/user/friendList';
 import FollowerList from '@/components/user/followerList';
 
@@ -43,6 +43,16 @@ const Home = () => {
     }
   };
 
+  const handleGuestLogin = async () => {
+    try {
+      const response = await GuestLoginAxios();
+      setIsLoggedIn(true);
+      setUsername(response.id);  
+      setAccessToken(response.access_token);
+    } catch (error) {
+      console.error('Error during guest login:', error);
+    }
+  };
 
   const navigateToChat = (chatId: any) => {
     getChatAxios(chatId).then((response) => {
@@ -174,9 +184,17 @@ const Home = () => {
         <br></br>
  
           {isLoggedIn ? <h1>Chat List</h1> : <h2>Sign up for an account if you don't have one.</h2> } 
-        
-        {/* <br></br><br></br> */}
-        {!isLoggedIn && ( <SignUpComponent/> )}
+          {!isLoggedIn && (
+          <>
+            <SignUpComponent />
+            <br></br>
+            <hr></hr>
+            <br></br>
+            <h2>Guest Login</h2>
+            <button onClick={handleGuestLogin}>Guest Login</button>
+          </>
+        )}
+
         { isLoggedIn && (
           <div>
             <button onClick={() => setChatReload(true) }>Reload Chat List</button> {  }
