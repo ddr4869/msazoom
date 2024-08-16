@@ -151,6 +151,7 @@ const Home = () => {
 
     const fetchFriends = async () => {
       try {
+        if (isGuest) return;
         const response = await GetFriendsAxios();
         if (response !== null) {
           setFriends(response);
@@ -162,6 +163,7 @@ const Home = () => {
 
     const fetchFollower = async () => {
       try {
+        if (isGuest) return;
         const response = await GetFollowerAxios();
         if (response !== null) {
           setFollowers(response);
@@ -244,7 +246,7 @@ const Home = () => {
           </div>
         }
         {isLoggedIn && !isGuest && <h1>Friends List</h1>}
-        {isLoggedIn && (          
+        {isLoggedIn && !isGuest && (          
             <FriendsList 
               key={friends.id}
               friends={friends} 
@@ -259,8 +261,8 @@ const Home = () => {
           <hr></hr>
           </div>
         }
-        {isLoggedIn && <h1>Following Request</h1>}
-        {isLoggedIn && (          
+        {isLoggedIn && !isGuest && <h1>Following Request</h1>}
+        {isLoggedIn && !isGuest && (          
             <FollowerList 
               followers={followers} 
               addFriend={addFriend} 

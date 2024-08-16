@@ -62,10 +62,10 @@ const ChatFriendComponent = ({ username, friendname }: { username: string, frien
             disconnect();
         };
         window.addEventListener('popstate', handleDisconnectState);
-        window.addEventListener('beforeunload', handleDisconnectState);
+        //window.addEventListener('beforeunload', handleDisconnectState);
         return () => {
             window.removeEventListener('popstate', handleDisconnectState);
-            window.removeEventListener('beforeunload', handleDisconnectState);
+            //window.removeEventListener('beforeunload', handleDisconnectState);
         };
     }, []);
 

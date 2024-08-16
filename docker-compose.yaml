@@ -13,7 +13,7 @@ services:
   
   # chat-service backend
   chat-backend:
-    build: ./chat-service
+    image: spspid/msazoom-chat-backend:latest
     ports:
       - "8082:8082"
     depends_on:
@@ -40,7 +40,7 @@ services:
   
   # message-service backend
   message-backend:
-    build: ./message-service
+    image: spspid/msazoom-message-backend:latest
     ports:
       - "8081:8081"
     depends_on:
@@ -67,7 +67,7 @@ services:
   
   # user-service backend
   user-backend:
-    build: ./user-service
+    image: spspid/msazoom-user-backend:latest
     ports:
       - "8083:8083"
     depends_on:
